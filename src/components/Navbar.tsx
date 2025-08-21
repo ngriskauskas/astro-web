@@ -1,14 +1,22 @@
 import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-white shadow">
-      {/* Logo */}
       <div className="text-xl font-bold text-gray-800">
         <a href="/">Astro</a>
       </div>
-      {/* Links (hidden on mobile) */}
       <div className="hidden md:flex space-x-6">
         <a href="/" className="text-gray-700 hover:text-gray-900">
           Home
@@ -16,11 +24,13 @@ export const Navbar = () => {
         <a href="/about" className="text-gray-700 hover:text-gray-900">
           About
         </a>
-        <a href="/contact" className="text-gray-700 hover:text-gray-900">
-          Contact
-        </a>
+        <button
+          className="text-gray-700 hover:text-gray-900 cursor-pointer"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
       </div>
-      {/* Mobile menu button (hamburger) */}
       <button
         className="md:hidden p-2 rounded hover:bg-gray-100"
         onClick={() => setIsOpen(!isOpen)}
@@ -40,21 +50,17 @@ export const Navbar = () => {
           />
         </svg>
       </button>
-      {/* Mobile dropdown menu */}
-      {/* Side nav overlay */}
       <div
         className={`fixed inset-0 z-40 transition-opacity duration-300 ${isOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
           }`}
       >
-        {/* Background overlay */}
         <div
-          className="absolute inset-0 bg-black/20" 
+          className="absolute inset-0 bg-black/20"
           onClick={() => setIsOpen(false)}
         />
 
-        {/* Sliding panel (from right) */}
         <div
           className={`absolute top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
             ${isOpen ? "translate-x-0" : "translate-x-full"}`}
