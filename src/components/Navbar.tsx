@@ -18,11 +18,8 @@ export const Navbar = () => {
         <a href="/">Astro</a>
       </div>
       <div className="hidden md:flex space-x-6">
-        <a href="/" className="text-gray-700 hover:text-gray-900">
-          Home
-        </a>
-        <a href="/about" className="text-gray-700 hover:text-gray-900">
-          About
+        <a href="/profile" className="text-gray-700 hover:text-gray-900">
+          Profile
         </a>
         <button
           className="text-gray-700 hover:text-gray-900 cursor-pointer"
@@ -66,15 +63,15 @@ export const Navbar = () => {
             ${isOpen ? "translate-x-0" : "translate-x-full"}`}
         >
           <div className="flex flex-col space-y-4 p-4">
-            <a href="/" className="text-gray-700 hover:text-gray-900">
-              Home
+            <a href="/profile" className="text-gray-700 hover:text-gray-900">
+              Profile
             </a>
-            <a href="/about" className="text-gray-700 hover:text-gray-900">
-              About
-            </a>
-            <a href="/contact" className="text-gray-700 hover:text-gray-900">
-              Contact
-            </a>
+            <button
+              className="mr-auto text-gray-700 hover:text-gray-900 cursor-pointer"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>
