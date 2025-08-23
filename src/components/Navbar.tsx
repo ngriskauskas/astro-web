@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,12 +15,12 @@ export const Navbar = () => {
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-white shadow">
       <div className="text-xl font-bold text-gray-800">
-        <a href="/">Astro</a>
+        <Link to="/">Astro</Link>
       </div>
       <div className="hidden md:flex space-x-6">
-        <a href="/profile" className="text-gray-700 hover:text-gray-900">
+        <Link to="/profile" className="text-gray-700 hover:text-gray-900">
           Profile
-        </a>
+        </Link>
         <button
           className="text-gray-700 hover:text-gray-900 cursor-pointer"
           onClick={handleLogout}
@@ -63,9 +63,9 @@ export const Navbar = () => {
             ${isOpen ? "translate-x-0" : "translate-x-full"}`}
         >
           <div className="flex flex-col space-y-4 p-4">
-            <a href="/profile" className="text-gray-700 hover:text-gray-900">
+            <Link to="/profile" className="text-gray-700 hover:text-gray-900">
               Profile
-            </a>
+            </Link>
             <button
               className="mr-auto text-gray-700 hover:text-gray-900 cursor-pointer"
               onClick={handleLogout}
