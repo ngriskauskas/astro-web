@@ -5,13 +5,14 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { decodeJwt } from "../utils/jwt";
+import { apiFetch } from "../utils/api";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export interface User {
   id: string;
   email: string;
+  username: string;
 }
 
 interface AuthContextType {
@@ -21,6 +22,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (email: string, password: string) => Promise<string | void>;
+  updateUser: (user: Partial<User>) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -32,21 +34,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     if (savedToken) {
-      try {
-        setToken(savedToken);
-        const user = decodeJwt<User>(savedToken);
-        setUser(user);
-      } catch {
-        localStorage.removeItem("token");
-        setToken(null);
-        setUser(null);
-      }
+      setToken(savedToken);
     }
-    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (!token) return;
+
+    fetchUser();
+  }, [token]);
+
+  const fetchUser = async () => {
+    try {
+      const data = await apiFetch("/me", {
+        method: "GET",
+      });
+      const user = data.user as User;
+      setUser(user);
+    } catch (err) {
+      localStorage.removeItem("token");
+      setToken(null);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const login = async (email: string, password: string) => {
     const res = await fetch(`${API_URL}/login`, {
@@ -63,8 +79,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     localStorage.setItem("token", token);
     setToken(token);
-    const user = decodeJwt<User>(token);
-    setUser(user);
   };
 
   const logout = () => {
@@ -92,9 +106,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateUser = async (updatedUser: Partial<User>) => {
+    const data = await apiFetch("/me", {
+      method: "PATCH",
+      body: JSON.stringify(updatedUser),
+    });
+
+    setUser(data.user);
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, token, login, logout, register, loading }}
+      value={{ user, token, login, logout, register, loading, updateUser }}
     >
       {children}
     </AuthContext.Provider>
