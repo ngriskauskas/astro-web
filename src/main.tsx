@@ -9,6 +9,7 @@ import { Register } from "./pages/Register.tsx";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
 import { ProtectedRoute } from "./components/ProtectedRoute.tsx";
 import { Profile } from "./pages/Profile.tsx";
+import { BirthProfilesProvider } from "./contexts/BirthProfilesContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -19,7 +20,9 @@ createRoot(document.getElementById("root")!).render(
             path="/"
             element={
               <ProtectedRoute>
-                <App />
+                <BirthProfilesProvider>
+                  <App />
+                </BirthProfilesProvider>
               </ProtectedRoute>
             }
           >

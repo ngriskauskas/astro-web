@@ -1,24 +1,50 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
+import { BirthInfoForm } from "../components/BirthInfoForm";
+import {
+  useBirthProfiles,
+  type BirthProfileInput,
+} from "../contexts/BirthProfilesContext";
 
 export const Profile = () => {
   const { user, updateUser } = useAuth();
+  const { mainProfile, updateProfile, createProfile } = useBirthProfiles();
   const [userInfo, setUserInfo] = useState({
     username: "",
   });
+  const [birthInfoState, setBirthInfoState] = useState<BirthProfileInput>();
 
   useEffect(() => {
     setUserInfo({ username: user!.username });
   }, []);
+
+  useEffect(() => {
+    if (!mainProfile) return;
+
+    setBirthInfoState({
+      birth_time: mainProfile.birth_time,
+      birth_place: mainProfile.birth_place,
+      birth_date: mainProfile.birth_date,
+      longitude: mainProfile.longitude,
+      latitude: mainProfile.latitude,
+      main: true,
+    });
+  }, [mainProfile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       await updateUser(userInfo);
+      if (!mainProfile) {
+        await createProfile(birthInfoState!);
+      } else {
+        await updateProfile(mainProfile!.id, birthInfoState!);
+      }
       toast.success("Profile Updated");
     } catch (err) {
+      console.log(err);
       toast.error("Something went wrong");
     }
   };
@@ -60,6 +86,13 @@ export const Profile = () => {
             />
           </div>
         </div>
+      </div>
+      <div className="bg-white shadow rounded-xl p-6 space-y-6">
+        <h2 className="text-xl font-semibold">My Birth Info</h2>
+        <BirthInfoForm
+          onChange={(state) => setBirthInfoState(state)}
+          initialProfile={mainProfile}
+        />
       </div>
 
       <div className="flex justify-end">
