@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
+import { BirthInfoForm } from "../components/BirthInfoForm";
+import { useBirthProfiles } from "../contexts/BirthProfilesContext";
+import { CustomProfileList } from "../components/CustomProfileList";
 
 export const Profile = () => {
   const { user, updateUser } = useAuth();
+  const { mainProfile } = useBirthProfiles();
   const [userInfo, setUserInfo] = useState({
     username: "",
   });
@@ -14,11 +18,11 @@ export const Profile = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       await updateUser(userInfo);
       toast.success("Profile Updated");
     } catch (err) {
+      console.log(err);
       toast.error("Something went wrong");
     }
   };
@@ -60,15 +64,21 @@ export const Profile = () => {
             />
           </div>
         </div>
+        <div className="flex justify-end">
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+          >
+            Save Changes
+          </button>
+        </div>
       </div>
-
-      <div className="flex justify-end">
-        <button
-          onClick={handleSubmit}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-        >
-          Save Changes
-        </button>
+      <div className="bg-white shadow rounded-xl p-6 space-y-6">
+        <h2 className="text-xl font-semibold">My Birth Info</h2>
+        <BirthInfoForm profileId={mainProfile?.id} />
+      </div>
+      <div className="bg-white shadow rounded-xl p-6 space-y-6">
+        <CustomProfileList />
       </div>
     </div>
   );

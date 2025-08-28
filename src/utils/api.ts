@@ -8,15 +8,19 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     headers.set("Authorization", `Bearer ${token}`);
   }
   headers.set("Content-Type", "application/json");
+  headers.set("Accept", "application/json");
 
   const res = await fetch(`${API_URL}${endpoint}`, {
     ...options,
-    headers
+    headers,
   });
-  const data = await res.json();
-
-  if(!res.ok) {
-    throw Error(data.message);
+  const data = res.status !== 204 ? await res.json() : null;
+  if (!res.ok) {
+    if (data.errors) {
+      const errorKey = Object.keys(data.errors)[0];
+      const errorMessage = data.errors[errorKey];
+      throw Error(`${errorKey}: ${errorMessage}`);
+    } else throw Error(data.message);
   }
 
   return data;
