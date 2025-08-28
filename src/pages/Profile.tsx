@@ -3,6 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 import { BirthInfoForm } from "../components/BirthInfoForm";
 import { useBirthProfiles } from "../contexts/BirthProfilesContext";
+import { CustomProfileList } from "../components/CustomProfileList";
 
 export const Profile = () => {
   const { user, updateUser } = useAuth();
@@ -75,6 +76,9 @@ export const Profile = () => {
       <div className="bg-white shadow rounded-xl p-6 space-y-6">
         <h2 className="text-xl font-semibold">My Birth Info</h2>
         <BirthInfoForm profileId={mainProfile?.id} />
+      </div>
+      <div className="bg-white shadow rounded-xl p-6 space-y-6">
+        <CustomProfileList />
       </div>
     </div>
   );

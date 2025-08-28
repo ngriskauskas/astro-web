@@ -16,6 +16,7 @@ export interface BirthProfile {
   longitude: number;
   main: boolean;
   birth_time_unknown: boolean;
+  name: string;
 }
 
 export interface BirthProfileInput {
@@ -26,6 +27,7 @@ export interface BirthProfileInput {
   longitude: number;
   main: boolean;
   birth_time_unknown: boolean;
+  name: string;
 }
 
 interface BirthProfileContextType {
@@ -52,6 +54,10 @@ export const BirthProfilesProvider = ({
     fetchProfiles();
   }, []);
 
+  useEffect(() => {
+    setMainProfile(profiles.find((x) => x.main));
+  }, [profiles]);
+
   const fetchProfiles = async () => {
     try {
       const data = await apiFetch("/me/birth_profiles", {
@@ -59,7 +65,6 @@ export const BirthProfilesProvider = ({
       });
       const birth_profiles = data.birth_profiles as BirthProfile[];
       setProfiles(birth_profiles);
-      setMainProfile(birth_profiles.find((x) => x.main));
     } catch (err) {
       console.log(err);
     }
@@ -70,6 +75,11 @@ export const BirthProfilesProvider = ({
       method: "PUT",
       body: JSON.stringify({ birth_profile: profile }),
     });
+    setProfiles((x) =>
+      x.map((profile) =>
+        profile.id === data.birth_profile.id ? data.birth_profile : profile,
+      ),
+    );
   };
 
   const createProfile = async (profile: BirthProfileInput) => {
@@ -77,12 +87,14 @@ export const BirthProfilesProvider = ({
       method: "POST",
       body: JSON.stringify({ birth_profile: profile }),
     });
+    setProfiles((x) => [...x, data.birth_profile]);
   };
 
   const deleteProfile = async (id: number) => {
-    const data = await apiFetch(`/birth_profiles/${id}`, {
+    await apiFetch(`/birth_profiles/${id}`, {
       method: "DELETE",
     });
+    setProfiles((x) => x.filter((profile) => profile.id !== id));
   };
 
   return (

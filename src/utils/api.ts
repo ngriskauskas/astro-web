@@ -14,13 +14,12 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     ...options,
     headers,
   });
-  const data = await res.json();
-
+  const data = res.status !== 204 ? await res.json() : null;
   if (!res.ok) {
     if (data.errors) {
       const errorKey = Object.keys(data.errors)[0];
       const errorMessage = data.errors[errorKey];
-      throw Error(`${errorKey}: ${errorMessage}`)
+      throw Error(`${errorKey}: ${errorMessage}`);
     } else throw Error(data.message);
   }
 

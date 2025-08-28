@@ -3,7 +3,17 @@ import { BirthPlacePicker } from "./BirthPlacePicker";
 import { useBirthProfiles } from "../contexts/BirthProfilesContext";
 import toast from "react-hot-toast";
 
-export const BirthInfoForm = ({ profileId }: { profileId?: number }) => {
+export const BirthInfoForm = ({
+  profileId,
+  isNew = false,
+  onCancel,
+  onSubmit,
+}: {
+  profileId?: number;
+  isNew?: boolean;
+  onCancel?: () => void;
+  onSubmit?: () => void;
+}) => {
   const [birthDate, setBirthDate] = useState("");
   const [birthTime, setBirthTime] = useState("");
   const [unknownTime, setUnknownTime] = useState(false);
@@ -11,7 +21,9 @@ export const BirthInfoForm = ({ profileId }: { profileId?: number }) => {
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
   const [isMain, setIsMain] = useState(false);
-  const { createProfile, updateProfile, profiles } = useBirthProfiles();
+  const [name, setName] = useState("");
+  const { createProfile, updateProfile, deleteProfile, profiles } =
+    useBirthProfiles();
 
   useEffect(() => {
     if (!profiles || !profileId) return;
@@ -25,6 +37,7 @@ export const BirthInfoForm = ({ profileId }: { profileId?: number }) => {
     setLongitude(profile?.longitude || 0);
     setLatitude(profile?.latitude || 0);
     setIsMain(profile?.main || false);
+    setName(profile?.name || "");
   }, [profiles, profileId]);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -38,10 +51,12 @@ export const BirthInfoForm = ({ profileId }: { profileId?: number }) => {
       birth_date: birthDate,
       birth_place: birthPlace,
       main: isMain,
+      name: name,
     };
     try {
       if (profileId) await updateProfile(profileId, updatedProfile);
       else await createProfile(updatedProfile);
+      if(onSubmit) onSubmit();
       toast.success("Profile updated");
     } catch (error: any) {
       console.log(error);
@@ -51,8 +66,40 @@ export const BirthInfoForm = ({ profileId }: { profileId?: number }) => {
     }
   };
 
+  const handleDelete = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!profileId) return;
+    try {
+      await deleteProfile(profileId);
+      toast.success("Profile deleted");
+    } catch (error: any) {
+      console.log(error);
+      toast.error("Error deleting Profile");
+    }
+  };
+
+  const handleCancel = async (e: FormEvent) => {
+    e.preventDefault();
+    onCancel!();
+  };
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
+      {!isMain && (
+        <div>
+          <label className="block mb-1 text-sm font-medium text-gray-700">
+            Name
+          </label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          />
+        </div>
+      )}
+
       <div>
         <label className="block mb-1 text-sm font-medium text-gray-700">
           Birth Date
@@ -73,7 +120,7 @@ export const BirthInfoForm = ({ profileId }: { profileId?: number }) => {
         <div className="flex items-center gap-4">
           <input
             type="time"
-            value={birthTime.slice(0,5)}
+            value={birthTime.slice(0, 5)}
             onChange={(e) => setBirthTime(e.target.value)}
             className="w-auto rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             disabled={unknownTime}
@@ -106,14 +153,40 @@ export const BirthInfoForm = ({ profileId }: { profileId?: number }) => {
           }}
         />
       </div>
-      <div className="flex justify-end">
-        <button
-          onClick={handleSubmit}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-        >
-          Save Changes
-        </button>
-      </div>
+      {isMain ? (
+        <div className="flex justify-end">
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+          >
+            Save Changes
+          </button>
+        </div>
+      ) : (
+        <div className="flex justify-between">
+          {isNew ? (
+            <button
+              onClick={handleCancel}
+              className="px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 cursor-pointer"
+            >
+              Cancel
+            </button>
+          ) : (
+            <button
+              onClick={handleDelete}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
+            >
+              Delete
+            </button>
+          )}
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+          >
+            {isNew ? "Submit" : "Save Changes"}
+          </button>
+        </div>
+      )}
     </form>
   );
 };
