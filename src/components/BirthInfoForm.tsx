@@ -42,10 +42,12 @@ export const BirthInfoForm = ({ profileId }: { profileId?: number }) => {
     try {
       if (profileId) await updateProfile(profileId, updatedProfile);
       else await createProfile(updatedProfile);
-      toast.success("Profile updated")
-    } catch (error) {
-      toast.error("Failed to update Profile");
-      console.log("error");
+      toast.success("Profile updated");
+    } catch (error: any) {
+      console.log(error);
+      toast.error(`Failed to update Profile ${error.message}`, {
+        duration: 3000,
+      });
     }
   };
 
@@ -71,7 +73,7 @@ export const BirthInfoForm = ({ profileId }: { profileId?: number }) => {
         <div className="flex items-center gap-4">
           <input
             type="time"
-            value={birthTime}
+            value={birthTime.slice(0,5)}
             onChange={(e) => setBirthTime(e.target.value)}
             className="w-auto rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             disabled={unknownTime}

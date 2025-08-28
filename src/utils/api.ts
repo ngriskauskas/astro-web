@@ -17,7 +17,11 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const data = await res.json();
 
   if (!res.ok) {
-    throw Error(data.message);
+    if (data.errors) {
+      const errorKey = Object.keys(data.errors)[0];
+      const errorMessage = data.errors[errorKey];
+      throw Error(`${errorKey}: ${errorMessage}`)
+    } else throw Error(data.message);
   }
 
   return data;
