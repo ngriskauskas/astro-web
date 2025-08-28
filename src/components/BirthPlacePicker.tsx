@@ -15,13 +15,22 @@ interface NominatimPlace {
 
 export const BirthPlacePicker = ({
   onSelect,
+  initialAddress,
 }: {
   onSelect: (place: BirthPlaceResult) => void;
+  initialAddress: string;
 }) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<NominatimPlace[]>([]);
+  const [selected, setSelected] = useState(true);
 
   useEffect(() => {
+    if (!initialAddress) return;
+    setQuery(initialAddress);
+  }, [initialAddress]);
+
+  useEffect(() => {
+    if (selected) return;
     if (query.length < 3) return setSuggestions([]);
     const timeout = setTimeout(async () => {
       const res = await fetch(
@@ -34,7 +43,7 @@ export const BirthPlacePicker = ({
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [query]);
+  }, [query, selected]);
 
   const handleSelect = (place: any) => {
     const lat = parseFloat(place.lat);
@@ -47,6 +56,7 @@ export const BirthPlacePicker = ({
 
     setQuery(place.display_name);
     setSuggestions([]);
+    setSelected(true);
   };
 
   return (
@@ -54,7 +64,10 @@ export const BirthPlacePicker = ({
       <input
         type="text"
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setSelected(false);
+        }}
         placeholder="City, Country"
         className="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
       />

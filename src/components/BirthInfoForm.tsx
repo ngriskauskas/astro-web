@@ -1,43 +1,56 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { BirthPlacePicker } from "./BirthPlacePicker";
-import type {
-  BirthProfile,
-  BirthProfileInput,
-} from "../contexts/BirthProfilesContext";
+import { useBirthProfiles } from "../contexts/BirthProfilesContext";
+import toast from "react-hot-toast";
 
-export const BirthInfoForm = ({
-  initialProfile,
-  onChange,
-  isMainProfile,
-}: {
-  initialProfile?: BirthProfile;
-  onChange: (profile: BirthProfileInput) => void;
-  isMainProfile: boolean;
-}) => {
-  const [birthDate, setBirthDate] = useState(initialProfile?.birth_date || "");
-  const [birthTime, setBirthTime] = useState(initialProfile?.birth_time || "");
-  const [unknownTime, setUnknownTime] = useState(
-    initialProfile && initialProfile.birth_time === null,
-  );
-  const [birthPlace, setBirthPlace] = useState(
-    initialProfile?.birth_place || "",
-  );
-  const [latitude, setLatitude] = useState(initialProfile?.latitude || 0);
-  const [longitude, setLongitude] = useState(initialProfile?.longitude || 0);
+export const BirthInfoForm = ({ profileId }: { profileId?: number }) => {
+  const [birthDate, setBirthDate] = useState("");
+  const [birthTime, setBirthTime] = useState("");
+  const [unknownTime, setUnknownTime] = useState(false);
+  const [birthPlace, setBirthPlace] = useState("");
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
+  const [isMain, setIsMain] = useState(false);
+  const { createProfile, updateProfile, profiles } = useBirthProfiles();
 
   useEffect(() => {
-    onChange({
-      birth_date: birthDate,
-      birth_time: unknownTime ? null : birthTime,
-      birth_place: birthPlace,
-      latitude: latitude,
+    if (!profiles || !profileId) return;
+
+    const profile = profiles.find((x) => x.id === profileId);
+
+    setBirthPlace(profile?.birth_place || "");
+    setBirthDate(profile?.birth_date || "");
+    setBirthTime(profile?.birth_time || "");
+    setUnknownTime(profile?.birth_time_unknown || false);
+    setLongitude(profile?.longitude || 0);
+    setLatitude(profile?.latitude || 0);
+    setIsMain(profile?.main || false);
+  }, [profiles, profileId]);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    const updatedProfile = {
+      latitude,
       longitude: longitude,
-      main: isMainProfile,
-    });
-  }, [birthDate, birthPlace, birthTime, unknownTime]);
+      birth_time_unknown: unknownTime,
+      birth_time: birthTime,
+      birth_date: birthDate,
+      birth_place: birthPlace,
+      main: isMain,
+    };
+    try {
+      if (profileId) await updateProfile(profileId, updatedProfile);
+      else await createProfile(updatedProfile);
+      toast.success("Profile updated")
+    } catch (error) {
+      toast.error("Failed to update Profile");
+      console.log("error");
+    }
+  };
 
   return (
-    <>
+    <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
       <div>
         <label className="block mb-1 text-sm font-medium text-gray-700">
           Birth Date
@@ -67,7 +80,11 @@ export const BirthInfoForm = ({
             <input
               type="checkbox"
               checked={unknownTime}
-              onChange={(e) => setUnknownTime(e.target.checked)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setUnknownTime(checked);
+                if (checked) setBirthTime("");
+              }}
             />
             Unknown time?
           </label>
@@ -79,6 +96,7 @@ export const BirthInfoForm = ({
           Birth Place
         </label>
         <BirthPlacePicker
+          initialAddress={birthPlace}
           onSelect={({ address, latitude, longitude }) => {
             setBirthPlace(address);
             setLatitude(latitude);
@@ -86,6 +104,14 @@ export const BirthInfoForm = ({
           }}
         />
       </div>
-    </>
+      <div className="flex justify-end">
+        <button
+          onClick={handleSubmit}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+        >
+          Save Changes
+        </button>
+      </div>
+    </form>
   );
 };

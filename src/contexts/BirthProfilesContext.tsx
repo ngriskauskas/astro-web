@@ -14,8 +14,8 @@ export interface BirthProfile {
   birth_place: string;
   latitude: number;
   longitude: number;
-  timezone: string;
   main: boolean;
+  birth_time_unknown: boolean;
 }
 
 export interface BirthProfileInput {
@@ -25,8 +25,9 @@ export interface BirthProfileInput {
   latitude: number;
   longitude: number;
   main: boolean;
+  birth_time_unknown: boolean;
 }
-//TODO I NEED UNKOWN TIME FIELD
+
 interface BirthProfileContextType {
   profiles: BirthProfile[];
   mainProfile: BirthProfile | undefined;
@@ -65,16 +66,10 @@ export const BirthProfilesProvider = ({
   };
 
   const updateProfile = async (id: number, profile: BirthProfileInput) => {
-    try {
-      const data = await apiFetch(`/birth_profiles/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(profile),
-      });
-
-      console.log(data);
-    } catch (err) {
-      console.log(err);
-    }
+    const data = await apiFetch(`/birth_profiles/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({ birth_profile: profile }),
+    });
   };
 
   const createProfile = async (profile: BirthProfileInput) => {
