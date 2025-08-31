@@ -1,4 +1,9 @@
-import {  type Cusp, type Planet, type ZodiacSign } from "../../../contexts/ChartContext";
+import { PlanetsData } from "../../../constants/zodiac";
+import {
+  type Cusp,
+  type Planet,
+  type ZodiacSign,
+} from "../../../contexts/ChartContext";
 
 interface PlanetAngle extends Planet {
   angle: number;
@@ -35,15 +40,13 @@ export const Planets = ({ radius, center, angles }: PlanetProps) => {
               stroke="white"
               strokeWidth={1}
             />
-            <text
-              x={tx}
-              y={ty}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="white"
-            >
-              {name}
-            </text>
+            <image
+              href={PlanetsData[name]}
+              x={tx - 10}
+              y={ty - 10}
+              width={25}
+              height={25}
+            />
           </g>
         );
       })}

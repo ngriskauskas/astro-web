@@ -1,4 +1,4 @@
-import {  type Cusp, type ZodiacSign } from "../../../contexts/ChartContext";
+import { type Cusp, type ZodiacSign } from "../../../contexts/ChartContext";
 
 interface CuspAngle extends Cusp {
   angle: number;
@@ -15,6 +15,23 @@ export const Houses = ({ radius, center, angles }: HouseProps) => {
   const outerRadius = radius;
   return (
     <g>
+      <circle
+        cx={center}
+        cy={center}
+        r={innerRadius}
+        fill="none"
+        stroke="white"
+        strokeWidth={1}
+      />
+      <circle
+        cx={center}
+        cy={center}
+        r={outerRadius}
+        fill="none"
+        stroke="white"
+        strokeWidth={1}
+      />
+
       {angles.map(({ name, angle }) => {
         const rad = ((angle - 180) * Math.PI) / 180;
         const x1 = center + innerRadius * Math.cos(rad);

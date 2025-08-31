@@ -36,12 +36,9 @@ export const ZodiacWheel = ({ chart, showAspects }: ZodiacWheelProps) => {
   const calcSignAngles = (chart: SingleChart) => {
     const ascSign = chart.cusps["cusp1"].sign;
 
-    const ascIndex = ZodiacSigns.indexOf(
-      ascSign.charAt(0).toUpperCase() + ascSign.slice(1),
-    );
+    const ascIndex = ZodiacSigns.indexOf(ascSign);
 
     const startAngleFirstSign = -chart.cusps["cusp1"].deg_in_sign;
-
     return ZodiacSigns.map((s, i) => {
       const offset = (i - ascIndex + 12) % 12;
       const angle =
@@ -52,13 +49,6 @@ export const ZodiacWheel = ({ chart, showAspects }: ZodiacWheelProps) => {
     });
   };
 
-  useEffect(() => {
-    console.log(chart);
-    calcCuspAngles(chart);
-    calcPlanetAngles(chart);
-    calcSignAngles(chart);
-  }, [chart]);
-
   const size = 700;
   const radius = size / 2;
   return (
@@ -66,17 +56,17 @@ export const ZodiacWheel = ({ chart, showAspects }: ZodiacWheelProps) => {
       <Background radius={radius} />
       <Signs
         center={radius}
-        radius={radius - 100}
+        radius={radius - 5}
         angles={calcSignAngles(chart)}
       />
       <Houses
         center={radius}
-        radius={radius - 50}
+        radius={radius - 120}
         angles={calcCuspAngles(chart)}
       />
       <Planets
         center={radius}
-        radius={radius - 150}
+        radius={radius - 200}
         angles={calcPlanetAngles(chart)}
       />
     </svg>

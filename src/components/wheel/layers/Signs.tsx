@@ -1,4 +1,6 @@
-import { ZodiacSigns, type ZodiacSign } from "../../../contexts/ChartContext";
+import { ZodiacData } from "../../../constants/zodiac";
+import { type ZodiacSign } from "../../../contexts/ChartContext";
+import { createWedgePath } from "./Utils";
 
 interface SignProps {
   center: number;
@@ -7,39 +9,54 @@ interface SignProps {
 }
 
 export const Signs = ({ radius, center, angles }: SignProps) => {
-  const innerRadius = radius - 25;
+  const innerRadius = radius - 50;
   const outerRadius = radius;
   return (
     <g>
+      <circle
+        cx={center}
+        cy={center}
+        r={innerRadius}
+        fill="none"
+        stroke="white"
+        strokeWidth={1}
+      />
+      <circle
+        cx={center}
+        cy={center}
+        r={outerRadius}
+        fill="none"
+        stroke="white"
+        strokeWidth={1}
+      />
       {angles.map(({ sign, angle }) => {
-        const rad = ((angle - 180) * Math.PI) / 180;
-        const x1 = center + innerRadius * Math.cos(rad);
-        const y1 = center - innerRadius * Math.sin(rad);
-        const x2 = center + outerRadius * Math.cos(rad);
-        const y2 = center - outerRadius * Math.sin(rad);
+        const { glyph, color } = ZodiacData[sign];
+        const rad = ((angle + 15 - 180) * Math.PI) / 180;
+        const midRadius = (innerRadius + outerRadius) / 2;
+        const tx = center + midRadius * Math.cos(rad);
+        const ty = center - midRadius * Math.sin(rad);
 
-        const textRadius = outerRadius + 20;
-        const tx = center + textRadius * Math.cos(rad);
-        const ty = center - textRadius * Math.sin(rad);
         return (
           <g key={sign}>
-            <line
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
+            <path
+              d={createWedgePath(
+                center,
+                innerRadius,
+                outerRadius,
+                angle,
+                angle + 30,
+              )}
+              fill={color}
               stroke="white"
-              strokeWidth={1}
+              fillRule="evenodd"
             />
-            <text
-              x={tx}
-              y={ty}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="white"
-            >
-              {sign}
-            </text>
+            <image 
+              href={glyph}
+              x={tx - 12}
+              y={ty - 12}
+              width={25}
+              height={25}
+            />
           </g>
         );
       })}
