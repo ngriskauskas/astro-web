@@ -51,7 +51,7 @@ export const BirthInfoForm = ({
       birth_date: birthDate,
       birth_place: birthPlace,
       main: isMain,
-      name: name,
+      name: isMain ? "My Profile" : name,
     };
     try {
       if (profileId) await updateProfile(profileId, updatedProfile);

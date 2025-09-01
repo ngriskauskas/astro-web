@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useEffect,
-  useState,
-  useContext,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { apiFetch } from "../utils/api";
 
 export const ZodiacSigns = [
@@ -90,25 +84,30 @@ export interface SingleChart {
   aspects: Aspect[];
 }
 
-export type HouseSystem =
-  | "whole_sign"
-  | "placidus"
-  | "koch"
-  | "equal"
-  | "campanus"
-  | "regio";
+export const HOUSE_SYSTEMS = [
+  "whole_sign",
+  "placidus",
+  "koch",
+  "equal",
+  "campanus",
+  "regio",
+] as const;
+export type HouseSystem = (typeof HOUSE_SYSTEMS)[number];
 
-export type ZodiacSystem = "tropical" | "sidereal";
+export const ZODIAC_SYSTEMS = ["tropical", "sidereal"] as const;
+export type ZodiacSystem = (typeof ZODIAC_SYSTEMS)[number];
 
-export type Ayanamsa =
-  | "faganBradely"
-  | "lahiri"
-  | "deLuce"
-  | "raman"
-  | "ushaSashi"
-  | "krishnamurit"
-  | "djwhwalKhul"
-  | "yukteshwar";
+export const AYANAMSAS = [
+  "faganBradely",
+  "lahiri",
+  "deLuce",
+  "raman",
+  "ushaSashi",
+  "krishnamurit",
+  "djwhwalKhul",
+  "yukteshwar",
+] as const;
+export type Ayanamsa = (typeof AYANAMSAS)[number];
 
 interface ChartOptions {
   house_system: HouseSystem;

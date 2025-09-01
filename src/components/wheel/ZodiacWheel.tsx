@@ -10,14 +10,19 @@ import { Signs } from "./layers/Signs";
 import { Houses } from "./layers/Houses";
 import { Planets, type PlanetAngle } from "./layers/Planets";
 import { Aspects } from "./layers/Aspects";
+import type { ZodiacWheelOptions } from "./ZodiacWheelSettings";
 
 interface ZodiacWheelProps {
   chart: SingleChart;
-  showAspects: true;
   aspectMinOrb: number;
+  options: ZodiacWheelOptions;
 }
 
-export const ZodiacWheel = ({ chart, aspectMinOrb = 6 }: ZodiacWheelProps) => {
+export const ZodiacWheel = ({
+  chart,
+  aspectMinOrb = 6,
+  options,
+}: ZodiacWheelProps) => {
   const [hoveredPlanet, setHoveredPlanet] = useState<PlanetName | null>(null);
   const [hoverAspectedPlanets, setHoverAspectedPlanets] = useState<
     PlanetName[]
@@ -95,8 +100,8 @@ export const ZodiacWheel = ({ chart, aspectMinOrb = 6 }: ZodiacWheelProps) => {
         hoverAspectedPlanets={hoverAspectedPlanets}
         onHoverPlanet={(planet) => {
           setHoveredPlanet(planet);
-          chart.aspects.forEach(({ planet1, planet2,orb }) => {
-            if(orb > aspectMinOrb) return;
+          chart.aspects.forEach(({ planet1, planet2, orb }) => {
+            if (orb > aspectMinOrb) return;
             if (planet1.name === planet)
               setHoverAspectedPlanets((prev) => [planet2.name, ...prev]);
             else if (planet2.name === planet)
