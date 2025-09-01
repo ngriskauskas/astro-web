@@ -11,6 +11,7 @@ import SagittariusSvg from "../assets/signs/normal_symbols/Sagittarius.svg";
 import CapricornSvg from "../assets/signs/normal_symbols/Capricorn.svg";
 import AquariusSvg from "../assets/signs/normal_symbols/Aquarius.svg";
 import PiscesSvg from "../assets/signs/normal_symbols/Pisces.svg";
+// @ts-ignore
 import SunSvg from "../assets/planets/Sun.svg";
 import MoonSvg from "../assets/planets/Moon.svg";
 import MercurySvg from "../assets/planets/Mercury.svg";
@@ -56,10 +57,11 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
 interface PlanetInfo {
   glyph: string;
   scale: number;
+  isSvg?: boolean;
 }
 
 export const PlanetsData: Record<PlanetName, PlanetInfo> = {
-  Sun: { glyph: "☉", scale: 1.1 },
+  Sun: { glyph: "☉", scale: 1 },
   Moon: { glyph: "☽", scale: 1 },
   Mercury: { glyph: "☿", scale: 1.1 },
   Venus: { glyph: "♀", scale: 1.2 },
