@@ -6,7 +6,7 @@ export const Background = ({ radius }: BackgroundProps) => {
     <g>
       <defs>
         <radialGradient id="bgGradient" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#222" />
+          <stop offset="0%" stopColor="#333" />
           <stop offset="100%" stopColor="#777" />
         </radialGradient>
       </defs>

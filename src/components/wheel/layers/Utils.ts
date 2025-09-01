@@ -4,27 +4,59 @@ export const createWedgePath = (
   outerRadius: number,
   startAngle: number,
   endAngle: number,
+  drawOuterArc: boolean = true,
 ) => {
-  const toRad = (deg: number) => ((deg - 180) * Math.PI) / 180;
+  const { x: innerStartX, y: innerStartY } = polarToCartesian(
+    center,
+    innerRadius,
+    startAngle,
+  );
+  const { x: innerEndX, y: innerEndY } = polarToCartesian(
+    center,
+    innerRadius,
+    endAngle,
+  );
+  const { x: outerStartX, y: outerStartY } = polarToCartesian(
+    center,
+    outerRadius,
+    startAngle,
+  );
+  const { x: outerEndX, y: outerEndY } = polarToCartesian(
+    center,
+    outerRadius,
+    endAngle,
+  );
 
-  const sA = toRad(startAngle);
-  const eA = toRad(endAngle);
+  if (drawOuterArc) {
+    return `
+      M ${innerStartX} ${innerStartY}
+      A ${innerRadius} ${innerRadius} 0 0 0 ${innerEndX} ${innerEndY}
+      L ${outerEndX} ${outerEndY}
+      A ${outerRadius} ${outerRadius} 0 0 1 ${outerStartX} ${outerStartY}
+      Z
+    `;
+  } else {
+    return `
+      M ${innerStartX} ${innerStartY}
+      A ${innerRadius} ${innerRadius} 0 0 0 ${innerEndX} ${innerEndY}
+      L ${outerEndX} ${outerEndY}
+    `;
+  }
+};
 
-  const innerStartX = center + innerRadius * Math.cos(sA);
-  const innerStartY = center - innerRadius * Math.sin(sA);
-  const innerEndX = center + innerRadius * Math.cos(eA);
-  const innerEndY = center - innerRadius * Math.sin(eA);
+const degToRad = (deg: number) => ((deg - 180) * Math.PI) / 180;
 
-  const outerStartX = center + outerRadius * Math.cos(sA);
-  const outerStartY = center - outerRadius * Math.sin(sA);
-  const outerEndX = center + outerRadius * Math.cos(eA);
-  const outerEndY = center - outerRadius * Math.sin(eA);
+export const midpointAngle = (startAngle: number, endAngle: number) =>
+  (startAngle + ((endAngle - startAngle + 360) % 360) / 2) % 360;
 
-  return `
-    M ${innerStartX} ${innerStartY}
-    A ${innerRadius} ${innerRadius} 0 0 0 ${innerEndX} ${innerEndY}
-    L ${outerEndX} ${outerEndY}
-    A ${outerRadius} ${outerRadius} 0 0 1 ${outerStartX} ${outerStartY}
-    Z
-  `;
+export const polarToCartesian = (
+  center: number,
+  radius: number,
+  angle: number,
+) => {
+  const rad = degToRad(angle);
+  return {
+    x: center + radius * Math.cos(rad),
+    y: center - radius * Math.sin(rad),
+  };
 };

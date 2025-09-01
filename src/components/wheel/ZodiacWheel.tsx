@@ -1,20 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   ZodiacSigns,
   type SingleChart,
   type ZodiacSign,
 } from "../../contexts/ChartContext";
 import { Background } from "./layers/Background";
-import { Signs } from "./layers/Signs";
-import { Houses } from "./layers/Houses";
-import { Planets } from "./layers/Planets";
+import { Signs, type SignAngle } from "./layers/Signs";
+import { type CuspAngle, Houses } from "./layers/Houses";
+import { Planets, type PlanetAngle } from "./layers/Planets";
+import { Aspects } from "./layers/Aspects";
 
 interface ZodiacWheelProps {
   chart: SingleChart;
   showAspects: true;
 }
 
-export const ZodiacWheel = ({ chart, showAspects }: ZodiacWheelProps) => {
+export const ZodiacWheel = ({ chart }: ZodiacWheelProps) => {
   const calcCuspAngles = (chart: SingleChart) => {
     const ascPos = chart.cusps["cusp1"].position;
 
@@ -27,10 +28,26 @@ export const ZodiacWheel = ({ chart, showAspects }: ZodiacWheelProps) => {
   const calcPlanetAngles = (chart: SingleChart) => {
     const ascPos = chart.cusps["cusp1"].position;
 
-    return Object.entries(chart.planets).map(([_key, planet]) => ({
-      ...planet,
-      angle: (planet.position - ascPos + 360) % 360,
-    }));
+    const planetAngles = Object.entries(chart.planets)
+      .map(([_key, planet]) => ({
+        ...planet,
+        angle: (planet.position - ascPos + 360) % 360,
+      }))
+      .sort((a, b) => a.angle - b.angle);
+
+    const adjusted: PlanetAngle[] = [];
+    planetAngles.forEach((planet, i) => {
+      if (i === 0) {
+        adjusted.push({ ...planet, glyphAngle: planet.angle });
+      } else {
+        const prev = adjusted[i - 1];
+        const diff = planet.angle - prev.glyphAngle;
+        const glyphAngle = diff <= 4 ? prev.glyphAngle + 5 : planet.angle;
+        adjusted.push({ ...planet, glyphAngle });
+      }
+    });
+
+    return adjusted;
   };
 
   const calcSignAngles = (chart: SingleChart) => {
@@ -49,25 +66,28 @@ export const ZodiacWheel = ({ chart, showAspects }: ZodiacWheelProps) => {
     });
   };
 
+  const planetAngles = calcPlanetAngles(chart);
+  const signAngles = calcSignAngles(chart);
+  const cuspAngles = calcCuspAngles(chart);
   const size = 700;
   const radius = size / 2;
   return (
-    <svg width={size} height={size}>
+    <svg
+      viewBox={`0 0 ${size} ${size}`}
+      width="100%"
+      height="auto"
+      preserveAspectRatio="xMidYMid meet"
+    >
       <Background radius={radius} />
-      <Signs
+      <Signs center={radius} radius={radius - 5} angles={signAngles} />
+      <Houses center={radius} radius={radius - 55} angles={cuspAngles} />
+      <Planets center={radius} radius={radius - 55} angles={planetAngles} />
+      <Aspects
         center={radius}
-        radius={radius - 5}
-        angles={calcSignAngles(chart)}
-      />
-      <Houses
-        center={radius}
-        radius={radius - 120}
-        angles={calcCuspAngles(chart)}
-      />
-      <Planets
-        center={radius}
-        radius={radius - 200}
-        angles={calcPlanetAngles(chart)}
+        radius={radius - 175}
+        angles={planetAngles}
+        aspects={chart.aspects}
+        minOrb={6}
       />
     </svg>
   );

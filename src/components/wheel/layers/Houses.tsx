@@ -1,6 +1,7 @@
 import { type Cusp, type ZodiacSign } from "../../../contexts/ChartContext";
+import { createWedgePath, midpointAngle, polarToCartesian } from "./Utils";
 
-interface CuspAngle extends Cusp {
+export interface CuspAngle extends Cusp {
   angle: number;
 }
 
@@ -11,47 +12,81 @@ interface HouseProps {
 }
 
 export const Houses = ({ radius, center, angles }: HouseProps) => {
-  const innerRadius = radius - 25;
+  const innerRadius = radius - 120;
   const outerRadius = radius;
+
+  const houseAngles = angles
+    .filter(({ name }) => !["asc", "dc", "ic", "mc"].includes(name))
+    .map(({ name, angle }) => ({
+      number: parseInt(name.replace("cusp", ""), 10),
+      angle,
+    }))
+    .sort((a, b) => a.number - b.number);
+
+  const keyAngles = angles.filter(({ name }) =>
+    ["asc", "dc", "ic", "mc"].includes(name),
+  );
+
   return (
     <g>
-      <circle
-        cx={center}
-        cy={center}
-        r={innerRadius}
-        fill="none"
-        stroke="white"
-        strokeWidth={1}
-      />
-      <circle
-        cx={center}
-        cy={center}
-        r={outerRadius}
-        fill="none"
-        stroke="white"
-        strokeWidth={1}
-      />
+      {keyAngles.map(({ name, angle }) => {
 
-      {angles.map(({ name, angle }) => {
-        const rad = ((angle - 180) * Math.PI) / 180;
-        const x1 = center + innerRadius * Math.cos(rad);
-        const y1 = center - innerRadius * Math.sin(rad);
-        const x2 = center + outerRadius * Math.cos(rad);
-        const y2 = center - outerRadius * Math.sin(rad);
+        const { x: innerX, y: innerY } = polarToCartesian(
+          center,
+          innerRadius,
+          angle,
+        );
+        const { x: outerX, y: outerY } = polarToCartesian(
+          center,
+          outerRadius,
+          angle,
+        );
+        const { x: lx, y: ly } = polarToCartesian(
+          center,
+          outerRadius - 18,
+          angle + 3,
+        );
 
-        const textRadius = outerRadius + 20;
-        const tx = center + textRadius * Math.cos(rad);
-        const ty = center - textRadius * Math.sin(rad);
         return (
           <g key={name}>
             <line
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
+              x1={innerX}
+              y1={innerY}
+              x2={outerX}
+              y2={outerY}
               stroke="white"
-              strokeWidth={1}
+              strokeWidth={3}
             />
+            <text
+              x={lx}
+              y={ly}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="white"
+            >
+              {name.toUpperCase()}
+            </text>
+          </g>
+        );
+      })}
+      {houseAngles.map(({ number, angle }, i) => {
+        const nextAngle = houseAngles[(i + 1) % houseAngles.length].angle;
+
+        const wedgePath = createWedgePath(
+          center,
+          innerRadius,
+          outerRadius,
+          angle,
+          nextAngle,
+          false,
+        );
+        const midAngle = midpointAngle(angle, nextAngle);
+
+        const { x: tx, y: ty } = polarToCartesian(center, innerRadius + 15, midAngle);
+
+        return (
+          <g key={number}>
+            <path d={wedgePath} fill="none" stroke="white" strokeWidth={1} />
             <text
               x={tx}
               y={ty}
@@ -59,7 +94,7 @@ export const Houses = ({ radius, center, angles }: HouseProps) => {
               dominantBaseline="middle"
               fill="white"
             >
-              {name}
+              {number}
             </text>
           </g>
         );

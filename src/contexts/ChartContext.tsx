@@ -55,7 +55,9 @@ export type PlanetName =
   | "Pluto"
   | "Chiron"
   | "true Node"
-  | "mean Apogee";
+  | "South Node"
+  | "mean Apogee"
+  | "osc. Apogee";
 
 export interface Cusp {
   name: string;

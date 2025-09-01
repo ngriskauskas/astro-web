@@ -1,11 +1,16 @@
 import { ZodiacData } from "../../../constants/zodiac";
 import { type ZodiacSign } from "../../../contexts/ChartContext";
-import { createWedgePath } from "./Utils";
+import { createWedgePath, polarToCartesian } from "./Utils";
+
+export interface SignAngle {
+  sign: ZodiacSign;
+  angle: number;
+}
 
 interface SignProps {
   center: number;
   radius: number;
-  angles: { sign: ZodiacSign; angle: number }[];
+  angles: SignAngle[];
 }
 
 export const Signs = ({ radius, center, angles }: SignProps) => {
@@ -31,10 +36,9 @@ export const Signs = ({ radius, center, angles }: SignProps) => {
       />
       {angles.map(({ sign, angle }) => {
         const { glyph, color } = ZodiacData[sign];
-        const rad = ((angle + 15 - 180) * Math.PI) / 180;
+
         const midRadius = (innerRadius + outerRadius) / 2;
-        const tx = center + midRadius * Math.cos(rad);
-        const ty = center - midRadius * Math.sin(rad);
+        const { x, y } = polarToCartesian(center, midRadius, angle + 15);
 
         return (
           <g key={sign}>
@@ -50,13 +54,7 @@ export const Signs = ({ radius, center, angles }: SignProps) => {
               stroke="white"
               fillRule="evenodd"
             />
-            <image 
-              href={glyph}
-              x={tx - 12}
-              y={ty - 12}
-              width={25}
-              height={25}
-            />
+            <image href={glyph} x={x - 12} y={y - 12} width={25} height={25} />
           </g>
         );
       })}

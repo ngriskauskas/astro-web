@@ -1,12 +1,10 @@
 import { PlanetsData } from "../../../constants/zodiac";
-import {
-  type Cusp,
-  type Planet,
-  type ZodiacSign,
-} from "../../../contexts/ChartContext";
+import { type Planet } from "../../../contexts/ChartContext";
+import { polarToCartesian } from "./Utils";
 
-interface PlanetAngle extends Planet {
+export interface PlanetAngle extends Planet {
   angle: number;
+  glyphAngle: number;
 }
 
 interface PlanetProps {
@@ -16,20 +14,21 @@ interface PlanetProps {
 }
 
 export const Planets = ({ radius, center, angles }: PlanetProps) => {
-  const innerRadius = radius - 25;
+  const innerRadius = radius - 10;
   const outerRadius = radius;
+
   return (
     <g>
-      {angles.map(({ name, angle }) => {
-        const rad = ((angle - 180) * Math.PI) / 180;
-        const x1 = center + innerRadius * Math.cos(rad);
-        const y1 = center - innerRadius * Math.sin(rad);
-        const x2 = center + outerRadius * Math.cos(rad);
-        const y2 = center - outerRadius * Math.sin(rad);
+      {angles.map(({ name, angle, glyphAngle }) => {
+        const { x: x1, y: y1 } = polarToCartesian(center, innerRadius, angle);
+        const { x: x2, y: y2 } = polarToCartesian(center, outerRadius, angle);
+        const { x: tx, y: ty } = polarToCartesian(
+          center,
+          outerRadius - 25,
+          glyphAngle,
+        );
 
-        const textRadius = outerRadius + 20;
-        const tx = center + textRadius * Math.cos(rad);
-        const ty = center - textRadius * Math.sin(rad);
+        const planetInfo = PlanetsData[name];
         return (
           <g key={name}>
             <line
@@ -40,13 +39,17 @@ export const Planets = ({ radius, center, angles }: PlanetProps) => {
               stroke="white"
               strokeWidth={1}
             />
-            <image
-              href={PlanetsData[name]}
-              x={tx - 10}
-              y={ty - 10}
-              width={25}
-              height={25}
-            />
+            <text
+              className="font-normal"
+              x={tx}
+              y={ty}
+              fontSize={26 * planetInfo.scale}
+              textAnchor="middle"
+              dominantBaseline="central"
+              fontFamily='"Segoe UI Symbol", "Noto Sans Symbols", sans-serif'
+            >
+              {planetInfo.glyph}
+            </text>
           </g>
         );
       })}

@@ -14,6 +14,7 @@ export const Home = () => {
       zodiac_system: "tropical",
       house_system: "placidus",
     });
+    console.log(data);
     setChart(data);
   };
 

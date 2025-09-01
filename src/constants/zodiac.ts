@@ -53,20 +53,27 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
   pisces: { glyph: PiscesSvg, color: ElementColors["water"] },
 };
 
-export const PlanetsData: Record<PlanetName, string> = {
-  Sun: SunSvg,
-  Moon: MoonSvg,
-  Mercury: MercurySvg,
-  Venus: VenusSvg,
-  Mars: MarsSvg,
-  Jupiter: JupiterSvg,
-  Saturn: SaturnSvg,
-  Uranus: UranusSvg,
-  Neptune: NeptuneSvg,
-  Pluto: PlutoSvg,
-  Chiron: ChironSvg,
-  "mean Apogee": LilithSvg,
-  "true Node": NorthNodeSvg,
+interface PlanetInfo {
+  glyph: string;
+  scale: number;
+}
+
+export const PlanetsData: Record<PlanetName, PlanetInfo> = {
+  Sun: { glyph: "☉", scale: 1.1 },
+  Moon: { glyph: "☽", scale: 1 },
+  Mercury: { glyph: "☿", scale: 1.1 },
+  Venus: { glyph: "♀", scale: 1.2 },
+  Mars: { glyph: "♂", scale: 1.3 },
+  Jupiter: { glyph: "♃", scale: 1 },
+  Saturn: { glyph: "♄", scale: 1 },
+  Uranus: { glyph: "♅", scale: 1 },
+  Neptune: { glyph: "♆", scale: 1 },
+  Pluto: { glyph: "♇", scale: 1 },
+  Chiron: { glyph: "⚷", scale: 1.2 },
+  "mean Apogee": { glyph: "⚸", scale: 1.3 },
+  "true Node": { glyph: "☊", scale: 0.95 },
+  "osc. Apogee": { glyph: "⚸", scale: 1.3 },
+  "South Node": { glyph: "☋", scale: 0.95 },
 };
 
 export const Aspects = {
