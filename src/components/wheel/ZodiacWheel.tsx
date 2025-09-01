@@ -1,21 +1,28 @@
 import { useEffect, useState } from "react";
 import {
   ZodiacSigns,
+  type PlanetName,
   type SingleChart,
   type ZodiacSign,
 } from "../../contexts/ChartContext";
 import { Background } from "./layers/Background";
-import { Signs, type SignAngle } from "./layers/Signs";
-import { type CuspAngle, Houses } from "./layers/Houses";
+import { Signs } from "./layers/Signs";
+import { Houses } from "./layers/Houses";
 import { Planets, type PlanetAngle } from "./layers/Planets";
 import { Aspects } from "./layers/Aspects";
 
 interface ZodiacWheelProps {
   chart: SingleChart;
   showAspects: true;
+  aspectMinOrb: number;
 }
 
-export const ZodiacWheel = ({ chart }: ZodiacWheelProps) => {
+export const ZodiacWheel = ({ chart, aspectMinOrb = 6 }: ZodiacWheelProps) => {
+  const [hoveredPlanet, setHoveredPlanet] = useState<PlanetName | null>(null);
+  const [hoverAspectedPlanets, setHoverAspectedPlanets] = useState<
+    PlanetName[]
+  >([]);
+
   const calcCuspAngles = (chart: SingleChart) => {
     const ascPos = chart.cusps["cusp1"].position;
 
@@ -79,15 +86,35 @@ export const ZodiacWheel = ({ chart }: ZodiacWheelProps) => {
       preserveAspectRatio="xMidYMid meet"
     >
       <Background radius={radius} />
-      <Signs center={radius} radius={radius - 5} angles={signAngles} />
       <Houses center={radius} radius={radius - 55} angles={cuspAngles} />
-      <Planets center={radius} radius={radius - 55} angles={planetAngles} />
+      <Signs center={radius} radius={radius - 5} angles={signAngles} />
+      <Planets
+        center={radius}
+        radius={radius - 55}
+        angles={planetAngles}
+        hoverAspectedPlanets={hoverAspectedPlanets}
+        onHoverPlanet={(planet) => {
+          setHoveredPlanet(planet);
+          chart.aspects.forEach(({ planet1, planet2,orb }) => {
+            if(orb > aspectMinOrb) return;
+            if (planet1.name === planet)
+              setHoverAspectedPlanets((prev) => [planet2.name, ...prev]);
+            else if (planet2.name === planet)
+              setHoverAspectedPlanets((prev) => [planet1.name, ...prev]);
+          });
+        }}
+        onLeavePlanet={() => {
+          setHoveredPlanet(null);
+          setHoverAspectedPlanets([]);
+        }}
+      />
       <Aspects
         center={radius}
         radius={radius - 175}
         angles={planetAngles}
         aspects={chart.aspects}
-        minOrb={6}
+        minOrb={aspectMinOrb}
+        hoveredPlanet={hoveredPlanet}
       />
     </svg>
   );

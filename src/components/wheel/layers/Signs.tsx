@@ -18,22 +18,6 @@ export const Signs = ({ radius, center, angles }: SignProps) => {
   const outerRadius = radius;
   return (
     <g>
-      <circle
-        cx={center}
-        cy={center}
-        r={innerRadius}
-        fill="none"
-        stroke="white"
-        strokeWidth={1}
-      />
-      <circle
-        cx={center}
-        cy={center}
-        r={outerRadius}
-        fill="none"
-        stroke="white"
-        strokeWidth={1}
-      />
       {angles.map(({ sign, angle }) => {
         const { glyph, color } = ZodiacData[sign];
 
@@ -53,6 +37,8 @@ export const Signs = ({ radius, center, angles }: SignProps) => {
               fill={color}
               stroke="white"
               fillRule="evenodd"
+              className="cursor-pointer transition-transform duration-200
+              ease-in-out hover:scale-101 origin-[50%_50%] hover:drop-shadow-lg hover:opacity-60"
             />
             <image href={glyph} x={x - 12} y={y - 12} width={25} height={25} />
           </g>

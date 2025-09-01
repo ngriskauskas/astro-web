@@ -14,7 +14,6 @@ export const Home = () => {
       zodiac_system: "tropical",
       house_system: "placidus",
     });
-    console.log(data);
     setChart(data);
   };
 
@@ -25,7 +24,9 @@ export const Home = () => {
 
   return (
     <div className="flex items-center justify-center mt-10 bg-gray-100">
-      {chart && <ZodiacWheel showAspects={true} chart={chart} />}
+      <div className="w-3/4">
+        {chart && <ZodiacWheel showAspects={true} chart={chart} />}
+      </div>
     </div>
   );
 };

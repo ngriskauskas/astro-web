@@ -29,8 +29,57 @@ export const Houses = ({ radius, center, angles }: HouseProps) => {
 
   return (
     <g>
-      {keyAngles.map(({ name, angle }) => {
+      {houseAngles.map(({ number, angle }, i) => {
+        const nextAngle = houseAngles[(i + 1) % houseAngles.length].angle;
 
+        const wedgePath = createWedgePath(
+          center,
+          innerRadius,
+          outerRadius,
+          angle,
+          nextAngle,
+        );
+        const midAngle = midpointAngle(angle, nextAngle);
+
+        const { x: tx, y: ty } = polarToCartesian(
+          center,
+          innerRadius + 15,
+          midAngle,
+        );
+
+        return (
+          <g key={number}>
+            <radialGradient
+              id="houseGradient"
+              cx="50%"
+              cy="50%"
+              r="50%"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop offset="0%" stopColor="rgba(255,255,255)" />
+              <stop offset="60%" stopColor="rgba(255,255,255,0.1)" />
+            </radialGradient>
+            <path
+              className="cursor-pointer transition-transform duration-200
+              ease-in-out hover:scale-101 origin-[50%_50%] hover:drop-shadow-lg hover:opacity-40"
+              d={wedgePath}
+              fill="url(#houseGradient)"
+              stroke="white"
+              strokeWidth={1}
+            />
+            <text
+              x={tx}
+              y={ty}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="white"
+            >
+              {number}
+            </text>
+          </g>
+        );
+      })}
+      {keyAngles.map(({ name, angle }) => {
         const { x: innerX, y: innerY } = polarToCartesian(
           center,
           innerRadius,
@@ -58,6 +107,8 @@ export const Houses = ({ radius, center, angles }: HouseProps) => {
               strokeWidth={3}
             />
             <text
+              className="cursor-pointer fill-current hover:text-yellow-300
+              ease-in-out hover:scale-101 duration-200 origin-[50%_50%]"
               x={lx}
               y={ly}
               textAnchor="middle"
@@ -65,36 +116,6 @@ export const Houses = ({ radius, center, angles }: HouseProps) => {
               fill="white"
             >
               {name.toUpperCase()}
-            </text>
-          </g>
-        );
-      })}
-      {houseAngles.map(({ number, angle }, i) => {
-        const nextAngle = houseAngles[(i + 1) % houseAngles.length].angle;
-
-        const wedgePath = createWedgePath(
-          center,
-          innerRadius,
-          outerRadius,
-          angle,
-          nextAngle,
-          false,
-        );
-        const midAngle = midpointAngle(angle, nextAngle);
-
-        const { x: tx, y: ty } = polarToCartesian(center, innerRadius + 15, midAngle);
-
-        return (
-          <g key={number}>
-            <path d={wedgePath} fill="none" stroke="white" strokeWidth={1} />
-            <text
-              x={tx}
-              y={ty}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="white"
-            >
-              {number}
             </text>
           </g>
         );

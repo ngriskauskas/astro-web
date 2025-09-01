@@ -1,6 +1,6 @@
 import { polarToCartesian } from "./Utils";
 import { type PlanetAngle } from "./Planets";
-import type { Aspect } from "../../../contexts/ChartContext";
+import type { Aspect, PlanetName } from "../../../contexts/ChartContext";
 
 const aspectColors: Record<string, string> = {
   conjunction: "#FFD700",
@@ -16,6 +16,7 @@ interface AspectProps {
   angles: PlanetAngle[];
   aspects: Aspect[];
   minOrb: number;
+  hoveredPlanet: PlanetName | null;
 }
 
 export const Aspects = ({
@@ -24,11 +25,17 @@ export const Aspects = ({
   angles,
   aspects,
   minOrb,
+  hoveredPlanet,
 }: AspectProps) => {
   return (
     <g>
       {aspects.map(({ type, orb, planet1, planet2 }, i) => {
         if (orb > minOrb) return;
+
+        const isHighlighted =
+          hoveredPlanet &&
+          (planet1.name === hoveredPlanet || planet2.name === hoveredPlanet);
+
         const planet1Angle = angles.find(
           ({ name }) => name === planet1.name,
         )!.angle;
@@ -39,6 +46,8 @@ export const Aspects = ({
         const { x: x2, y: y2 } = polarToCartesian(center, radius, planet2Angle);
         return (
           <line
+            className={`transition-colors duration-200 ${isHighlighted ? 'opacity-100' : 'opacity-50'
+              }`}
             key={i}
             x1={x1}
             y1={y1}
@@ -46,7 +55,7 @@ export const Aspects = ({
             y2={y2}
             stroke={aspectColors[type]}
             strokeDasharray={orb > 5 ? "4 2" : undefined}
-            strokeWidth={orb < 2 ? 2 : 1}
+            strokeWidth={isHighlighted ? 3.5 : orb < 2 ? 1.5 : 1}
           />
         );
       })}
