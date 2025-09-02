@@ -1,5 +1,6 @@
 import { PlanetsData } from "../../../constants/zodiac";
 import { type Planet, type PlanetName } from "../../../contexts/ChartContext";
+import type { ObjectOptions } from "../ZodiacWheelSettings";
 import { polarToCartesian } from "./Utils";
 
 export interface PlanetAngle extends Planet {
@@ -14,6 +15,8 @@ interface PlanetProps {
   onHoverPlanet: (name: PlanetName) => void;
   onLeavePlanet: () => void;
   hoverAspectedPlanets: PlanetName[];
+  options: ObjectOptions;
+  showAngleLabels: boolean;
 }
 
 export const Planets = ({
@@ -23,13 +26,22 @@ export const Planets = ({
   onHoverPlanet,
   onLeavePlanet,
   hoverAspectedPlanets,
+  options,
+  showAngleLabels,
 }: PlanetProps) => {
   const innerRadius = radius - 10;
   const outerRadius = radius;
-
   return (
     <g>
-      {angles.map(({ name, angle, glyphAngle }) => {
+      {angles.map(({ name, angle, glyphAngle, retrograde, deg_min }) => {
+        if (name === "Chiron" && !options.showChiron) return;
+        if (
+          !options.lilith &&
+          (name === "mean Apogee" || name === "osc. Apogee")
+        )
+          return;
+        if (options.lilith === "true" && name === "mean Apogee") return;
+        if (options.lilith === "mean" && name === "osc. Apogee") return;
         const { x: x1, y: y1 } = polarToCartesian(center, innerRadius, angle);
         const { x: x2, y: y2 } = polarToCartesian(center, outerRadius, angle);
         const { x: tx, y: ty } = polarToCartesian(
@@ -37,8 +49,12 @@ export const Planets = ({
           outerRadius - 25,
           glyphAngle,
         );
+        const {x: dx, y: dy} = polarToCartesian(center, outerRadius - 60, glyphAngle);
+
         const isAspected = hoverAspectedPlanets.includes(name);
         const planetInfo = PlanetsData[name];
+        const [deg, min] = deg_min;
+        const degLabel = `${Math.round(deg)}° ${Math.round(min)}′`;
         return (
           <g key={name}>
             <line
@@ -65,28 +81,45 @@ export const Planets = ({
                   ${isAspected ? "stroke-white" : ""} 
                   group-hover:stroke-yellow-300`}
               />
-              {planetInfo.isSvg ? (
-                <image
-                  href={planetInfo.glyph}
-                  x={tx - 15}
-                  y={ty - 17}
-                  width={25 * planetInfo.scale}
-                  height={25 * planetInfo.scale}
-                  className="transition duration-200 ease-in-out group-hover:brightness-150"
-                />
-              ) : (
+              <text
+                x={tx}
+                y={ty}
+                fontSize={26 * planetInfo.scale}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontFamily='"Segoe UI Symbol", "Noto Sans Symbols", sans-serif'
+                className="fill-current transition-transform duration-200 
+                  ease-in-out group-hover:text-yellow-300"
+                pointerEvents="none"
+              >
+                {planetInfo.glyph}
+              </text>
+              {retrograde && (
                 <text
-                  x={tx}
-                  y={ty}
-                  fontSize={26 * planetInfo.scale}
+                  x={tx + 9}
+                  y={ty + 10}
+                  fontSize={10}
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fontFamily='"Segoe UI Symbol", "Noto Sans Symbols", sans-serif'
                   className="fill-current transition-transform duration-200 
-                  ease-in-out group-hover:text-yellow-300"
+                    ease-in-out group-hover:text-yellow-300"
                   pointerEvents="none"
                 >
-                  {planetInfo.glyph}
+                  ℞
+                </text>
+              )}
+              {showAngleLabels && (
+                <text
+                  x={dx}
+                  y={dy}
+                  fontSize={10}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontFamily='"Segoe UI Symbol", "Noto Sans Symbols", sans-serif'
+                  pointerEvents="none"
+                >
+                  {degLabel}
                 </text>
               )}
             </g>

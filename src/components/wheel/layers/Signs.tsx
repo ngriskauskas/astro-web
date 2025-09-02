@@ -11,9 +11,10 @@ interface SignProps {
   center: number;
   radius: number;
   angles: SignAngle[];
+  showTickMarks: boolean;
 }
 
-export const Signs = ({ radius, center, angles }: SignProps) => {
+export const Signs = ({ radius, center, angles, showTickMarks }: SignProps) => {
   const innerRadius = radius - 50;
   const outerRadius = radius;
   return (
@@ -25,7 +26,11 @@ export const Signs = ({ radius, center, angles }: SignProps) => {
         const { x, y } = polarToCartesian(center, midRadius, angle + 15);
 
         return (
-          <g key={sign}>
+          <g
+            key={sign}
+            className="cursor-pointer transition-transform duration-200 
+             ease-in-out hover:scale-101 origin-[50%_50%] hover:drop-shadow-lg hover:opacity-60"
+          >
             <path
               d={createWedgePath(
                 center,
@@ -37,10 +42,39 @@ export const Signs = ({ radius, center, angles }: SignProps) => {
               fill={color}
               stroke="white"
               fillRule="evenodd"
-              className="cursor-pointer transition-transform duration-200
-              ease-in-out hover:scale-101 origin-[50%_50%] hover:drop-shadow-lg hover:opacity-60"
             />
             <image href={glyph} x={x - 12} y={y - 12} width={25} height={25} />
+            {showTickMarks &&
+              Array.from({ length: 29 }, (_, i) => {
+                const tickAngle = angle + (i + 1);
+                let tickLength: number;
+                if ((i + 1) % 10 === 0) {
+                  tickLength = 15;
+                } else if ((i + 1) % 5 === 0) {
+                  tickLength = 10;
+                } else {
+                  tickLength = 4;
+                }
+
+                const p1 = polarToCartesian(center, innerRadius, tickAngle);
+                const p2 = polarToCartesian(
+                  center,
+                  innerRadius + tickLength,
+                  tickAngle,
+                );
+
+                return (
+                  <line
+                    key={tickAngle}
+                    x1={p1.x}
+                    y1={p1.y}
+                    x2={p2.x}
+                    y2={p2.y}
+                    stroke="white"
+                    strokeWidth={1}
+                  />
+                );
+              })}{" "}
           </g>
         );
       })}

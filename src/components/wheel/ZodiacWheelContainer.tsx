@@ -6,7 +6,6 @@ import {
   type ZodiacWheelOptions,
 } from "./ZodiacWheelSettings";
 import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
-import { unstable_batchedUpdates } from "react-dom";
 
 export const ZodiacWheelContainer = ({
   initialProfileId,
@@ -28,6 +27,14 @@ export const ZodiacWheelContainer = ({
       trine: { show: true, minOrb: 6 },
       sextile: { show: true, minOrb: 6 },
     },
+    objectOptions: {
+      showChiron: true,
+      lilith: "true",
+    },
+    displayOptions: {
+      angleLabels: true,
+      tickMarks: true
+    }
   });
 
   const fetchChart = async () => {
@@ -54,7 +61,7 @@ export const ZodiacWheelContainer = ({
     <div className="flex gap-5 items-center">
       <div className="flex-[3] flex-shrink-0 flex justify-center">
         {chart ? (
-          <ZodiacWheel chart={chart} options={settings} aspectMinOrb={6} />
+          <ZodiacWheel chart={chart} options={settings} />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500">
             Loading...

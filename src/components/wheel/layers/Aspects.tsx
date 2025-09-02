@@ -1,6 +1,7 @@
 import { polarToCartesian } from "./Utils";
 import { type PlanetAngle } from "./Planets";
 import type { Aspect, PlanetName } from "../../../contexts/ChartContext";
+import type { AspectOptions } from "../ZodiacWheelSettings";
 
 const aspectColors: Record<string, string> = {
   conjunction: "#FFD700",
@@ -15,8 +16,8 @@ interface AspectProps {
   radius: number;
   angles: PlanetAngle[];
   aspects: Aspect[];
-  minOrb: number;
   hoveredPlanet: PlanetName | null;
+  options: AspectOptions;
 }
 
 export const Aspects = ({
@@ -24,13 +25,14 @@ export const Aspects = ({
   center,
   angles,
   aspects,
-  minOrb,
   hoveredPlanet,
+  options,
 }: AspectProps) => {
   return (
     <g>
       {aspects.map(({ type, orb, planet1, planet2 }, i) => {
-        if (orb > minOrb) return;
+        const { minOrb, show } = options[type];
+        if (!show || orb > minOrb) return;
 
         const isHighlighted =
           hoveredPlanet &&
@@ -46,8 +48,9 @@ export const Aspects = ({
         const { x: x2, y: y2 } = polarToCartesian(center, radius, planet2Angle);
         return (
           <line
-            className={`transition-colors duration-200 ${isHighlighted ? 'opacity-100' : 'opacity-50'
-              }`}
+            className={`transition-colors duration-200 ${
+              isHighlighted ? "opacity-100" : "opacity-50"
+            }`}
             key={i}
             x1={x1}
             y1={y1}

@@ -14,15 +14,10 @@ import type { ZodiacWheelOptions } from "./ZodiacWheelSettings";
 
 interface ZodiacWheelProps {
   chart: SingleChart;
-  aspectMinOrb: number;
   options: ZodiacWheelOptions;
 }
 
-export const ZodiacWheel = ({
-  chart,
-  aspectMinOrb = 6,
-  options,
-}: ZodiacWheelProps) => {
+export const ZodiacWheel = ({ chart, options }: ZodiacWheelProps) => {
   const [hoveredPlanet, setHoveredPlanet] = useState<PlanetName | null>(null);
   const [hoverAspectedPlanets, setHoverAspectedPlanets] = useState<
     PlanetName[]
@@ -91,17 +86,30 @@ export const ZodiacWheel = ({
       preserveAspectRatio="xMidYMid meet"
     >
       <Background radius={radius} />
-      <Houses center={radius} radius={radius - 55} angles={cuspAngles} />
-      <Signs center={radius} radius={radius - 5} angles={signAngles} />
+      <Houses
+        center={radius}
+        radius={radius - 55}
+        angles={cuspAngles}
+        showAngleLabels={options.displayOptions.angleLabels}
+      />
+      <Signs
+        center={radius}
+        radius={radius - 5}
+        angles={signAngles}
+        showTickMarks={options.displayOptions.tickMarks}
+      />
       <Planets
         center={radius}
         radius={radius - 55}
         angles={planetAngles}
         hoverAspectedPlanets={hoverAspectedPlanets}
+        options={options.objectOptions}
+        showAngleLabels={options.displayOptions.angleLabels}
         onHoverPlanet={(planet) => {
           setHoveredPlanet(planet);
-          chart.aspects.forEach(({ planet1, planet2, orb }) => {
-            if (orb > aspectMinOrb) return;
+          chart.aspects.forEach(({ planet1, planet2, orb, type }) => {
+            const { minOrb, show } = options.aspectOptions[type];
+            if (!show || orb > minOrb) return;
             if (planet1.name === planet)
               setHoverAspectedPlanets((prev) => [planet2.name, ...prev]);
             else if (planet2.name === planet)
@@ -118,7 +126,7 @@ export const ZodiacWheel = ({
         radius={radius - 175}
         angles={planetAngles}
         aspects={chart.aspects}
-        minOrb={aspectMinOrb}
+        options={options.aspectOptions}
         hoveredPlanet={hoveredPlanet}
       />
     </svg>

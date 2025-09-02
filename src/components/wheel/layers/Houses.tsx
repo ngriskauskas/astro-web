@@ -1,4 +1,4 @@
-import { type Cusp, type ZodiacSign } from "../../../contexts/ChartContext";
+import { type Cusp } from "../../../contexts/ChartContext";
 import { createWedgePath, midpointAngle, polarToCartesian } from "./Utils";
 
 export interface CuspAngle extends Cusp {
@@ -9,9 +9,15 @@ interface HouseProps {
   center: number;
   radius: number;
   angles: CuspAngle[];
+  showAngleLabels: boolean;
 }
 
-export const Houses = ({ radius, center, angles }: HouseProps) => {
+export const Houses = ({
+  radius,
+  center,
+  angles,
+  showAngleLabels,
+}: HouseProps) => {
   const innerRadius = radius - 120;
   const outerRadius = radius;
 
@@ -79,7 +85,7 @@ export const Houses = ({ radius, center, angles }: HouseProps) => {
           </g>
         );
       })}
-      {keyAngles.map(({ name, angle }) => {
+      {keyAngles.map(({ name, angle, deg_min }) => {
         const { x: innerX, y: innerY } = polarToCartesian(
           center,
           innerRadius,
@@ -92,9 +98,12 @@ export const Houses = ({ radius, center, angles }: HouseProps) => {
         );
         const { x: lx, y: ly } = polarToCartesian(
           center,
-          outerRadius - 18,
-          angle + 3,
+          innerRadius + 18,
+          angle + 4,
         );
+        const { x: dx, y: dy } = polarToCartesian(center, outerRadius - 15, angle + 2);
+        const [deg, min] = deg_min;
+        const degLabel = `${Math.round(deg)}° ${Math.round(min)}′`;
 
         return (
           <g key={name}>
@@ -117,6 +126,19 @@ export const Houses = ({ radius, center, angles }: HouseProps) => {
             >
               {name.toUpperCase()}
             </text>
+            {showAngleLabels && (
+              <text
+                x={dx}
+                y={dy}
+                fontSize={10}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontFamily='"Segoe UI Symbol", "Noto Sans Symbols", sans-serif'
+                pointerEvents="none"
+              >
+                {degLabel}
+              </text>
+            )}
           </g>
         );
       })}

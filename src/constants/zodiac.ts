@@ -61,7 +61,7 @@ interface PlanetInfo {
 }
 
 export const PlanetsData: Record<PlanetName, PlanetInfo> = {
-  Sun: { glyph: "☉", scale: 1.1 },
+  Sun: { glyph: "☉", scale: 1.15 },
   Moon: { glyph: "☽", scale: 1 },
   Mercury: { glyph: "☿", scale: 1.1 },
   Venus: { glyph: "♀", scale: 1.2 },
