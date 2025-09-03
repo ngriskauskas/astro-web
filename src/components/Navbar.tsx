@@ -14,8 +14,16 @@ export const Navbar = () => {
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-white shadow">
-      <div className="text-xl font-bold text-gray-800">
-        <Link to="/">Astro</Link>
+      <div className="flex items-center space-x-4">
+        <div className="text-xl font-bold text-gray-800 mr-15">
+          <Link to="/">Astro</Link>
+        </div>
+        <Link to="/charts" className="text-gray-700 hover:text-gray-900">
+          Charts
+        </Link>
+        <Link to="/current-time" className="text-gray-700 hover:text-gray-900">
+          Time
+        </Link>
       </div>
       <div className="hidden md:flex space-x-6">
         <Link to="/profile" className="text-gray-700 hover:text-gray-900">
@@ -48,10 +56,11 @@ export const Navbar = () => {
         </svg>
       </button>
       <div
-        className={`fixed inset-0 z-40 transition-opacity duration-300 ${isOpen
+        className={`fixed inset-0 z-40 transition-opacity duration-300 ${
+          isOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
-          }`}
+        }`}
       >
         <div
           className="absolute inset-0 bg-black/20"
