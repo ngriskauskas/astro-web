@@ -1,7 +1,7 @@
 import { polarToCartesian } from "./Utils";
 import { type PlanetAngle } from "./Planets";
 import type { Aspect, PlanetName } from "../../../contexts/ChartContext";
-import type { AspectOptions } from "../ZodiacWheelSettings";
+import type { AspectOptions, ObjectOptions } from "../ZodiacWheelSettings";
 
 const aspectColors: Record<string, string> = {
   conjunction: "#FFD700",
@@ -18,6 +18,7 @@ interface AspectProps {
   aspects: Aspect[];
   hoveredPlanet: PlanetName | null;
   options: AspectOptions;
+  objectOptions: ObjectOptions;
 }
 
 export const Aspects = ({
@@ -27,12 +28,30 @@ export const Aspects = ({
   aspects,
   hoveredPlanet,
   options,
+  objectOptions,
 }: AspectProps) => {
   return (
     <g>
       {aspects.map(({ type, orb, planet1, planet2 }, i) => {
         const { minOrb, show } = options[type];
         if (!show || orb > minOrb) return;
+
+        if (
+          !objectOptions.showChiron &&
+          (planet1.name === "Chiron" || planet2.name === "Chiron")
+        )
+          return;
+
+        if (
+          (planet1.name === "mean Apogee" || planet2.name === "mean Apogee") &&
+          (objectOptions.lilith === "true" || !objectOptions.lilith)
+        )
+          return;
+        if (
+          (planet1.name === "osc. Apogee" || planet2.name === "osc. Apogee") &&
+          (objectOptions.lilith === "mean" || !objectOptions.lilith)
+        )
+          return;
 
         const isHighlighted =
           hoveredPlanet &&

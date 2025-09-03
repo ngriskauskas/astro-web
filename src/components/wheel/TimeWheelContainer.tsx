@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type SingleChart, useCharts } from "../../contexts/ChartContext";
 import { ZodiacWheel } from "./ZodiacWheel";
 import {
@@ -75,7 +75,7 @@ export const TimeWheelContainer = ({}: {}) => {
 
     const intervalId = setInterval(() => {
       fetchChart();
-    }, 10000);
+    }, 60 * 1000);
 
     return () => clearInterval(intervalId);
   }, [settings.zodiacSystem, settings.ayanamsa, settings.houseSystem]);

@@ -40,7 +40,7 @@ export const ZodiacWheelContainer = ({
 
   const fetchChart = async () => {
     const data = await getNatalChart({
-      birth_profile_id: settings.profileId,
+      birth_profile_id: settings.profileId!,
       zodiac_system: settings.zodiacSystem,
       house_system: settings.houseSystem,
       ayanamsa:

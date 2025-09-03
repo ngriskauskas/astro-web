@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   ZodiacSigns,
   type PlanetName,
@@ -79,33 +79,6 @@ export const ZodiacWheel = ({ chart, options }: ZodiacWheelProps) => {
   const size = 700;
   const radius = size / 2;
 
-  const rotatingRef = useRef<SVGGElement>(null);
-  const rotationRef = useRef(0);
-  useEffect(() => {
-    let lastTime = performance.now();
-
-    const animate = (now: number) => {
-      const delta = now - lastTime;
-      lastTime = now;
-
-      const DEGREES_PER_MS = 360 / (24 * 60 * 60 * 1000);
-      rotationRef.current =
-        (rotationRef.current + delta * DEGREES_PER_MS) % 360;
-      if (rotatingRef.current) {
-        rotatingRef.current.setAttribute(
-          "transform",
-          `rotate(${rotationRef.current}, ${radius}, ${radius})`,
-        );
-      }
-
-      requestAnimationFrame(animate);
-    };
-
-    requestAnimationFrame(animate);
-  }, []);
-  useEffect(() => {
-    rotationRef.current = 0; // reset rotation
-  }, [chart]);
   return (
     <svg
       viewBox={`0 0 ${size} ${size}`}
@@ -120,7 +93,7 @@ export const ZodiacWheel = ({ chart, options }: ZodiacWheelProps) => {
         angles={cuspAngles}
         showAngleLabels={options.displayOptions.angleLabels}
       />
-      <g ref={rotatingRef}>
+      <g>
         <Signs
           center={radius}
           radius={radius - 5}
@@ -156,6 +129,7 @@ export const ZodiacWheel = ({ chart, options }: ZodiacWheelProps) => {
           angles={planetAngles}
           aspects={chart.aspects}
           options={options.aspectOptions}
+          objectOptions={options.objectOptions}
           hoveredPlanet={hoveredPlanet}
         />
       </g>
