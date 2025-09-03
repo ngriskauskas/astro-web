@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ZodiacSigns,
   type PlanetName,
@@ -78,6 +78,34 @@ export const ZodiacWheel = ({ chart, options }: ZodiacWheelProps) => {
   const cuspAngles = calcCuspAngles(chart);
   const size = 700;
   const radius = size / 2;
+
+  const rotatingRef = useRef<SVGGElement>(null);
+  const rotationRef = useRef(0);
+  useEffect(() => {
+    let lastTime = performance.now();
+
+    const animate = (now: number) => {
+      const delta = now - lastTime;
+      lastTime = now;
+
+      const DEGREES_PER_MS = 360 / (24 * 60 * 60 * 1000);
+      rotationRef.current =
+        (rotationRef.current + delta * DEGREES_PER_MS) % 360;
+      if (rotatingRef.current) {
+        rotatingRef.current.setAttribute(
+          "transform",
+          `rotate(${rotationRef.current}, ${radius}, ${radius})`,
+        );
+      }
+
+      requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
+  }, []);
+  useEffect(() => {
+    rotationRef.current = 0; // reset rotation
+  }, [chart]);
   return (
     <svg
       viewBox={`0 0 ${size} ${size}`}
@@ -92,43 +120,45 @@ export const ZodiacWheel = ({ chart, options }: ZodiacWheelProps) => {
         angles={cuspAngles}
         showAngleLabels={options.displayOptions.angleLabels}
       />
-      <Signs
-        center={radius}
-        radius={radius - 5}
-        angles={signAngles}
-        showTickMarks={options.displayOptions.tickMarks}
-      />
-      <Planets
-        center={radius}
-        radius={radius - 55}
-        angles={planetAngles}
-        hoverAspectedPlanets={hoverAspectedPlanets}
-        options={options.objectOptions}
-        showAngleLabels={options.displayOptions.angleLabels}
-        onHoverPlanet={(planet) => {
-          setHoveredPlanet(planet);
-          chart.aspects.forEach(({ planet1, planet2, orb, type }) => {
-            const { minOrb, show } = options.aspectOptions[type];
-            if (!show || orb > minOrb) return;
-            if (planet1.name === planet)
-              setHoverAspectedPlanets((prev) => [planet2.name, ...prev]);
-            else if (planet2.name === planet)
-              setHoverAspectedPlanets((prev) => [planet1.name, ...prev]);
-          });
-        }}
-        onLeavePlanet={() => {
-          setHoveredPlanet(null);
-          setHoverAspectedPlanets([]);
-        }}
-      />
-      <Aspects
-        center={radius}
-        radius={radius - 175}
-        angles={planetAngles}
-        aspects={chart.aspects}
-        options={options.aspectOptions}
-        hoveredPlanet={hoveredPlanet}
-      />
+      <g ref={rotatingRef}>
+        <Signs
+          center={radius}
+          radius={radius - 5}
+          angles={signAngles}
+          showTickMarks={options.displayOptions.tickMarks}
+        />
+        <Planets
+          center={radius}
+          radius={radius - 55}
+          angles={planetAngles}
+          hoverAspectedPlanets={hoverAspectedPlanets}
+          options={options.objectOptions}
+          showAngleLabels={options.displayOptions.angleLabels}
+          onHoverPlanet={(planet) => {
+            setHoveredPlanet(planet);
+            chart.aspects.forEach(({ planet1, planet2, orb, type }) => {
+              const { minOrb, show } = options.aspectOptions[type];
+              if (!show || orb > minOrb) return;
+              if (planet1.name === planet)
+                setHoverAspectedPlanets((prev) => [planet2.name, ...prev]);
+              else if (planet2.name === planet)
+                setHoverAspectedPlanets((prev) => [planet1.name, ...prev]);
+            });
+          }}
+          onLeavePlanet={() => {
+            setHoveredPlanet(null);
+            setHoverAspectedPlanets([]);
+          }}
+        />
+        <Aspects
+          center={radius}
+          radius={radius - 175}
+          angles={planetAngles}
+          aspects={chart.aspects}
+          options={options.aspectOptions}
+          hoveredPlanet={hoveredPlanet}
+        />
+      </g>
     </svg>
   );
 };

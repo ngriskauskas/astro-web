@@ -29,8 +29,42 @@ export const Signs = ({ radius, center, angles, showTickMarks }: SignProps) => {
           <g
             key={sign}
             className="cursor-pointer transition-transform duration-200 
-             ease-in-out hover:scale-101 origin-[50%_50%] hover:drop-shadow-lg hover:opacity-60"
+             ease-in-out hover:scale-101 origin-[50%_50%] hover:drop-shadow-lg hover:opacity-80"
           >
+            <defs>
+              <linearGradient
+                id={`grad-${sign}`}
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+              >
+                <stop offset="0%" stopColor={color} stopOpacity={0.5}>
+                  <animate
+                    attributeName="stop-opacity"
+                    values="0.5;1;0.5"
+                    dur="4s"
+                    repeatCount="indefinite"
+                  />
+                </stop>
+                <stop offset="50%" stopColor={color} stopOpacity={0.8}>
+                  <animate
+                    attributeName="stop-opacity"
+                    values="0.8;0.5;0.8"
+                    dur="4s"
+                    repeatCount="indefinite"
+                  />
+                </stop>
+                <stop offset="100%" stopColor={color} stopOpacity={0.5}>
+                  <animate
+                    attributeName="stop-opacity"
+                    values="0.5;1;0.5"
+                    dur="4s"
+                    repeatCount="indefinite"
+                  />
+                </stop>
+              </linearGradient>
+            </defs>
             <path
               d={createWedgePath(
                 center,
@@ -39,7 +73,7 @@ export const Signs = ({ radius, center, angles, showTickMarks }: SignProps) => {
                 angle,
                 angle + 30,
               )}
-              fill={color}
+              fill={`url(#grad-${sign})`}
               stroke="white"
               fillRule="evenodd"
             />
@@ -74,7 +108,7 @@ export const Signs = ({ radius, center, angles, showTickMarks }: SignProps) => {
                     strokeWidth={1}
                   />
                 );
-              })}{" "}
+              })}
           </g>
         );
       })}

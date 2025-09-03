@@ -5,19 +5,14 @@ import {
   ZodiacWheelSettings,
   type ZodiacWheelOptions,
 } from "./ZodiacWheelSettings";
-import { type BirthProfile } from "../../contexts/BirthProfilesContext";
+import { useAuth } from "../../contexts/AuthContext";
 
-export const ZodiacWheelContainer = ({
-  initialProfileId,
-  profiles,
-}: {
-  initialProfileId: number;
-  profiles?: BirthProfile[];
-}) => {
+export const TimeWheelContainer = ({}: {}) => {
   const [chart, setChart] = useState<SingleChart | undefined>();
-  const { getNatalChart } = useCharts();
+  const { getCurrentChart } = useCharts();
+  const { user } = useAuth();
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
-    profileId: initialProfileId,
+    profileId: undefined,
     zodiacSystem: "tropical",
     houseSystem: "placidus",
     ayanamsa: "lahiri",
@@ -38,9 +33,35 @@ export const ZodiacWheelContainer = ({
     },
   });
 
+  const getCurrentPositionAsync = (): Promise<GeolocationPosition> => {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+  };
+
+  const getLocation = async () => {
+    try {
+      const {
+        coords: { latitude, longitude },
+      } = await getCurrentPositionAsync();
+      return { lon: longitude, lat: latitude };
+    } catch {
+      return { lon: user!.longitude, lat: user!.latitude };
+    }
+  };
+
   const fetchChart = async () => {
-    const data = await getNatalChart({
-      birth_profile_id: settings.profileId,
+    const now = new Date();
+    const localISODate =
+      now.getFullYear() +
+      "-" +
+      String(now.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(now.getDate()).padStart(2, "0");
+    const data = await getCurrentChart({
+      location: { lon: user!.longitude, lat: user!.latitude },
+      time: now.toTimeString().slice(0, 8),
+      date: localISODate,
       zodiac_system: settings.zodiacSystem,
       house_system: settings.houseSystem,
       ayanamsa:
@@ -51,12 +72,13 @@ export const ZodiacWheelContainer = ({
 
   useEffect(() => {
     fetchChart();
-  }, [
-    settings.profileId,
-    settings.zodiacSystem,
-    settings.ayanamsa,
-    settings.houseSystem,
-  ]);
+
+    const intervalId = setInterval(() => {
+      fetchChart();
+    }, 10000);
+
+    return () => clearInterval(intervalId);
+  }, [settings.zodiacSystem, settings.ayanamsa, settings.houseSystem]);
 
   return (
     <div className="flex gap-5 items-center">
@@ -73,7 +95,6 @@ export const ZodiacWheelContainer = ({
       <div className="flex-[1] max-h-[600px] overflow-y-auto my-5">
         <ZodiacWheelSettings
           options={settings}
-          profiles={profiles}
           onChange={({ key, value }) => {
             setSettings((prev) => ({ ...prev, [key]: value }));
           }}

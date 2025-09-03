@@ -13,6 +13,9 @@ export interface User {
   id: string;
   email: string;
   username: string;
+  address: string;
+  longitude: number;
+  latitude: number;
 }
 
 interface AuthContextType {

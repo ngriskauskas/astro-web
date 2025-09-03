@@ -119,8 +119,18 @@ export interface NatalChartOptions extends ChartOptions {
   birth_profile_id: number;
 }
 
+export interface CurrentChartOptions extends ChartOptions {
+  date: string; // "YYYY-MM-DD"
+  time: string; // "HH:mm:ss"
+  location: {
+    lat: number;
+    lon: number;
+  };
+}
+
 interface ChartContextType {
   getNatalChart: (options: NatalChartOptions) => Promise<SingleChart>;
+  getCurrentChart: (options: CurrentChartOptions) => Promise<SingleChart>;
 }
 
 const ChartContext = createContext<ChartContextType | undefined>(undefined);
@@ -134,10 +144,19 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
     return data as SingleChart;
   };
 
+  const getCurrentChart = async (options: CurrentChartOptions) => {
+    const data = await apiFetch("/charts/generic", {
+      method: "POST",
+      body: JSON.stringify(options),
+    });
+    return data as SingleChart;
+  };
+
   return (
     <ChartContext.Provider
       value={{
         getNatalChart,
+        getCurrentChart,
       }}
     >
       {children}

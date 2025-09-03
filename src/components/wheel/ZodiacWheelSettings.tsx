@@ -43,7 +43,7 @@ export interface DisplayOptions {
 }
 
 export interface ZodiacWheelOptions {
-  profileId: number;
+  profileId?: number;
   zodiacSystem: ZodiacSystem;
   houseSystem: HouseSystem;
   ayanamsa?: Ayanamsa;
@@ -54,7 +54,7 @@ export interface ZodiacWheelOptions {
 
 interface ZodiacWheelSettingsProps {
   options: ZodiacWheelOptions;
-  profiles: BirthProfile[];
+  profiles?: BirthProfile[];
   onChange: <K extends keyof ZodiacWheelOptions>(params: {
     key: K;
     value: ZodiacWheelOptions[K];
@@ -79,31 +79,33 @@ export const ZodiacWheelSettings = ({
   return (
     <div className="space-y-6 p-6 bg-white rounded-xl shadow-md text-xs">
       {/* Profile selector */}
-      <div className="flex flex-col">
-        <label className="font-medium text-gray-700 mb-1">Profile</label>
-        <select
-          value={options.profileId}
-          onChange={(e) =>
-            onChange({ key: "profileId", value: Number(e.target.value) })
-          }
-          className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        >
-          {profiles
-            .filter((p) => p.name === "My Profile")
-            .map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          {profiles
-            .filter((p) => p.name !== "My Profile")
-            .map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-        </select>
-      </div>
+      {profiles && (
+        <div className="flex flex-col">
+          <label className="font-medium text-gray-700 mb-1">Profile</label>
+          <select
+            value={options.profileId}
+            onChange={(e) =>
+              onChange({ key: "profileId", value: Number(e.target.value) })
+            }
+            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          >
+            {profiles
+              .filter((p) => p.name === "My Profile")
+              .map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            {profiles
+              .filter((p) => p.name !== "My Profile")
+              .map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+          </select>
+        </div>
+      )}
 
       {/* Zodiac & House System */}
       <div className="grid grid-cols-2 gap-4">

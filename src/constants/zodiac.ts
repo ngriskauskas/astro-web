@@ -33,10 +33,10 @@ interface ZodiacInfo {
 }
 export type Element = "fire" | "water" | "air" | "earth";
 export const ElementColors: Record<Element, string> = {
-  fire: "#FF6F61",
-  water: "#20B2AA",
-  air: "#92A8D1",
-  earth: "#556B2F",
+  fire: "#FF6347", // tomato red
+  water: "#1EBDEB", // original
+  air: "#92A8D1", // original
+  earth: "#228B22", // original
 };
 
 export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {

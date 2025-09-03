@@ -4,16 +4,25 @@ import toast from "react-hot-toast";
 import { BirthInfoForm } from "../components/BirthInfoForm";
 import { useBirthProfiles } from "../contexts/BirthProfilesContext";
 import { CustomProfileList } from "../components/CustomProfileList";
+import { BirthPlacePicker } from "../components/BirthPlacePicker";
 
 export const Profile = () => {
   const { user, updateUser } = useAuth();
   const { mainProfile } = useBirthProfiles();
   const [userInfo, setUserInfo] = useState({
     username: "",
+    address: "",
+    latitude: 0,
+    longitude: 0,
   });
 
   useEffect(() => {
-    setUserInfo({ username: user!.username });
+    setUserInfo({
+      username: user!.username,
+      address: user!.address,
+      latitude: user!.latitude,
+      longitude: user!.longitude,
+    });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,6 +70,23 @@ export const Profile = () => {
               value={user!.email}
               disabled
               className="w-full rounded-lg border border-gray-300 p-2 bg-gray-100"
+            />
+          </div>
+          <div>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              Location
+            </label>
+
+            <BirthPlacePicker
+              initialAddress={userInfo.address}
+              onSelect={({ address, latitude, longitude }) => {
+                setUserInfo((prev) => ({
+                  ...prev,
+                  address,
+                  latitude,
+                  longitude,
+                }));
+              }}
             />
           </div>
         </div>

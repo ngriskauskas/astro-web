@@ -11,6 +11,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute.tsx";
 import { Profile } from "./pages/Profile.tsx";
 import { BirthProfilesProvider } from "./contexts/BirthProfilesContext.tsx";
 import { ChartProvider } from "./contexts/ChartContext.tsx";
+import { Charts } from "./pages/Charts.tsx";
+import { Time } from "./pages/Time.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -31,6 +33,9 @@ createRoot(document.getElementById("root")!).render(
           >
             <Route index element={<Home />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="current-time" element={<Time />} />
+            <Route path="charts" element={<Charts />} />
+
           </Route>
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
