@@ -78,6 +78,18 @@ export interface Aspect {
   planet2: Planet;
 }
 
+export interface MultiChart {
+  main: {
+    planets: Record<string, Planet>;
+    cusps: Record<string, Cusp>;
+  };
+  other: {
+    planets: Record<string, Planet>;
+    cusps: Record<string, Cusp>;
+  };
+  aspects: Aspect[];
+}
+
 export interface SingleChart {
   planets: Record<string, Planet>;
   cusps: Record<string, Cusp>;
@@ -120,8 +132,23 @@ export interface NatalChartOptions extends ChartOptions {
 }
 
 export interface CurrentChartOptions extends ChartOptions {
-  date: string; // "YYYY-MM-DD"
-  time: string; // "HH:mm:ss"
+  date: string;
+  time: string;
+  location: {
+    lat: number;
+    lon: number;
+  };
+}
+
+export interface SynastryChartOptions extends ChartOptions {
+  main_birth_profile_id: number;
+  other_birth_profile_id: number;
+}
+
+export interface TransitChartOptions extends ChartOptions {
+  birth_profile_id: number;
+  date: string;
+  time: string;
   location: {
     lat: number;
     lon: number;
@@ -131,6 +158,8 @@ export interface CurrentChartOptions extends ChartOptions {
 interface ChartContextType {
   getNatalChart: (options: NatalChartOptions) => Promise<SingleChart>;
   getCurrentChart: (options: CurrentChartOptions) => Promise<SingleChart>;
+  getSynastryChart: (options: SynastryChartOptions) => Promise<MultiChart>;
+  getTransitChart: (options: TransitChartOptions) => Promise<MultiChart>;
 }
 
 const ChartContext = createContext<ChartContextType | undefined>(undefined);
@@ -152,11 +181,28 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
     return data as SingleChart;
   };
 
+  const getSynastryChart = async (options: SynastryChartOptions) => {
+    const data = await apiFetch("/charts/synastry", {
+      method: "POST",
+      body: JSON.stringify(options),
+    });
+    return data as MultiChart;
+  };
+
+  const getTransitChart = async (options: TransitChartOptions) => {
+    const data = await apiFetch("/charts/transit", {
+      method: "POST",
+      body: JSON.stringify(options),
+    });
+    return data as MultiChart;
+  };
   return (
     <ChartContext.Provider
       value={{
         getNatalChart,
         getCurrentChart,
+        getSynastryChart,
+        getTransitChart,
       }}
     >
       {children}
