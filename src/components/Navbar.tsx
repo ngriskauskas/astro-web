@@ -22,7 +22,13 @@ export const Navbar = () => {
           Charts
         </Link>
         <Link to="/current-time" className="text-gray-700 hover:text-gray-900">
-          Time
+          Now
+        </Link>
+        <Link to="/transits" className="text-gray-700 hover:text-gray-900">
+          Transits
+        </Link>
+        <Link to="/synastry" className="text-gray-700 hover:text-gray-900">
+          Synastry
         </Link>
       </div>
       <div className="hidden md:flex space-x-6">

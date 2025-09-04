@@ -44,12 +44,17 @@ export interface DisplayOptions {
 
 export interface ZodiacWheelOptions {
   profileId?: number;
+  otherProfileId?: number;
   zodiacSystem: ZodiacSystem;
   houseSystem: HouseSystem;
   ayanamsa?: Ayanamsa;
   aspectOptions: AspectOptions;
   displayOptions: DisplayOptions;
   objectOptions: ObjectOptions;
+  datetimeOptions?: {
+    date: string;
+    time: string;
+  };
 }
 
 interface ZodiacWheelSettingsProps {
@@ -66,6 +71,11 @@ export const ZodiacWheelSettings = ({
   profiles,
   onChange,
 }: ZodiacWheelSettingsProps) => {
+  console.log(
+    "otherProfileId:",
+    options.otherProfileId,
+    typeof options.otherProfileId,
+  );
   const aspectKeys = Object.keys(
     options.aspectOptions,
   ) as (keyof typeof options.aspectOptions)[];
@@ -80,30 +90,114 @@ export const ZodiacWheelSettings = ({
     <div className="space-y-6 p-6 bg-white rounded-xl shadow-md text-xs">
       {/* Profile selector */}
       {profiles && (
-        <div className="flex flex-col">
-          <label className="font-medium text-gray-700 mb-1">Profile</label>
-          <select
-            value={options.profileId}
-            onChange={(e) =>
-              onChange({ key: "profileId", value: Number(e.target.value) })
-            }
-            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          >
-            {profiles
-              .filter((p) => p.name === "My Profile")
-              .map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            {profiles
-              .filter((p) => p.name !== "My Profile")
-              .map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-          </select>
+        <div>
+          <div className="flex flex-col">
+            <label className="font-medium text-gray-700 mb-1">Profile</label>
+            <select
+              value={options.profileId}
+              onChange={(e) =>
+                onChange({ key: "profileId", value: Number(e.target.value) })
+              }
+              className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            >
+              {profiles
+                .filter((p) => p.id !== options.otherProfileId)
+                .filter((p) => p.name === "My Profile")
+                .map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              {profiles
+                .filter((p) => p.id !== options.otherProfileId)
+                .filter((p) => p.name !== "My Profile")
+                .map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+          {options.otherProfileId && (
+            <div className="flex flex-col mt-4">
+              <label className="font-medium text-gray-700 mb-1">
+                Other Profile
+              </label>
+              <select
+                value={options.otherProfileId}
+                onChange={(e) =>
+                  onChange({
+                    key: "otherProfileId",
+                    value: Number(e.target.value),
+                  })
+                }
+                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              >
+                {profiles
+                  .filter((p) => p.id !== options.profileId)
+                  .filter((p) => p.name === "My Profile")
+                  .map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                {profiles
+                  .filter((p) => p.id !== options.profileId)
+                  .filter((p) => p.name !== "My Profile")
+                  .map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          )}
+        </div>
+      )}
+      {/* Date and Time Picker */}
+      {options.datetimeOptions && (
+        <div className="grid grid-cols-1 gap-4">
+          {/* Date */}
+          <div className="flex flex-col">
+            <label className="font-medium text-gray-700 mb-1 text-xs">
+              Date
+            </label>
+            <input
+              type="date"
+              value={options.datetimeOptions.date}
+              onChange={(e) =>
+                onChange({
+                  key: "datetimeOptions",
+                  value: {
+                    ...options.datetimeOptions!,
+                    date: e.target.value,
+                  },
+                })
+              }
+              className="border rounded px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+          </div>
+
+          {/* Time */}
+          <div className="flex flex-col">
+            <label className="font-medium text-gray-700 mb-1 text-xs">
+              Time
+            </label>
+            <input
+              type="time"
+              value={options.datetimeOptions.time}
+              onChange={(e) =>
+                onChange({
+                  key: "datetimeOptions",
+                  value: {
+                    ...options.datetimeOptions!,
+                    time: e.target.value,
+                  },
+                })
+              }
+              className="border rounded px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+          </div>
         </div>
       )}
 
@@ -144,7 +238,6 @@ export const ZodiacWheelSettings = ({
           </select>
         </div>
       </div>
-
       {/* Ayanamsa (only for sidereal) */}
       {options.zodiacSystem === "sidereal" && (
         <div className="flex flex-col">
@@ -164,7 +257,6 @@ export const ZodiacWheelSettings = ({
           </select>
         </div>
       )}
-
       {/* Object Options */}
       <div>
         <div
@@ -225,7 +317,6 @@ export const ZodiacWheelSettings = ({
           </div>
         )}
       </div>
-
       {/* Aspect Options */}
       <div>
         <div
@@ -288,7 +379,6 @@ export const ZodiacWheelSettings = ({
           </div>
         )}
       </div>
-
       {/* Display Options */}
       <div>
         <div

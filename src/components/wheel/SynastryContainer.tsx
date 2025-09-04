@@ -1,50 +1,48 @@
 import { useEffect, useState } from "react";
-import { type SingleChart, useCharts } from "../../contexts/ChartContext";
-import { ZodiacWheel } from "./ZodiacWheel";
+import { useCharts, type MultiChart } from "../../contexts/ChartContext";
 import {
   ZodiacWheelSettings,
   type ZodiacWheelOptions,
 } from "./ZodiacWheelSettings";
-import { useAuth } from "../../contexts/AuthContext";
+import { type BirthProfile } from "../../contexts/BirthProfilesContext";
+import { MultiZodiacWheel } from "./MultiZodiacWheel";
 
-export const TimeWheelContainer = ({}: {}) => {
-  const [chart, setChart] = useState<SingleChart | undefined>();
-  const { getCurrentChart } = useCharts();
-  const { user } = useAuth();
+export const SynastryContainer = ({
+  initialProfileId,
+  profiles,
+}: {
+  initialProfileId: number;
+  profiles: BirthProfile[];
+}) => {
+  const [chart, setChart] = useState<MultiChart | undefined>();
+  const { getSynastryChart } = useCharts();
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
-    profileId: undefined,
+    profileId: initialProfileId,
+    otherProfileId: profiles[0].id,
     zodiacSystem: "tropical",
     houseSystem: "placidus",
     ayanamsa: "lahiri",
     aspectOptions: {
-      conjunction: { show: true, minOrb: 6 },
-      opposition: { show: true, minOrb: 6 },
-      square: { show: true, minOrb: 6 },
-      trine: { show: true, minOrb: 6 },
-      sextile: { show: true, minOrb: 6 },
+      conjunction: { show: true, minOrb: 3 },
+      opposition: { show: true, minOrb: 3 },
+      square: { show: true, minOrb: 3 },
+      trine: { show: true, minOrb: 3 },
+      sextile: { show: true, minOrb: 3 },
     },
     objectOptions: {
       showChiron: true,
       lilith: "true",
     },
     displayOptions: {
-      angleLabels: true,
+      angleLabels: false,
       tickMarks: true,
     },
   });
 
   const fetchChart = async () => {
-    const now = new Date();
-    const localISODate =
-      now.getFullYear() +
-      "-" +
-      String(now.getMonth() + 1).padStart(2, "0") +
-      "-" +
-      String(now.getDate()).padStart(2, "0");
-    const data = await getCurrentChart({
-      location: { lon: user!.longitude, lat: user!.latitude },
-      time: now.toTimeString().slice(0, 8),
-      date: localISODate,
+    const data = await getSynastryChart({
+      main_birth_profile_id: settings.profileId!,
+      other_birth_profile_id: settings.otherProfileId!,
       zodiac_system: settings.zodiacSystem,
       house_system: settings.houseSystem,
       ayanamsa:
@@ -55,19 +53,19 @@ export const TimeWheelContainer = ({}: {}) => {
 
   useEffect(() => {
     fetchChart();
-
-    const intervalId = setInterval(() => {
-      fetchChart();
-    }, 60 * 1000);
-
-    return () => clearInterval(intervalId);
-  }, [settings.zodiacSystem, settings.ayanamsa, settings.houseSystem]);
+  }, [
+    settings.profileId,
+    settings.otherProfileId,
+    settings.zodiacSystem,
+    settings.ayanamsa,
+    settings.houseSystem,
+  ]);
 
   return (
     <div className="flex gap-5 items-center">
       <div className="flex-[3] flex-shrink-0 flex justify-center">
         {chart ? (
-          <ZodiacWheel chart={chart} options={settings} />
+          <MultiZodiacWheel chart={chart} options={settings} />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500">
             Loading...
@@ -78,6 +76,7 @@ export const TimeWheelContainer = ({}: {}) => {
       <div className="flex-[1] max-h-[600px] overflow-y-auto my-5">
         <ZodiacWheelSettings
           options={settings}
+          profiles={profiles}
           onChange={({ key, value }) => {
             setSettings((prev) => ({ ...prev, [key]: value }));
           }}

@@ -8,17 +8,18 @@ export interface CuspAngle extends Cusp {
 interface HouseProps {
   center: number;
   radius: number;
+  innerRadius: number;
   angles: CuspAngle[];
   showAngleLabels: boolean;
 }
 
 export const Houses = ({
   radius,
+  innerRadius,
   center,
   angles,
   showAngleLabels,
 }: HouseProps) => {
-  const innerRadius = radius - 120;
   const outerRadius = radius;
 
   const houseAngles = angles

@@ -90,49 +90,48 @@ export const ZodiacWheel = ({ chart, options }: ZodiacWheelProps) => {
       <Houses
         center={radius}
         radius={radius - 55}
+        innerRadius={radius - 175}
         angles={cuspAngles}
         showAngleLabels={options.displayOptions.angleLabels}
       />
-      <g>
-        <Signs
-          center={radius}
-          radius={radius - 5}
-          angles={signAngles}
-          showTickMarks={options.displayOptions.tickMarks}
-        />
-        <Planets
-          center={radius}
-          radius={radius - 55}
-          angles={planetAngles}
-          hoverAspectedPlanets={hoverAspectedPlanets}
-          options={options.objectOptions}
-          showAngleLabels={options.displayOptions.angleLabels}
-          onHoverPlanet={(planet) => {
-            setHoveredPlanet(planet);
-            chart.aspects.forEach(({ planet1, planet2, orb, type }) => {
-              const { minOrb, show } = options.aspectOptions[type];
-              if (!show || orb > minOrb) return;
-              if (planet1.name === planet)
-                setHoverAspectedPlanets((prev) => [planet2.name, ...prev]);
-              else if (planet2.name === planet)
-                setHoverAspectedPlanets((prev) => [planet1.name, ...prev]);
-            });
-          }}
-          onLeavePlanet={() => {
-            setHoveredPlanet(null);
-            setHoverAspectedPlanets([]);
-          }}
-        />
-        <Aspects
-          center={radius}
-          radius={radius - 175}
-          angles={planetAngles}
-          aspects={chart.aspects}
-          options={options.aspectOptions}
-          objectOptions={options.objectOptions}
-          hoveredPlanet={hoveredPlanet}
-        />
-      </g>
+      <Signs
+        center={radius}
+        radius={radius - 5}
+        angles={signAngles}
+        showTickMarks={options.displayOptions.tickMarks}
+      />
+      <Planets
+        center={radius}
+        radius={radius - 55}
+        angles={planetAngles}
+        hoverAspectedPlanets={hoverAspectedPlanets}
+        options={options.objectOptions}
+        showAngleLabels={options.displayOptions.angleLabels}
+        onHoverPlanet={(planet) => {
+          setHoveredPlanet(planet);
+          chart.aspects.forEach(({ planet1, planet2, orb, type }) => {
+            const { minOrb, show } = options.aspectOptions[type];
+            if (!show || orb > minOrb) return;
+            if (planet1.name === planet)
+              setHoverAspectedPlanets((prev) => [planet2.name, ...prev]);
+            else if (planet2.name === planet)
+              setHoverAspectedPlanets((prev) => [planet1.name, ...prev]);
+          });
+        }}
+        onLeavePlanet={() => {
+          setHoveredPlanet(null);
+          setHoverAspectedPlanets([]);
+        }}
+      />
+      <Aspects
+        center={radius}
+        radius={radius - 175}
+        angles={planetAngles}
+        aspects={chart.aspects}
+        options={options.aspectOptions}
+        objectOptions={options.objectOptions}
+        hoveredPlanet={hoveredPlanet}
+      />
     </svg>
   );
 };

@@ -1,14 +1,14 @@
-import { ZodiacWheelContainer } from "../components/wheel/ZodiacWheelContainer";
+import { SynastryContainer } from "../components/wheel/SynastryContainer";
 import { useBirthProfiles } from "../contexts/BirthProfilesContext";
 
-export const Charts = () => {
+export const Synastry = () => {
   const { mainProfile, profiles } = useBirthProfiles();
 
   return (
-    <div className="flex items-center justify-center mt-5">
+    <div className="flex items-center justify-center mt-10">
       <div className="w-[90%] max-w-5xl">
         {mainProfile && (
-          <ZodiacWheelContainer
+          <SynastryContainer
             profiles={profiles}
             initialProfileId={mainProfile.id}
           />

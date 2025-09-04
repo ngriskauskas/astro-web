@@ -13,6 +13,8 @@ import { BirthProfilesProvider } from "./contexts/BirthProfilesContext.tsx";
 import { ChartProvider } from "./contexts/ChartContext.tsx";
 import { Charts } from "./pages/Charts.tsx";
 import { Time } from "./pages/Time.tsx";
+import { Synastry } from "./pages/Synastry.tsx";
+import { Transits } from "./pages/Transits.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -35,6 +37,8 @@ createRoot(document.getElementById("root")!).render(
             <Route path="profile" element={<Profile />} />
             <Route path="current-time" element={<Time />} />
             <Route path="charts" element={<Charts />} />
+            <Route path="synastry" element={<Synastry />} />
+            <Route path="transits" element={<Transits />} />
 
           </Route>
           <Route path="login" element={<Login />} />
