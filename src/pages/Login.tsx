@@ -1,79 +1,55 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../contexts/AuthContext";
-import { useState } from "react";
-import { Link } from "react-router-dom";
 
 export const Login = () => {
-  const { login, loading, user } = useAuth();
   const navigate = useNavigate();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    try {
-      await login(email, password);
-      navigate("/");
-    } catch (err) {
-      setError("Invalid email or password");
-    }
-  };
-
-  if (loading) {
-    return <>Loading...</>;
-  }
-
-  if (user) {
-    return <Navigate to="/" replace />;
-  }
+  const { oauth } = useAuth();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm"
-      >
-        <h1 className="text-2xl font-bold mb-4">Login</h1>
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md flex flex-col gap-6">
+        <h1 className="text-3xl font-bold text-center">Welcome</h1>
 
-        {error && <p className="text-red-500 mb-2">{error}</p>}
-
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="border border-gray-300 rounded px-3 py-2 w-full mb-3"
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="border border-gray-300 rounded px-3 py-2 w-full mb-4"
-        />
-        <div className="flex gap-4">
-          <button
-            type="submit"
-            onClick={handleSubmit}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full cursor-pointer"
-          >
-            Log In
-          </button>
-          <p className="text-center text-sm text-gray-600">
-            Don’t have an account?{" "}
-            <Link to="/register" className="text-blue-600 hover:underline">
-              Register
-            </Link>
-          </p>
+        {/* Social Login Buttons */}
+        <div className="flex flex-col gap-3 items-center">
+          <GoogleLogin
+            theme="outline"
+            size="large"
+            onSuccess={async (credentialResponse) => {
+              const id_token = credentialResponse.credential;
+              await oauth("google", id_token!);
+              navigate("/");
+            }}
+            onError={() => {
+              console.log("Google login failed");
+            }}
+          />
         </div>
-      </form>
+
+        <div className="flex items-center justify-center gap-2 text-gray-400">
+          <span className="h-px w-10 bg-gray-300" />
+          <span>or</span>
+          <span className="h-px w-10 bg-gray-300" />
+        </div>
+
+        {/* Email / Register Buttons */}
+        <div className="flex flex-col gap-3 items-center">
+          <button
+            onClick={() => navigate("/login/email")}
+            className="w-1/2 bg-blue-100 text-blue-800 border border-blue-300 rounded-lg py-2 hover:bg-blue-200  cursor-pointer"
+          >
+            Login with Email
+          </button>
+
+          <button
+            onClick={() => navigate("/register")}
+            className="w-1/2 bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 hover:bg-gray-200 cursor-pointer"
+          >
+            Register with Email
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

@@ -23,6 +23,7 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  oauth: (provider: string, id_token: string) => Promise<void>;
   logout: () => void;
   register: (email: string, password: string) => Promise<string | void>;
   updateUser: (user: Partial<User>) => Promise<void>;
@@ -53,6 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [token]);
 
   const fetchUser = async () => {
+    setLoading(true);
     try {
       const data = await apiFetch("/me", {
         method: "GET",
@@ -77,6 +79,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (!res.ok) {
       throw new Error("Login failed");
+    }
+
+    const { token } = await res.json();
+
+    localStorage.setItem("token", token);
+    setToken(token);
+  };
+
+  const oauth = async (provider: string, id_token: string) => {
+    const res = await fetch(`${API_URL}/oauth`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ provider, id_token, platform: "web" }),
+    });
+
+    if (!res.ok) {
+      throw new Error("OAuth login failed");
     }
 
     const { token } = await res.json();
@@ -121,7 +140,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, login, logout, register, loading, updateUser }}
+      value={{
+        user,
+        token,
+        login,
+        logout,
+        register,
+        loading,
+        updateUser,
+        oauth,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -7,7 +7,7 @@ import {
 } from "./ZodiacWheelSettings";
 import { useAuth } from "../../contexts/AuthContext";
 
-export const TimeWheelContainer = ({}: {}) => {
+export const TimeWheelContainer = ({ }: {}) => {
   const [chart, setChart] = useState<SingleChart | undefined>();
   const { getCurrentChart } = useCharts();
   const { user } = useAuth();

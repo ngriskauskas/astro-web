@@ -15,36 +15,61 @@ import { Charts } from "./pages/Charts.tsx";
 import { Time } from "./pages/Time.tsx";
 import { Synastry } from "./pages/Synastry.tsx";
 import { Transits } from "./pages/Transits.tsx";
+import { LoginEmail } from "./pages/LoginEmail.tsx";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { ProtectedCharts } from "./components/ProtectedCharts.tsx";
+import { ProtectedUserLocation } from "./components/ProtectedUserLocation.tsx";
 
+const clientid =
+  "778010176336-78unv2cj1ion4lggpfas6tokpupqeule.apps.googleusercontent.com";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <BirthProfilesProvider>
-                  <ChartProvider>
-                    <App />
-                  </ChartProvider>
-                </BirthProfilesProvider>
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Home />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="current-time" element={<Time />} />
-            <Route path="charts" element={<Charts />} />
-            <Route path="synastry" element={<Synastry />} />
-            <Route path="transits" element={<Transits />} />
+    <GoogleOAuthProvider clientId={clientid}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <BirthProfilesProvider>
+                    <ChartProvider>
+                      <App />
+                    </ChartProvider>
+                  </BirthProfilesProvider>
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<Home />} />
+              <Route path="profile" element={<Profile />} />
 
-          </Route>
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+              <Route element={<ProtectedCharts />}>
+                <Route
+                  path="current-time"
+                  element={
+                    <ProtectedUserLocation>
+                      <Time />
+                    </ProtectedUserLocation>
+                  }
+                />
+                <Route path="charts" element={<Charts />} />
+                <Route path="synastry" element={<Synastry />} />
+                <Route
+                  path="transits"
+                  element={
+                    <ProtectedUserLocation>
+                      <Transits />
+                    </ProtectedUserLocation>
+                  }
+                />
+              </Route>
+            </Route>
+            <Route path="login" element={<Login />} />
+            <Route path="login/email" element={<LoginEmail />} />
+            <Route path="register" element={<Register />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   </StrictMode>,
 );
