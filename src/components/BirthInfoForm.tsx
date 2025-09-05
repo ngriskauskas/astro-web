@@ -6,11 +6,13 @@ import toast from "react-hot-toast";
 export const BirthInfoForm = ({
   profileId,
   isNew = false,
+  isMainProfile = false,
   onCancel,
   onSubmit,
 }: {
   profileId?: number;
   isNew?: boolean;
+  isMainProfile?: boolean;
   onCancel?: () => void;
   onSubmit?: () => void;
 }) => {
@@ -20,7 +22,7 @@ export const BirthInfoForm = ({
   const [birthPlace, setBirthPlace] = useState("");
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
-  const [isMain, setIsMain] = useState(false);
+  const [isMain, setIsMain] = useState(isMainProfile);
   const [name, setName] = useState("");
   const { createProfile, updateProfile, deleteProfile, profiles } =
     useBirthProfiles();
@@ -56,7 +58,7 @@ export const BirthInfoForm = ({
     try {
       if (profileId) await updateProfile(profileId, updatedProfile);
       else await createProfile(updatedProfile);
-      if(onSubmit) onSubmit();
+      if (onSubmit) onSubmit();
       toast.success("Profile updated");
     } catch (error: any) {
       console.log(error);

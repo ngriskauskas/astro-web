@@ -18,8 +18,8 @@ export const Profile = () => {
 
   useEffect(() => {
     setUserInfo({
-      username: user!.username,
-      address: user!.address,
+      username: user!.username || "",
+      address: user!.address || "",
       latitude: user!.latitude,
       longitude: user!.longitude,
     });
@@ -101,7 +101,7 @@ export const Profile = () => {
       </div>
       <div className="bg-white shadow rounded-xl p-6 space-y-6">
         <h2 className="text-xl font-semibold">My Birth Info</h2>
-        <BirthInfoForm profileId={mainProfile?.id} />
+        <BirthInfoForm profileId={mainProfile?.id} isMainProfile={true} />
       </div>
       <div className="bg-white shadow rounded-xl p-6 space-y-6">
         <CustomProfileList />

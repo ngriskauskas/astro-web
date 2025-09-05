@@ -71,11 +71,6 @@ export const ZodiacWheelSettings = ({
   profiles,
   onChange,
 }: ZodiacWheelSettingsProps) => {
-  console.log(
-    "otherProfileId:",
-    options.otherProfileId,
-    typeof options.otherProfileId,
-  );
   const aspectKeys = Object.keys(
     options.aspectOptions,
   ) as (keyof typeof options.aspectOptions)[];
