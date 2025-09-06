@@ -19,9 +19,9 @@ import { LoginEmail } from "./pages/LoginEmail.tsx";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ProtectedCharts } from "./components/ProtectedCharts.tsx";
 import { ProtectedUserLocation } from "./components/ProtectedUserLocation.tsx";
+import { DescProvider } from "./contexts/DescContext.tsx";
 
-const clientid =
-  "778010176336-78unv2cj1ion4lggpfas6tokpupqeule.apps.googleusercontent.com";
+const clientid = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={clientid}>
@@ -34,7 +34,9 @@ createRoot(document.getElementById("root")!).render(
                 <ProtectedRoute>
                   <BirthProfilesProvider>
                     <ChartProvider>
-                      <App />
+                      <DescProvider>
+                        <App />
+                      </DescProvider>
                     </ChartProvider>
                   </BirthProfilesProvider>
                 </ProtectedRoute>
