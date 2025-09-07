@@ -1,4 +1,4 @@
-import { type Cusp } from "../../../contexts/ChartContext";
+import { type Cusp } from "../../../types/zodiac";
 import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, midpointAngle, polarToCartesian } from "./Utils";

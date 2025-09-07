@@ -1,11 +1,6 @@
 import { createContext, useEffect, useState, type ReactNode } from "react";
-import {
-  type SingleChart,
-  useCharts,
-  ZodiacSigns,
-  type ZodiacSign,
-  type Aspect,
-} from "./ChartContext";
+import { type SingleChart, useCharts } from "./ChartContext";
+import { ZodiacSigns, type Aspect, type ZodiacSign } from "../types/zodiac";
 import { type ZodiacWheelOptions } from "../components/wheel/ZodiacWheelSettings";
 import { useBirthProfiles } from "./BirthProfilesContext";
 import { type PlanetAngle } from "../components/wheel/layers/Planets";
@@ -182,7 +177,7 @@ export const SingleWheelProvider = ({
         signAngles,
         cuspAngles,
         aspects,
-        type
+        type,
       }}
     >
       {children}

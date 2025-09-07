@@ -1,16 +1,12 @@
 import { PlanetsData, ZodiacData } from "../constants/zodiac";
 import { useDesc } from "../contexts/DescContext";
 
-type SvgComp = React.ComponentType<React.SVGProps<SVGSVGElement>>;
-
 export const DescriptionSidePanel = () => {
   const { active, close } = useDesc();
 
   if (!active) return null;
   const zodiacInfo = ZodiacData[active.id as keyof typeof ZodiacData];
   const planetInfo = PlanetsData[active.id as keyof typeof PlanetsData];
-  const SignGlyph = zodiacInfo?.glyph as unknown as SvgComp | undefined;
-  const PlanetGlyph = planetInfo?.glyph as unknown as SvgComp | undefined;
   return (
     <div className="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl border-l border-gray-200 z-50 flex flex-col">
       {/* Header */}
@@ -38,7 +34,7 @@ export const DescriptionSidePanel = () => {
         </div>
         <button
           onClick={close}
-          className="text-gray-500 hover:text-gray-700 transition"
+          className="text-gray-500 hover:text-gray-700 transition cursor-pointer"
         >
           ✕
         </button>

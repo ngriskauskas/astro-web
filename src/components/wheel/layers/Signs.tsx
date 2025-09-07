@@ -1,5 +1,5 @@
 import { ZodiacData } from "../../../constants/zodiac";
-import { type ZodiacSign } from "../../../contexts/ChartContext";
+import { type ZodiacSign } from "../../../types/zodiac";
 import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, polarToCartesian } from "./Utils";

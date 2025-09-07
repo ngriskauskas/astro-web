@@ -7,7 +7,7 @@ import {
   type Ayanamsa,
   type HouseSystem,
   type ZodiacSystem,
-} from "../../contexts/ChartContext";
+} from "../../types/zodiac";
 import { useWheel } from "../../hooks/useWheel";
 
 export interface AspectOptions {

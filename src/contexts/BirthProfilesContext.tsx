@@ -33,6 +33,7 @@ export interface BirthProfileInput {
 interface BirthProfileContextType {
   profiles: BirthProfile[];
   mainProfile: BirthProfile | undefined;
+  loading: boolean;
   updateProfile: (id: number, profile: BirthProfileInput) => Promise<void>;
   deleteProfile: (id: number) => Promise<void>;
   createProfile: (profile: BirthProfileInput) => Promise<void>;
@@ -49,16 +50,20 @@ export const BirthProfilesProvider = ({
 }) => {
   const [profiles, setProfiles] = useState<BirthProfile[]>([]);
   const [mainProfile, setMainProfile] = useState<BirthProfile>();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchProfiles();
   }, []);
 
   useEffect(() => {
+    if (profiles.length === 0) return;
     setMainProfile(profiles.find((x) => x.main));
+    setLoading(false);
   }, [profiles]);
 
   const fetchProfiles = async () => {
+    setLoading(true);
     try {
       const data = await apiFetch("/me/birth_profiles", {
         method: "GET",
@@ -105,6 +110,7 @@ export const BirthProfilesProvider = ({
         updateProfile,
         createProfile,
         deleteProfile,
+        loading,
       }}
     >
       {children}

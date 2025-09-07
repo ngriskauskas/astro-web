@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { type PlanetName } from "../../contexts/ChartContext";
 import { Background } from "./layers/Background";
 import { Signs } from "./layers/Signs";
 import { Houses } from "./layers/Houses";
@@ -8,6 +7,7 @@ import { ZodiacWheelSettings } from "./ZodiacWheelSettings";
 import { MultiAspects } from "./layers/MultiAspects";
 import { useWheel } from "../../hooks/useWheel";
 import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
+import { type PlanetName } from "../../types/zodiac";
 
 export const MultiZodiacWheel = () => {
   const [hoveredPlanet, setHoveredPlanet] = useState<{

@@ -1,4 +1,4 @@
-import { type PlanetName, type ZodiacSign } from "../contexts/ChartContext";
+import { type PlanetName, type ZodiacSign } from "../types/zodiac";
 import AriesSvg from "../assets/signs/normal_symbols/Aries.svg";
 import TaurusSvg from "../assets/signs/normal_symbols/Taurus.svg";
 import GeminiSvg from "../assets/signs/normal_symbols/Gemini.svg";

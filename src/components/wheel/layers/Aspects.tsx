@@ -1,7 +1,7 @@
 import { polarToCartesian } from "./Utils";
-import type { PlanetName } from "../../../contexts/ChartContext";
 import { useWheel } from "../../../hooks/useWheel";
 import type { SingleWheelContextType } from "../../../contexts/SingleWheelContext";
+import { type PlanetName } from "../../../types/zodiac";
 
 const aspectColors: Record<string, string> = {
   conjunction: "#FFD700",

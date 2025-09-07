@@ -6,7 +6,14 @@ import {
   type ReactNode,
 } from "react";
 import { apiFetch } from "../utils/api";
-import type { AspectType, PlanetName, ZodiacSign } from "./ChartContext";
+import type {
+  Aspect,
+  AspectType,
+  Cusp,
+  Planet,
+  PlanetName,
+  ZodiacSign,
+} from "../types/zodiac";
 
 interface BasicDescriptions {
   aspects: Record<AspectType, string>;
@@ -25,7 +32,7 @@ interface Description {
 
 interface DescriptionParams {
   type: DescriptionType;
-  id: string;
+  value: Planet | ZodiacSign | Cusp | Aspect;
 }
 
 interface DesContextType {
@@ -46,7 +53,7 @@ export const DescProvider = ({ children }: { children: ReactNode }) => {
     let desc = "";
     switch (type) {
       case "planet":
-        desc = basicDescriptions.planets[id] ?? "No description";
+        desc = basicDescriptions.planets[id as PlanetName];
         break;
       case "house":
         desc = basicDescriptions.houses[id] ?? "No description";

@@ -1,17 +1,12 @@
 import { createContext, useEffect, useState, type ReactNode } from "react";
-import {
-  type MultiChart,
-  useCharts,
-  ZodiacSigns,
-  type ZodiacSign,
-  type Aspect,
-} from "./ChartContext";
+import { type MultiChart, useCharts } from "./ChartContext";
 import { type ZodiacWheelOptions } from "../components/wheel/ZodiacWheelSettings";
 import { useBirthProfiles } from "./BirthProfilesContext";
 import { type PlanetAngle } from "../components/wheel/layers/Planets";
 import { type CuspAngle } from "../components/wheel/layers/Houses";
 import { type SignAngle } from "../components/wheel/layers/Signs";
 import { useAuth } from "./AuthContext";
+import { ZodiacSigns, type Aspect, type ZodiacSign } from "../types/zodiac";
 
 export interface MultiWheelContextType {
   settings: ZodiacWheelOptions;

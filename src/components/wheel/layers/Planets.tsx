@@ -1,5 +1,5 @@
 import { PlanetsData } from "../../../constants/zodiac";
-import { type Planet, type PlanetName } from "../../../contexts/ChartContext";
+import { type PlanetName, type Planet } from "../../../types/zodiac";
 import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { polarToCartesian } from "./Utils";
