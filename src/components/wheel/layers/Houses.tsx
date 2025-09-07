@@ -1,4 +1,5 @@
 import { type Cusp } from "../../../contexts/ChartContext";
+import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, midpointAngle, polarToCartesian } from "./Utils";
 
@@ -19,6 +20,8 @@ export const Houses = ({ radius, innerRadius, center, angles }: HouseProps) => {
       displayOptions: { angleLabels: showAngleLabels },
     },
   } = useWheel();
+
+  const { open } = useDesc();
 
   const outerRadius = radius;
 
@@ -73,6 +76,7 @@ export const Houses = ({ radius, innerRadius, center, angles }: HouseProps) => {
               fill="url(#houseGradient)"
               stroke="white"
               strokeWidth={1}
+              onClick={() => open({ type: "house", id: number.toString() })}
             />
             <text
               x={tx}
@@ -128,6 +132,7 @@ export const Houses = ({ radius, innerRadius, center, angles }: HouseProps) => {
               textAnchor="middle"
               dominantBaseline="middle"
               fill="white"
+              onClick={() => open({ type: "house", id: name })}
             >
               {name.toUpperCase()}
             </text>

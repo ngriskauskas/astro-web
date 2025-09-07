@@ -1,5 +1,6 @@
 import { PlanetsData } from "../../../constants/zodiac";
 import { type Planet, type PlanetName } from "../../../contexts/ChartContext";
+import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { polarToCartesian } from "./Utils";
 
@@ -31,19 +32,22 @@ export const Planets = ({
       objectOptions: options,
     },
   } = useWheel();
+
+  const { open } = useDesc();
+
   const innerRadius = radius - 10;
   const outerRadius = radius;
   return (
     <g>
       {angles.map(({ name, angle, glyphAngle, retrograde, deg_min }) => {
-        if (name === "Chiron" && !options.showChiron) return;
+        if (name === "chiron" && !options.showChiron) return;
         if (
           !options.lilith &&
-          (name === "mean Apogee" || name === "osc. Apogee")
+          (name === "mean apogee" || name === "osc. apogee")
         )
           return;
-        if (options.lilith === "true" && name === "mean Apogee") return;
-        if (options.lilith === "mean" && name === "osc. Apogee") return;
+        if (options.lilith === "true" && name === "mean apogee") return;
+        if (options.lilith === "mean" && name === "osc. apogee") return;
         const { x: x1, y: y1 } = polarToCartesian(center, innerRadius, angle);
         const { x: x2, y: y2 } = polarToCartesian(center, outerRadius, angle);
         const { x: tx, y: ty } = polarToCartesian(
@@ -61,6 +65,8 @@ export const Planets = ({
         const planetInfo = PlanetsData[name];
         const [deg, min] = deg_min;
         const degLabel = `${Math.round(deg)}° ${Math.round(min)}′`;
+        const labelName =
+          name === "mean apogee" || name === "osc. apogee" ? "lilith" : name;
         return (
           <g key={name}>
             <line
@@ -77,6 +83,7 @@ export const Planets = ({
               origin-[50%_50%] hover:scale-101"
               onMouseEnter={() => onHoverPlanet(name)}
               onMouseLeave={onLeavePlanet}
+              onClick={() => open({ type: "planet", id: labelName })}
             >
               <circle
                 cx={tx}

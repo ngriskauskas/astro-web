@@ -1,5 +1,6 @@
 import { ZodiacData } from "../../../constants/zodiac";
 import { type ZodiacSign } from "../../../contexts/ChartContext";
+import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, polarToCartesian } from "./Utils";
 
@@ -20,6 +21,8 @@ export const Signs = ({ radius, center }: SignProps) => {
       displayOptions: { tickMarks: showTickMarks },
     },
   } = useWheel();
+
+  const { open } = useDesc();
 
   const innerRadius = radius - 50;
   const outerRadius = radius;
@@ -82,6 +85,7 @@ export const Signs = ({ radius, center }: SignProps) => {
               fill={`url(#grad-${sign})`}
               stroke="white"
               fillRule="evenodd"
+              onClick={() => open({ type: "sign", id: sign })}
             />
             <image href={glyph} x={x - 12} y={y - 12} width={25} height={25} />
             {showTickMarks &&

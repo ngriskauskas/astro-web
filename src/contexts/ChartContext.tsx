@@ -37,21 +37,21 @@ export type AspectType =
   | "sextile";
 
 export type PlanetName =
-  | "Sun"
-  | "Moon"
-  | "Mercury"
-  | "Venus"
-  | "Mars"
-  | "Jupiter"
-  | "Saturn"
-  | "Uranus"
-  | "Neptune"
-  | "Pluto"
-  | "Chiron"
-  | "true Node"
-  | "South Node"
-  | "mean Apogee"
-  | "osc. Apogee";
+  | "sun"
+  | "moon"
+  | "mercury"
+  | "venus"
+  | "mars"
+  | "jupiter"
+  | "saturn"
+  | "uranus"
+  | "neptune"
+  | "pluto"
+  | "chiron"
+  | "north node"
+  | "south node"
+  | "mean apogee"
+  | "osc. apogee";
 
 export interface Cusp {
   name: string;
@@ -170,6 +170,7 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
       method: "POST",
       body: JSON.stringify(options),
     });
+    console.log(data);
     return data as SingleChart;
   };
 
