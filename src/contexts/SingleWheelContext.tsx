@@ -20,6 +20,7 @@ export interface SingleWheelContextType {
   cuspAngles: CuspAngle[];
   signAngles: SignAngle[];
   aspects: Aspect[];
+  type: "natal" | "time";
 }
 
 export const SingleWheelContext = createContext<
@@ -56,7 +57,7 @@ export const SingleWheelProvider = ({
     },
     objectOptions: {
       showChiron: true,
-      lilith: "true",
+      showLilith: true,
     },
     displayOptions: {
       angleLabels: true,
@@ -181,6 +182,7 @@ export const SingleWheelProvider = ({
         signAngles,
         cuspAngles,
         aspects,
+        type
       }}
     >
       {children}

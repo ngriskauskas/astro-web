@@ -37,18 +37,12 @@ export const MultiAspects = ({
 
         if (
           !objectOptions.showChiron &&
-          (planet1.name === "Chiron" || planet2.name === "Chiron")
-        )
-          return;
-
-        if (
-          (planet1.name === "mean Apogee" || planet2.name === "mean Apogee") &&
-          (objectOptions.lilith === "true" || !objectOptions.lilith)
+          (planet1.name === "chiron" || planet2.name === "chiron")
         )
           return;
         if (
-          (planet1.name === "osc. Apogee" || planet2.name === "osc. Apogee") &&
-          (objectOptions.lilith === "mean" || !objectOptions.lilith)
+          !objectOptions.showLilith &&
+          (planet1.name === "lilith" || planet2.name === "lilith")
         )
           return;
 
@@ -59,7 +53,6 @@ export const MultiAspects = ({
             (hoveredPlanet.profile === "other" &&
               planet2.name === hoveredPlanet.planet));
 
-        //TODO prolly wrong
         const planet1Angle = mainPlanetAngles.find(
           ({ name }) => name === planet1.name,
         )!.angle;

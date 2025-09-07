@@ -20,6 +20,7 @@ type DescriptionType = "planet" | "house" | "sign" | "aspect";
 interface Description {
   type: DescriptionType;
   desc: string;
+  id: string;
 }
 
 interface DescriptionParams {
@@ -58,7 +59,7 @@ export const DescProvider = ({ children }: { children: ReactNode }) => {
         break;
     }
 
-    setActive({ type, desc });
+    setActive({ type, desc, id });
   };
 
   const close = () => setActive(null);

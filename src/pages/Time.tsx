@@ -1,3 +1,4 @@
+import { DescriptionSidePanel } from "../components/DescriptionSidePanel";
 import { ZodiacWheel } from "../components/wheel/ZodiacWheel";
 import { SingleWheelProvider } from "../contexts/SingleWheelContext";
 
@@ -9,6 +10,7 @@ export const Time = () => {
           <ZodiacWheel />
         </div>
       </div>
+      <DescriptionSidePanel />
     </SingleWheelProvider>
   );
 };

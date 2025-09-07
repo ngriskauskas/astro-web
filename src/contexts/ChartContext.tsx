@@ -50,8 +50,7 @@ export type PlanetName =
   | "chiron"
   | "north node"
   | "south node"
-  | "mean apogee"
-  | "osc. apogee";
+  | "lilith";
 
 export interface Cusp {
   name: string;

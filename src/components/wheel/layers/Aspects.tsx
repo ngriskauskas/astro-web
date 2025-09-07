@@ -1,8 +1,7 @@
 import { polarToCartesian } from "./Utils";
-import { type PlanetAngle } from "./Planets";
-import type { Aspect, PlanetName } from "../../../contexts/ChartContext";
-import type { AspectOptions, ObjectOptions } from "../ZodiacWheelSettings";
+import type { PlanetName } from "../../../contexts/ChartContext";
 import { useWheel } from "../../../hooks/useWheel";
+import type { SingleWheelContextType } from "../../../contexts/SingleWheelContext";
 
 const aspectColors: Record<string, string> = {
   conjunction: "#FFD700",
@@ -23,7 +22,7 @@ export const Aspects = ({ radius, center, hoveredPlanet }: AspectProps) => {
     planetAngles: angles,
     aspects,
     settings: { aspectOptions: options, objectOptions },
-  } = useWheel();
+  } = useWheel() as SingleWheelContextType;
   return (
     <g>
       {aspects.map(({ type, orb, planet1, planet2 }, i) => {
@@ -32,18 +31,13 @@ export const Aspects = ({ radius, center, hoveredPlanet }: AspectProps) => {
 
         if (
           !objectOptions.showChiron &&
-          (planet1.name === "Chiron" || planet2.name === "Chiron")
+          (planet1.name === "chiron" || planet2.name === "chiron")
         )
           return;
 
         if (
-          (planet1.name === "mean Apogee" || planet2.name === "mean Apogee") &&
-          (objectOptions.lilith === "true" || !objectOptions.lilith)
-        )
-          return;
-        if (
-          (planet1.name === "osc. Apogee" || planet2.name === "osc. Apogee") &&
-          (objectOptions.lilith === "mean" || !objectOptions.lilith)
+          !objectOptions.showLilith &&
+          (planet1.name === "lilith" || planet2.name === "lilith")
         )
           return;
 

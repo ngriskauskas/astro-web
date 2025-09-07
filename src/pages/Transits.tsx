@@ -1,3 +1,4 @@
+import { DescriptionSidePanel } from "../components/DescriptionSidePanel";
 import { MultiZodiacWheel } from "../components/wheel/MultiZodiacWheel";
 import { MultiWheelProvider } from "../contexts/MultiWheelContext";
 
@@ -9,6 +10,7 @@ export const Transits = () => {
           <MultiZodiacWheel />
         </div>
       </div>
+      <DescriptionSidePanel />
     </MultiWheelProvider>
   );
 };

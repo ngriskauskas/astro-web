@@ -22,6 +22,7 @@ export interface MultiWheelContextType {
   otherCuspAngles: CuspAngle[];
   signAngles: SignAngle[];
   aspects: Aspect[];
+  type: "synastry" | "transit";
 }
 
 export const MultiWheelContext = createContext<
@@ -49,7 +50,7 @@ export const MultiWheelProvider = ({
   const now = new Date();
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
     profileId: mainProfile?.id,
-    otherProfileId: profiles[0].id,
+    otherProfileId: type === "synastry" ? profiles[0].id : undefined,
     zodiacSystem: "tropical",
     houseSystem: "placidus",
     ayanamsa: "lahiri",
@@ -62,7 +63,7 @@ export const MultiWheelProvider = ({
     },
     objectOptions: {
       showChiron: true,
-      lilith: "true",
+      showLilith: true,
     },
     displayOptions: {
       angleLabels: false,
@@ -216,6 +217,7 @@ export const MultiWheelProvider = ({
         otherCuspAngles,
         signAngles,
         aspects,
+        type,
       }}
     >
       {children}

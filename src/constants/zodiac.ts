@@ -72,9 +72,8 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
   neptune: { glyph: "♆", scale: 1 },
   pluto: { glyph: "♇", scale: 1 },
   chiron: { glyph: "⚷", scale: 1.2 },
-  "mean apogee": { glyph: "⚸", scale: 1.3 },
   "north node": { glyph: "☊", scale: 0.95 },
-  "osc. apogee": { glyph: "⚸", scale: 1.3 },
+  lilith: { glyph: "⚸", scale: 1.3 },
   "south node": { glyph: "☋", scale: 0.95 },
 };
 
