@@ -1,5 +1,6 @@
 import { ZodiacData } from "../../../constants/zodiac";
 import { type ZodiacSign } from "../../../contexts/ChartContext";
+import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, polarToCartesian } from "./Utils";
 
 export interface SignAngle {
@@ -10,11 +11,16 @@ export interface SignAngle {
 interface SignProps {
   center: number;
   radius: number;
-  angles: SignAngle[];
-  showTickMarks: boolean;
 }
 
-export const Signs = ({ radius, center, angles, showTickMarks }: SignProps) => {
+export const Signs = ({ radius, center }: SignProps) => {
+  const {
+    signAngles: angles,
+    settings: {
+      displayOptions: { tickMarks: showTickMarks },
+    },
+  } = useWheel();
+
   const innerRadius = radius - 50;
   const outerRadius = radius;
   return (

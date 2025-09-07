@@ -1,19 +1,14 @@
-import { TransitContainer } from "../components/wheel/TransitContainer";
-import { useBirthProfiles } from "../contexts/BirthProfilesContext";
+import { MultiZodiacWheel } from "../components/wheel/MultiZodiacWheel";
+import { MultiWheelProvider } from "../contexts/MultiWheelContext";
 
 export const Transits = () => {
-  const { mainProfile, profiles } = useBirthProfiles();
-
   return (
-    <div className="flex items-center justify-center mt-10">
-      <div className="w-[90%] max-w-5xl">
-        {mainProfile && (
-          <TransitContainer
-            profiles={profiles}
-            initialProfileId={mainProfile.id}
-          />
-        )}
+    <MultiWheelProvider type="transit">
+      <div className="flex items-center justify-center mt-10">
+        <div className="w-[90%] max-w-5xl">
+          <MultiZodiacWheel />
+        </div>
       </div>
-    </div>
+    </MultiWheelProvider>
   );
 };

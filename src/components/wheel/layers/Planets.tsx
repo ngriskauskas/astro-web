@@ -1,6 +1,6 @@
 import { PlanetsData } from "../../../constants/zodiac";
 import { type Planet, type PlanetName } from "../../../contexts/ChartContext";
-import type { ObjectOptions } from "../ZodiacWheelSettings";
+import { useWheel } from "../../../hooks/useWheel";
 import { polarToCartesian } from "./Utils";
 
 export interface PlanetAngle extends Planet {
@@ -11,24 +11,26 @@ export interface PlanetAngle extends Planet {
 interface PlanetProps {
   center: number;
   radius: number;
-  angles: PlanetAngle[];
   onHoverPlanet: (name: PlanetName) => void;
   onLeavePlanet: () => void;
   hoverAspectedPlanets: PlanetName[];
-  options: ObjectOptions;
-  showAngleLabels: boolean;
+  angles: PlanetAngle[];
 }
 
 export const Planets = ({
   radius,
   center,
-  angles,
   onHoverPlanet,
   onLeavePlanet,
   hoverAspectedPlanets,
-  options,
-  showAngleLabels,
+  angles,
 }: PlanetProps) => {
+  const {
+    settings: {
+      displayOptions: { angleLabels: showAngleLabels },
+      objectOptions: options,
+    },
+  } = useWheel();
   const innerRadius = radius - 10;
   const outerRadius = radius;
   return (
@@ -49,7 +51,11 @@ export const Planets = ({
           outerRadius - 25,
           glyphAngle,
         );
-        const {x: dx, y: dy} = polarToCartesian(center, outerRadius - 60, glyphAngle);
+        const { x: dx, y: dy } = polarToCartesian(
+          center,
+          outerRadius - 60,
+          glyphAngle,
+        );
 
         const isAspected = hoverAspectedPlanets.includes(name);
         const planetInfo = PlanetsData[name];

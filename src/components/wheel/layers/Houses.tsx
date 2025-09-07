@@ -1,4 +1,5 @@
 import { type Cusp } from "../../../contexts/ChartContext";
+import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, midpointAngle, polarToCartesian } from "./Utils";
 
 export interface CuspAngle extends Cusp {
@@ -10,16 +11,15 @@ interface HouseProps {
   radius: number;
   innerRadius: number;
   angles: CuspAngle[];
-  showAngleLabels: boolean;
 }
 
-export const Houses = ({
-  radius,
-  innerRadius,
-  center,
-  angles,
-  showAngleLabels,
-}: HouseProps) => {
+export const Houses = ({ radius, innerRadius, center, angles }: HouseProps) => {
+  const {
+    settings: {
+      displayOptions: { angleLabels: showAngleLabels },
+    },
+  } = useWheel();
+
   const outerRadius = radius;
 
   const houseAngles = angles
@@ -102,7 +102,11 @@ export const Houses = ({
           innerRadius + 18,
           angle + 4,
         );
-        const { x: dx, y: dy } = polarToCartesian(center, outerRadius - 15, angle + 2);
+        const { x: dx, y: dy } = polarToCartesian(
+          center,
+          outerRadius - 15,
+          angle + 2,
+        );
         const [deg, min] = deg_min;
         const degLabel = `${Math.round(deg)}° ${Math.round(min)}′`;
 
