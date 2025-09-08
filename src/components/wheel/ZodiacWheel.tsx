@@ -7,7 +7,7 @@ import { Aspects } from "./layers/Aspects";
 import { useWheel } from "../../hooks/useWheel";
 import { ZodiacWheelSettings } from "./ZodiacWheelSettings";
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
-import { type PlanetName } from "../../types/zodiac";
+import { type PlanetName } from "../../types/planet";
 
 export const ZodiacWheel = () => {
   const [hoveredPlanet, setHoveredPlanet] = useState<PlanetName | null>(null);

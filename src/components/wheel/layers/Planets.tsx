@@ -1,5 +1,4 @@
-import { PlanetsData } from "../../../constants/zodiac";
-import { type PlanetName, type Planet } from "../../../types/zodiac";
+import { type PlanetName, type Planet, PlanetsData } from "../../../types/planet";
 import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { polarToCartesian } from "./Utils";
@@ -39,7 +38,8 @@ export const Planets = ({
   const outerRadius = radius;
   return (
     <g>
-      {angles.map(({ name, angle, glyphAngle, retrograde, deg_min }) => {
+      {angles.map((planet) => {
+        const { name, angle, glyphAngle, retrograde, deg_min } = planet;
         if (name === "chiron" && !options.showChiron) return;
         if (name === "lilith" && !options.showLilith) return;
 
@@ -76,7 +76,7 @@ export const Planets = ({
               origin-[50%_50%] hover:scale-101"
               onMouseEnter={() => onHoverPlanet(name)}
               onMouseLeave={onLeavePlanet}
-              onClick={() => open({ type: "planet", id: name })}
+              onClick={() => open({ type: "planet", value: planet.name })}
             >
               <circle
                 cx={tx}

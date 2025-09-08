@@ -76,7 +76,6 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
       method: "POST",
       body: JSON.stringify(options),
     });
-    console.log(data);
     return data as SingleChart;
   };
 

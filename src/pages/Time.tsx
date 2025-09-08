@@ -1,4 +1,4 @@
-import { DescriptionSidePanel } from "../components/DescriptionSidePanel";
+import { DescriptionSidePanel } from "../components/descriptions/DescriptionSidePanel";
 import { ZodiacWheel } from "../components/wheel/ZodiacWheel";
 import { SingleWheelProvider } from "../contexts/SingleWheelContext";
 

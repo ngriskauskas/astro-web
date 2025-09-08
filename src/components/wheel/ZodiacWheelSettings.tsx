@@ -1,13 +1,9 @@
 import { useState } from "react";
 import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
-import {
-  AYANAMSAS,
-  HOUSE_SYSTEMS,
-  ZODIAC_SYSTEMS,
-  type Ayanamsa,
-  type HouseSystem,
-  type ZodiacSystem,
-} from "../../types/zodiac";
+import { AYANAMSAS, type Ayanamsa } from "../../types/ayanamsa";
+import { HOUSE_SYSTEMS, type HouseSystem } from "../../types/house-system";
+import { ZODIAC_SYSTEMS, type ZodiacSystem } from "../../types/zodiac-system";
+
 import { useWheel } from "../../hooks/useWheel";
 
 export interface AspectOptions {

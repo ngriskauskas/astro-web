@@ -8,7 +8,6 @@ export const ProtectedCharts = () => {
   const hasToasted = useRef(false);
 
   useEffect(() => {
-    console.log("loading", loading, "mainprofile", mainProfile);
     if (!loading && !mainProfile && !hasToasted.current) {
       toast.error("Please create your birth profile first");
       hasToasted.current = true;

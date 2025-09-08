@@ -1,4 +1,4 @@
-import { type Cusp } from "../../../types/zodiac";
+import { type Cusp } from "../../../types/cusp";
 import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, midpointAngle, polarToCartesian } from "./Utils";
@@ -27,9 +27,9 @@ export const Houses = ({ radius, innerRadius, center, angles }: HouseProps) => {
 
   const houseAngles = angles
     .filter(({ name }) => !["asc", "dc", "ic", "mc"].includes(name))
-    .map(({ name, angle }) => ({
-      number: parseInt(name.replace("cusp", ""), 10),
-      angle,
+    .map((cusp) => ({
+      ...cusp,
+      number: parseInt(cusp.name.replace("cusp", ""), 10),
     }))
     .sort((a, b) => a.number - b.number);
 
@@ -39,7 +39,8 @@ export const Houses = ({ radius, innerRadius, center, angles }: HouseProps) => {
 
   return (
     <g>
-      {houseAngles.map(({ number, angle }, i) => {
+      {houseAngles.map((house, i) => {
+        const { number, angle } = house;
         const nextAngle = houseAngles[(i + 1) % houseAngles.length].angle;
 
         const wedgePath = createWedgePath(
@@ -76,7 +77,7 @@ export const Houses = ({ radius, innerRadius, center, angles }: HouseProps) => {
               fill="url(#houseGradient)"
               stroke="white"
               strokeWidth={1}
-              onClick={() => open({ type: "house", id: number.toString() })}
+              onClick={() => open({ type: "house", value: house.name })}
             />
             <text
               x={tx}
@@ -90,7 +91,8 @@ export const Houses = ({ radius, innerRadius, center, angles }: HouseProps) => {
           </g>
         );
       })}
-      {keyAngles.map(({ name, angle, deg_min }) => {
+      {keyAngles.map((keyAngle) => {
+        const { name, angle, deg_min } = keyAngle;
         const { x: innerX, y: innerY } = polarToCartesian(
           center,
           innerRadius,
@@ -132,7 +134,7 @@ export const Houses = ({ radius, innerRadius, center, angles }: HouseProps) => {
               textAnchor="middle"
               dominantBaseline="middle"
               fill="white"
-              onClick={() => open({ type: "house", id: name })}
+              onClick={() => open({ type: "angle", value: keyAngle.name })}
             >
               {name.toUpperCase()}
             </text>

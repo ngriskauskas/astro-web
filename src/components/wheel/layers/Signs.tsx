@@ -1,5 +1,4 @@
-import { ZodiacData } from "../../../constants/zodiac";
-import { type ZodiacSign } from "../../../types/zodiac";
+import { type ZodiacSign, ZodiacData } from "../../../types/zodiac";
 import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, polarToCartesian } from "./Utils";
@@ -85,9 +84,16 @@ export const Signs = ({ radius, center }: SignProps) => {
               fill={`url(#grad-${sign})`}
               stroke="white"
               fillRule="evenodd"
-              onClick={() => open({ type: "sign", id: sign })}
+              onClick={() => open({ type: "sign", value: sign })}
             />
-            <image href={glyph} x={x - 12} y={y - 12} width={25} height={25} />
+            <image
+              href={glyph}
+              x={x - 12}
+              y={y - 12}
+              width={25}
+              height={25}
+              onClick={() => open({ type: "sign", value: sign })}
+            />
             {showTickMarks &&
               Array.from({ length: 29 }, (_, i) => {
                 const tickAngle = angle + (i + 1);
