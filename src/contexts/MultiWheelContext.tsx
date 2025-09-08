@@ -6,7 +6,9 @@ import { type PlanetAngle } from "../components/wheel/layers/Planets";
 import { type CuspAngle } from "../components/wheel/layers/Houses";
 import { type SignAngle } from "../components/wheel/layers/Signs";
 import { useAuth } from "./AuthContext";
-import { ZodiacSigns, type Aspect, type ZodiacSign } from "../types/zodiac";
+import { ZodiacSigns, type ZodiacSign } from "../types/zodiac";
+import { type Aspect } from "../types/aspect";
+import type { Planet, PlanetName } from "../types/planet";
 
 export interface MultiWheelContextType {
   settings: ZodiacWheelOptions;
@@ -18,6 +20,9 @@ export interface MultiWheelContextType {
   signAngles: SignAngle[];
   aspects: Aspect[];
   type: "synastry" | "transit";
+  getPlanetsInSign: (sign: ZodiacSign) => Planet[];
+  getPlanetsInHouse: (house: string) => Planet[];
+  getPlanetAspects: (planet: PlanetName) => Aspect[];
 }
 
 export const MultiWheelContext = createContext<
@@ -201,6 +206,35 @@ export const MultiWheelProvider = ({
     setAspects(chart.aspects);
   }, [chart]);
 
+  //TODO change these for multi
+  const getPlanetsInSign = (sign: ZodiacSign) => {
+    const planets = mainPlanetAngles.filter((x) => x.sign === sign);
+    return (planets as Planet[]) ?? [];
+  };
+
+  const getPlanetsInHouse = (house: string) => {
+    const houseAngle = mainCuspAngles.find((x) => x.name === house);
+    const start = houseAngle!.position;
+    const end = (start + 30) % 360;
+    return mainPlanetAngles.filter((planet) => {
+      if (start < end) {
+        return planet.position >= start && planet.position < end;
+      } else {
+        return planet.position >= start || planet.position < end;
+      }
+    });
+  };
+
+  const getPlanetAspects = (planet: PlanetName) => {
+    return aspects
+      .filter((x) => x.planet1.name === planet || x.planet2.name === planet)
+      .map((x) => {
+        if (x.planet1.name === planet) return x;
+        return { ...x, planet1: x.planet2, planet2: x.planet1 };
+      })
+      .sort((a, b) => a.orb - b.orb);
+  };
+
   return (
     <MultiWheelContext.Provider
       value={{
@@ -213,6 +247,9 @@ export const MultiWheelProvider = ({
         signAngles,
         aspects,
         type,
+        getPlanetAspects,
+        getPlanetsInHouse,
+        getPlanetsInSign,
       }}
     >
       {children}

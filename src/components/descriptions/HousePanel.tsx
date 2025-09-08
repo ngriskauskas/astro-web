@@ -1,11 +1,15 @@
 import { useDesc } from "../../contexts/DescContext";
+import { useWheel } from "../../hooks/useWheel";
 import { HouseData } from "../../types/cusp";
 import { ZodiacData } from "../../types/zodiac";
-import { BackButton, CloseButton, OverviewCard, Section } from "./Helpers";
+import { BackButton, CloseButton, OverviewCard, PlanetChip, Section } from "./Helpers";
 
 export const HousePanel = ({ house }: { house: string; desc: string }) => {
   const houseInfo = HouseData[house];
   const { open } = useDesc();
+  const { getPlanetsInHouse } = useWheel();
+
+  const planets = getPlanetsInHouse(house);
 
   return (
     <div className="flex flex-col h-full">
@@ -46,6 +50,15 @@ export const HousePanel = ({ house }: { house: string; desc: string }) => {
               glyph={ZodiacData[houseInfo.info.sign].glyph}
               onClick={() => open({ type: "sign", value: houseInfo.info.sign })}
             />
+          </div>
+        </Section>
+        <Section title="Planets in this House">
+          <div className="flex flex-wrap gap-1">
+            {planets.length === 0 ? (
+              <span className="text-gray-500">—</span>
+            ) : (
+              planets.map(({ name }) => <PlanetChip key={name} planet={name} />)
+            )}
           </div>
         </Section>
       </div>

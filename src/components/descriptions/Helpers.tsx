@@ -4,6 +4,7 @@ import type { ZodiacSign } from "../../types/zodiac";
 import { ZodiacData } from "../../types/zodiac";
 import { PlanetsData, type PlanetName } from "../../types/planet";
 import { useState } from "react";
+import { Aspects, type Aspect } from "../../types/aspect";
 
 export const Section = ({
   title,
@@ -100,6 +101,7 @@ export const PlanetChip = ({ planet }: { planet: PlanetName }) => {
     </div>
   );
 };
+
 export const PlanetGroup = ({
   title,
   planets,
@@ -157,3 +159,25 @@ export const SignGroup = ({
     </div>
   </div>
 );
+
+export const AspectChip = ({ aspect }: { aspect: Aspect }) => {
+  const { open } = useDesc();
+
+  return (
+    <div
+      className="flex items-center gap-1 px-1 py-0.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md"
+      onClick={() => open({ type: "aspect", value: aspect })}
+    >
+      <span className="text-base">
+        {PlanetsData[aspect.planet1.name].glyph}
+      </span>
+      <span className="capitalize">{aspect.planet1.name}</span>
+      <span className="text-base">{Aspects[aspect.type]}</span>
+      <span className="text-base">
+        {PlanetsData[aspect.planet2.name].glyph}
+      </span>
+      <span className="capitalize">{aspect.planet2.name}</span>
+      <span className="text-gray-500 text-[10px] ml-1">{aspect.orb}°</span>
+    </div>
+  );
+};

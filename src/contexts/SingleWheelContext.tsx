@@ -1,12 +1,14 @@
 import { createContext, useEffect, useState, type ReactNode } from "react";
 import { type SingleChart, useCharts } from "./ChartContext";
-import { ZodiacSigns, type Aspect, type ZodiacSign } from "../types/zodiac";
+import { ZodiacSigns, type ZodiacSign } from "../types/zodiac";
 import { type ZodiacWheelOptions } from "../components/wheel/ZodiacWheelSettings";
 import { useBirthProfiles } from "./BirthProfilesContext";
 import { type PlanetAngle } from "../components/wheel/layers/Planets";
 import { type CuspAngle } from "../components/wheel/layers/Houses";
 import { type SignAngle } from "../components/wheel/layers/Signs";
 import { useAuth } from "./AuthContext";
+import { type Aspect } from "../types/aspect";
+import type { Planet, PlanetName } from "../types/planet";
 
 export interface SingleWheelContextType {
   settings: ZodiacWheelOptions;
@@ -16,6 +18,9 @@ export interface SingleWheelContextType {
   signAngles: SignAngle[];
   aspects: Aspect[];
   type: "natal" | "time";
+  getPlanetsInSign: (sign: ZodiacSign) => Planet[];
+  getPlanetsInHouse: (house: string) => Planet[];
+  getPlanetAspects: (planet: PlanetName) => Aspect[];
 }
 
 export const SingleWheelContext = createContext<
@@ -168,6 +173,42 @@ export const SingleWheelProvider = ({
     setAspects(chart.aspects);
   }, [chart]);
 
+  const getPlanetsInSign = (sign: ZodiacSign) => {
+    const planets = planetAngles.filter((x) => x.sign === sign);
+    return (planets as Planet[]) ?? [];
+  };
+
+  const getPlanetsInHouse = (house: string) => {
+    const houseNum = parseInt(house);
+    const nextHouseNum = houseNum === 12 ? 1 : houseNum + 1;
+    const startCusp = cuspAngles.find(
+      (x) => x.name.replace("cusp", "") === String(houseNum),
+    );
+    const endCusp = cuspAngles.find(
+      (x) => x.name.replace("cusp", "") === String(nextHouseNum),
+    );
+
+    const start = startCusp!.position;
+    const end = endCusp!.position;
+    return planetAngles.filter((planet) => {
+      if (start < end) {
+        return planet.position >= start && planet.position < end;
+      } else {
+        return planet.position >= start || planet.position < end;
+      }
+    });
+  };
+
+  const getPlanetAspects = (planet: PlanetName) => {
+    return aspects
+      .filter((x) => x.planet1.name === planet || x.planet2.name === planet)
+      .filter(({ type, orb }) => orb <= settings.aspectOptions[type].minOrb)
+      .map((x) => {
+        if (x.planet1.name === planet) return x;
+        return { ...x, planet1: x.planet2, planet2: x.planet1 };
+      })
+      .sort((a, b) => a.orb - b.orb);
+  };
   return (
     <SingleWheelContext.Provider
       value={{
@@ -178,6 +219,9 @@ export const SingleWheelProvider = ({
         cuspAngles,
         aspects,
         type,
+        getPlanetsInSign,
+        getPlanetsInHouse,
+        getPlanetAspects,
       }}
     >
       {children}

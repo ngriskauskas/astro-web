@@ -3,22 +3,21 @@ import {
   BackButton,
   CloseButton,
   OverviewCard,
+  PlanetChip,
   PlanetGroup,
   Section,
 } from "./Helpers";
 import { type ZodiacSign } from "../../types/zodiac";
 import { useDesc } from "../../contexts/DescContext";
+import { useWheel } from "../../hooks/useWheel";
 
-export const SignPanel = ({
-  sign,
-  desc,
-}: {
-  sign: ZodiacSign;
-  desc: string;
-}) => {
+export const SignPanel = ({ sign }: { sign: ZodiacSign; desc: string }) => {
   const { open } = useDesc();
+  const { getPlanetsInSign } = useWheel();
   const signInfo = ZodiacData[sign];
   const { info } = signInfo;
+
+  const planets = getPlanetsInSign(sign);
 
   return (
     <div className="flex flex-col h-full">
@@ -68,8 +67,14 @@ export const SignPanel = ({
           </div>
         </Section>
 
-        <Section title="Planets" startOpen={false}>
-          {desc}
+        <Section title="Planets in this Sign">
+          <div className="flex flex-wrap gap-1">
+            {planets.length === 0 ? (
+              <span className="text-gray-500">—</span>
+            ) : (
+              planets.map(({ name }) => <PlanetChip key={name} planet={name} />)
+            )}
+          </div>
         </Section>
       </div>
     </div>

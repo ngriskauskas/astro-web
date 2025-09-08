@@ -1,13 +1,21 @@
-import { BackButton, CloseButton, Section, SignGroup } from "./Helpers";
+import {
+  AspectChip,
+  BackButton,
+  CloseButton,
+  Section,
+  SignGroup,
+} from "./Helpers";
 import { PlanetsData, type PlanetName } from "../../types/planet";
+import { useWheel } from "../../hooks/useWheel";
 
 export const PlanetPanel = ({
   planet,
-  desc,
 }: {
   planet: PlanetName;
   desc: string;
 }) => {
+  const { getPlanetAspects } = useWheel();
+  const aspects = getPlanetAspects(planet);
   const planetInfo = PlanetsData[planet];
   return (
     <div className="flex flex-col h-full">
@@ -28,8 +36,24 @@ export const PlanetPanel = ({
           <div className="mt-3 space-y-2">
             <SignGroup title="Rulerships" signs={planetInfo.info.rulerships} />
             <SignGroup title="Exalted in" signs={planetInfo.info.exaltedIn} />
-            <SignGroup title="Detriment in" signs={planetInfo.info.detrimentIn} />
+            <SignGroup
+              title="Detriment in"
+              signs={planetInfo.info.detrimentIn}
+            />
             <SignGroup title="Fall in" signs={planetInfo.info.fallIn} />
+          </div>
+        </Section>
+        <Section title="Aspects">
+          <div className="flex flex-col gap-1">
+            {aspects.length === 0 ? (
+              <span className="text-gray-500">—</span>
+            ) : (
+              aspects.map((aspect, index) => (
+                <div className="self-start">
+                  <AspectChip key={index} aspect={aspect} />
+                </div>
+              ))
+            )}
           </div>
         </Section>
       </div>
