@@ -4,7 +4,8 @@ import type { ZodiacSign } from "../../types/zodiac";
 import { ZodiacData } from "../../types/zodiac";
 import { PlanetsData, type PlanetName } from "../../types/planet";
 import { useState } from "react";
-import { Aspects, type Aspect } from "../../types/aspect";
+import { AspectData, type Aspect } from "../../types/aspect";
+import { HouseData } from "../../types/cusp";
 
 export const Section = ({
   title,
@@ -70,8 +71,9 @@ export const OverviewCard = ({
   onClick?: () => void;
 }) => (
   <div
-    className={`flex flex-col items-center p-1 bg-white border rounded shadow-sm ${onClick ? "cursor-pointer hover:shadow-md" : ""
-      }`}
+    className={`flex flex-col items-center p-1 bg-white border rounded shadow-sm ${
+      onClick ? "cursor-pointer hover:shadow-md" : ""
+    }`}
     onClick={onClick}
   >
     <span className="text-gray-400 text-xs uppercase tracking-wide mb-1 text-center">
@@ -172,12 +174,25 @@ export const AspectChip = ({ aspect }: { aspect: Aspect }) => {
         {PlanetsData[aspect.planet1.name].glyph}
       </span>
       <span className="capitalize">{aspect.planet1.name}</span>
-      <span className="text-base">{Aspects[aspect.type]}</span>
+      <span className="text-base">{AspectData[aspect.type].glyph}</span>
       <span className="text-base">
         {PlanetsData[aspect.planet2.name].glyph}
       </span>
       <span className="capitalize">{aspect.planet2.name}</span>
       <span className="text-gray-500 text-[10px] ml-1">{aspect.orb}°</span>
+    </div>
+  );
+};
+
+export const HouseChip = ({ house }: { house: number }) => {
+  const { open } = useDesc();
+  const houseInfo = HouseData[house];
+  return (
+    <div
+      className="flex items-center gap-1 px-1 py-1 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md"
+      onClick={() => open({ type: "house", value: house })}
+    >
+      <span className="font-xs">{houseInfo.name}</span>
     </div>
   );
 };

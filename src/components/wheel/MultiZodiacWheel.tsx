@@ -7,7 +7,7 @@ import { ZodiacWheelSettings } from "./ZodiacWheelSettings";
 import { MultiAspects } from "./layers/MultiAspects";
 import { useWheel } from "../../hooks/useWheel";
 import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
-import { type PlanetName } from "../../types/zodiac";
+import { type PlanetName } from "../../types/planet";
 
 export const MultiZodiacWheel = () => {
   const [hoveredPlanet, setHoveredPlanet] = useState<{

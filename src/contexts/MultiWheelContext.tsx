@@ -23,6 +23,8 @@ export interface MultiWheelContextType {
   getPlanetsInSign: (sign: ZodiacSign) => Planet[];
   getPlanetsInHouse: (house: string) => Planet[];
   getPlanetAspects: (planet: PlanetName) => Aspect[];
+  getPlanet: (planet: PlanetName) => Planet;
+  getPlanetHouse: (planet: PlanetName) => number;
 }
 
 export const MultiWheelContext = createContext<
@@ -235,6 +237,20 @@ export const MultiWheelProvider = ({
       .sort((a, b) => a.orb - b.orb);
   };
 
+  const getPlanet = (planet: PlanetName) => {
+    return mainPlanetAngles.find((x) => x.name === planet)!;
+  };
+
+  const getPlanetHouse = (planet: PlanetName): number => {
+    for (let house = 1; house <= 12; house++) {
+      const planetsInHouse = getPlanetsInHouse(String(house));
+      if (planetsInHouse.some((p) => p.name === planet)) {
+        return house;
+      }
+    }
+    throw new Error(`House not found for planet ${planet}`);
+  };
+
   return (
     <MultiWheelContext.Provider
       value={{
@@ -250,6 +266,8 @@ export const MultiWheelProvider = ({
         getPlanetAspects,
         getPlanetsInHouse,
         getPlanetsInSign,
+        getPlanet,
+        getPlanetHouse,
       }}
     >
       {children}

@@ -2,7 +2,9 @@ import {
   AspectChip,
   BackButton,
   CloseButton,
+  HouseChip,
   Section,
+  SignChip,
   SignGroup,
 } from "./Helpers";
 import { PlanetsData, type PlanetName } from "../../types/planet";
@@ -14,8 +16,10 @@ export const PlanetPanel = ({
   planet: PlanetName;
   desc: string;
 }) => {
-  const { getPlanetAspects } = useWheel();
+  const { getPlanetAspects, getPlanet, getPlanetHouse } = useWheel();
   const aspects = getPlanetAspects(planet);
+  const planetValue = getPlanet(planet);
+  const house = getPlanetHouse(planet);
   const planetInfo = PlanetsData[planet];
   return (
     <div className="flex flex-col h-full">
@@ -41,6 +45,36 @@ export const PlanetPanel = ({
               signs={planetInfo.info.detrimentIn}
             />
             <SignGroup title="Fall in" signs={planetInfo.info.fallIn} />
+          </div>
+        </Section>
+        <Section title="Details">
+          <div className="flex flex-col gap-3">
+            {planetValue.retrograde && (
+              <div className="flex flex-col items-start gap-1">
+                <span className="text-gray-500 text-sm">Retrograde ℞</span>
+              </div>
+            )}
+
+            <div className="flex flex-col items-start gap-1">
+              <span className="text-gray-500 text-xs uppercase tracking-wide">
+                Sign
+              </span>
+              <div className="flex items-center gap-1">
+                <SignChip sign={planetValue.sign} />
+                <span className="text-gray-600 text-[13px] ml-1">
+                  {`${Math.round(planetValue.deg_min[0])}° ${Math.round(
+                    planetValue.deg_min[1],
+                  )}′`}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-start gap-1">
+              <span className="text-gray-500 text-xs uppercase tracking-wide">
+                House
+              </span>
+              <HouseChip house={house} />
+            </div>
           </div>
         </Section>
         <Section title="Aspects">

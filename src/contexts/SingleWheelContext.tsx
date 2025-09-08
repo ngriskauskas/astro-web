@@ -21,6 +21,8 @@ export interface SingleWheelContextType {
   getPlanetsInSign: (sign: ZodiacSign) => Planet[];
   getPlanetsInHouse: (house: string) => Planet[];
   getPlanetAspects: (planet: PlanetName) => Aspect[];
+  getPlanet: (planet: PlanetName) => Planet;
+  getPlanetHouse: (planet: PlanetName) => number;
 }
 
 export const SingleWheelContext = createContext<
@@ -209,6 +211,21 @@ export const SingleWheelProvider = ({
       })
       .sort((a, b) => a.orb - b.orb);
   };
+
+  const getPlanet = (planet: PlanetName) => {
+    return planetAngles.find((x) => x.name === planet)!;
+  };
+
+  const getPlanetHouse = (planet: PlanetName): number => {
+    for (let house = 1; house <= 12; house++) {
+      const planetsInHouse = getPlanetsInHouse(String(house));
+      if (planetsInHouse.some((p) => p.name === planet)) {
+        return house;
+      }
+    }
+    throw new Error(`House not found for planet ${planet}`);
+  };
+
   return (
     <SingleWheelContext.Provider
       value={{
@@ -222,6 +239,8 @@ export const SingleWheelProvider = ({
         getPlanetsInSign,
         getPlanetsInHouse,
         getPlanetAspects,
+        getPlanet,
+        getPlanetHouse,
       }}
     >
       {children}
