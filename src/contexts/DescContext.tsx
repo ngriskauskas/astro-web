@@ -74,7 +74,16 @@ export const DescProvider = ({ children }: { children: ReactNode }) => {
       setHistory((prev) => [...prev, active]);
     }
 
-    setActive(desc);
+    setActive({
+      owner,
+      type,
+      value:
+        type === "house"
+          ? typeof value === "string"
+            ? (value as string).replace("cusp", "")
+            : value
+          : value,
+    });
   };
 
   const close = () => setActive(null);

@@ -261,7 +261,7 @@ export const MultiWheelProvider = ({
 
   const getPlanetsInHouse = (
     house: string,
-    owner: OwnerType,
+    owner: OwnerType = "main",
   ): [Planet[], Planet[]] => {
     const mainPlanets = computePlanets(
       mainPlanetAngles,
@@ -276,7 +276,7 @@ export const MultiWheelProvider = ({
     return [mainPlanets, otherPlanets];
   };
 
-  const getPlanetAspects = (planet: PlanetName, owner: OwnerType) => {
+  const getPlanetAspects = (planet: PlanetName, owner: OwnerType = "main") => {
     return aspects
       .filter((x) =>
         owner === "main"
@@ -291,12 +291,18 @@ export const MultiWheelProvider = ({
       .sort((a, b) => a.orb - b.orb);
   };
 
-  const getPlanet = (planet: PlanetName, owner: OwnerType): PlanetAngle => {
+  const getPlanet = (
+    planet: PlanetName,
+    owner: OwnerType = "main",
+  ): PlanetAngle => {
     const angles = owner === "other" ? otherPlanetAngles : mainPlanetAngles;
     return angles.find((x) => x.name === planet)!;
   };
 
-  const getPlanetHouse = (planet: PlanetName, owner: OwnerType): number => {
+  const getPlanetHouse = (
+    planet: PlanetName,
+    owner: OwnerType = "main",
+  ): number => {
     const angles = owner === "other" ? otherPlanetAngles : mainPlanetAngles;
     const cusps = owner === "other" ? otherCuspAngles : mainCuspAngles;
 

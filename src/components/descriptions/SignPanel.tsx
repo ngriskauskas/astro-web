@@ -84,20 +84,32 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
                 open({
                   type: "house",
                   value: String(info.house),
-                  owner: "main",
+                  owner: mainPlanets ? "main" : undefined,
                 })
               }
             />
           </div>
           <div className="mt-3 space-y-2">
-            <PlanetGroup title="Rulers" planets={info.rulers} owner="main" />
-            <PlanetGroup title="Exalted" planets={info.exalted} owner="main" />
+            <PlanetGroup
+              title="Rulers"
+              planets={info.rulers}
+              owner={mainPlanets ? "main" : undefined}
+            />
+            <PlanetGroup
+              title="Exalted"
+              planets={info.exalted}
+              owner={mainPlanets ? "main" : undefined}
+            />
             <PlanetGroup
               title="Detriment"
               planets={info.detriment}
-              owner="main"
+              owner={mainPlanets ? "main" : undefined}
             />
-            <PlanetGroup title="Fall" planets={info.fall} owner="main" />
+            <PlanetGroup
+              title="Fall"
+              planets={info.fall}
+              owner={mainPlanets ? "main" : undefined}
+            />
           </div>
         </Section>
         <Section title="Planets in this Sign">
@@ -107,7 +119,11 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
                 <span className="text-gray-500">—</span>
               ) : (
                 planets.map(({ name }) => (
-                  <PlanetChip key={name} planet={name} owner="main" />
+                  <PlanetChip
+                    key={name}
+                    planet={name}
+                    owner={mainPlanets ? "main" : undefined}
+                  />
                 ))
               ))}
 
@@ -122,7 +138,11 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
                       <span className="text-gray-400">—</span>
                     ) : (
                       mainPlanets.map(({ name }) => (
-                        <PlanetChip key={name} planet={name} owner="main" />
+                        <PlanetChip
+                          key={name}
+                          planet={name}
+                          owner={mainPlanets ? "main" : undefined}
+                        />
                       ))
                     )}
                   </div>
@@ -137,7 +157,11 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
                       <span className="text-gray-400">—</span>
                     ) : (
                       otherPlanets.map(({ name }) => (
-                        <PlanetChip key={name} planet={name} owner="main" />
+                        <PlanetChip
+                          key={name}
+                          planet={name}
+                          owner={mainPlanets ? "main" : undefined}
+                        />
                       ))
                     )}
                   </div>
