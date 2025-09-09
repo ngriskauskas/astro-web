@@ -24,6 +24,8 @@ export const MultiZodiacWheel = () => {
     otherCuspAngles,
     mainPlanetAngles,
     otherPlanetAngles,
+    aspects,
+    settings: { aspectOptions },
   } = useWheel() as MultiWheelContextType;
 
   const size = 800;
@@ -45,15 +47,18 @@ export const MultiZodiacWheel = () => {
               radius={radius - 55}
               innerRadius={radius - 145}
               angles={mainCuspAngles}
+              owner="main"
             />
             <Houses
               center={radius}
               radius={radius - 145}
               innerRadius={radius - 240}
               angles={otherCuspAngles}
+              owner="other"
             />
             <Signs center={radius} radius={radius - 5} />
             <Planets
+              owner="main"
               center={radius}
               radius={radius - 55}
               angles={mainPlanetAngles}
@@ -64,8 +69,8 @@ export const MultiZodiacWheel = () => {
               }
               onHoverPlanet={(planet) => {
                 setHoveredPlanet({ planet, profile: "main" });
-                chart.aspects.forEach(({ planet1, planet2, orb, type }) => {
-                  const { minOrb, show } = options.aspectOptions[type];
+                aspects.forEach(({ planet1, planet2, orb, type }) => {
+                  const { minOrb, show } = aspectOptions[type];
                   if (!show || orb > minOrb) return;
                   if (planet1.name === planet)
                     setHoverAspectedPlanets((prev) => ({
@@ -81,6 +86,7 @@ export const MultiZodiacWheel = () => {
             />
 
             <Planets
+              owner="other"
               center={radius}
               radius={radius - 145}
               angles={otherPlanetAngles}
@@ -91,8 +97,8 @@ export const MultiZodiacWheel = () => {
               }
               onHoverPlanet={(planet) => {
                 setHoveredPlanet({ planet, profile: "other" });
-                chart.aspects.forEach(({ planet1, planet2, orb, type }) => {
-                  const { minOrb, show } = options.aspectOptions[type];
+                aspects.forEach(({ planet1, planet2, orb, type }) => {
+                  const { minOrb, show } = aspectOptions[type];
                   if (!show || orb > minOrb) return;
                   if (planet2.name === planet)
                     setHoverAspectedPlanets((prev) => ({

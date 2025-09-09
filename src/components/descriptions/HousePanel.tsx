@@ -1,15 +1,58 @@
+import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
 import { useDesc } from "../../contexts/DescContext";
+import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
+import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { useWheel } from "../../hooks/useWheel";
 import { HouseData } from "../../types/cusp";
 import { ZodiacData } from "../../types/zodiac";
-import { BackButton, CloseButton, OverviewCard, PlanetChip, Section } from "./Helpers";
+import {
+  BackButton,
+  CloseButton,
+  OverviewCard,
+  PlanetChip,
+  Section,
+} from "./Helpers";
 
-export const HousePanel = ({ house }: { house: string; desc: string }) => {
+export const HousePanel = ({
+  house,
+  owner,
+}: {
+  house: string;
+  owner?: "main" | "other";
+}) => {
   const houseInfo = HouseData[house];
   const { open } = useDesc();
-  const { getPlanetsInHouse } = useWheel();
 
-  const planets = getPlanetsInHouse(house);
+  const getPlanets = () => {
+    if (owner) {
+      const { getPlanetsInHouse } = useWheel() as MultiWheelContextType;
+      const [mainPlanets, otherPlanets] = getPlanetsInHouse(house, owner);
+
+      return { mainPlanets, otherPlanets };
+    } else {
+      const { getPlanetsInHouse } = useWheel() as SingleWheelContextType;
+      const planets = getPlanetsInHouse(house);
+      return { planets };
+    }
+  };
+
+  const {
+    settings: { otherProfileId },
+    type,
+  } = useWheel();
+  const { profiles } = useBirthProfiles();
+
+  const otherProfileName =
+    otherProfileId && profiles
+      ? profiles.find((x) => x.id === otherProfileId)?.name
+      : type === "transit"
+        ? "Transit"
+        : "Other";
+
+  const planetData = getPlanets();
+  const planets = planetData.planets;
+  const mainPlanets = planetData.mainPlanets;
+  const otherPlanets = planetData.otherPlanets;
 
   return (
     <div className="flex flex-col h-full">
@@ -54,10 +97,46 @@ export const HousePanel = ({ house }: { house: string; desc: string }) => {
         </Section>
         <Section title="Planets in this House">
           <div className="flex flex-wrap gap-1">
-            {planets.length === 0 ? (
-              <span className="text-gray-500">—</span>
-            ) : (
-              planets.map(({ name }) => <PlanetChip key={name} planet={name} />)
+            {planets &&
+              (planets.length === 0 ? (
+                <span className="text-gray-500">—</span>
+              ) : (
+                planets.map(({ name }) => (
+                  <PlanetChip key={name} planet={name} owner={owner} />
+                ))
+              ))}
+            {mainPlanets && otherPlanets && (
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-gray-500">
+                    Your planets
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {mainPlanets.length === 0 ? (
+                      <span className="text-gray-400">—</span>
+                    ) : (
+                      mainPlanets.map(({ name }) => (
+                        <PlanetChip key={name} planet={name} owner={owner} />
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-gray-500">
+                    {`${otherProfileName} Planets`}
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {otherPlanets.length === 0 ? (
+                      <span className="text-gray-400">—</span>
+                    ) : (
+                      otherPlanets.map(({ name }) => (
+                        <PlanetChip key={name} planet={name} owner={owner} />
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </Section>

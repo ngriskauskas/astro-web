@@ -91,12 +91,18 @@ export const OverviewCard = ({
   </div>
 );
 
-export const PlanetChip = ({ planet }: { planet: PlanetName }) => {
+export const PlanetChip = ({
+  planet,
+  owner,
+}: {
+  planet: PlanetName;
+  owner?: "main" | "other";
+}) => {
   const { open } = useDesc();
   return (
     <div
       className="flex items-center gap-1 px-1 py-0.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md"
-      onClick={() => open({ type: "planet", value: planet })}
+      onClick={() => open({ type: "planet", value: planet, owner })}
     >
       <span className="text-base">{PlanetsData[planet].glyph}</span>
       <span className="capitalize">{planet}</span>
@@ -107,9 +113,11 @@ export const PlanetChip = ({ planet }: { planet: PlanetName }) => {
 export const PlanetGroup = ({
   title,
   planets,
+  owner,
 }: {
   title: string;
   planets: PlanetName[];
+  owner?: "main" | "other";
 }) => (
   <div className="flex flex-col gap-1">
     <span className="text-gray-500 text-xs uppercase tracking-wide">
@@ -120,7 +128,9 @@ export const PlanetGroup = ({
       {planets.length === 0 ? (
         <span className="text-gray-500">—</span>
       ) : (
-        planets.map((planet) => <PlanetChip key={planet} planet={planet} />)
+        planets.map((planet) => (
+          <PlanetChip key={planet} planet={planet} owner={owner} />
+        ))
       )}
     </div>
   </div>
@@ -184,13 +194,19 @@ export const AspectChip = ({ aspect }: { aspect: Aspect }) => {
   );
 };
 
-export const HouseChip = ({ house }: { house: number }) => {
+export const HouseChip = ({
+  house,
+  owner,
+}: {
+  house: number;
+  owner?: "main" | "other";
+}) => {
   const { open } = useDesc();
   const houseInfo = HouseData[house];
   return (
     <div
       className="flex items-center gap-1 px-1 py-1 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md"
-      onClick={() => open({ type: "house", value: house })}
+      onClick={() => open({ type: "house", value: String(house), owner })}
     >
       <span className="font-xs">{houseInfo.name}</span>
     </div>

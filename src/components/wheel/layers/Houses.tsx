@@ -12,9 +12,16 @@ interface HouseProps {
   radius: number;
   innerRadius: number;
   angles: CuspAngle[];
+  owner?: "main" | "other";
 }
 
-export const Houses = ({ radius, innerRadius, center, angles }: HouseProps) => {
+export const Houses = ({
+  radius,
+  innerRadius,
+  center,
+  angles,
+  owner,
+}: HouseProps) => {
   const {
     settings: {
       displayOptions: { angleLabels: showAngleLabels },
@@ -77,7 +84,7 @@ export const Houses = ({ radius, innerRadius, center, angles }: HouseProps) => {
               fill="url(#houseGradient)"
               stroke="white"
               strokeWidth={1}
-              onClick={() => open({ type: "house", value: house.name })}
+              onClick={() => open({ type: "house", value: house.name, owner })}
             />
             <text
               x={tx}
@@ -134,7 +141,9 @@ export const Houses = ({ radius, innerRadius, center, angles }: HouseProps) => {
               textAnchor="middle"
               dominantBaseline="middle"
               fill="white"
-              onClick={() => open({ type: "angle", value: keyAngle.name })}
+              onClick={() =>
+                open({ type: "angle", value: keyAngle.name, owner })
+              }
             >
               {name.toUpperCase()}
             </text>

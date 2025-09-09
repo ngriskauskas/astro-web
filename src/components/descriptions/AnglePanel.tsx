@@ -1,7 +1,7 @@
 import { AngleData } from "../../types/cusp";
 import { BackButton, CloseButton, Section } from "./Helpers";
 
-export const AnglePanel = ({ angle }: { angle: string; desc: string }) => {
+export const AnglePanel = ({ angle }: { angle: string }) => {
   const angleInfo = AngleData[angle];
 
   return (

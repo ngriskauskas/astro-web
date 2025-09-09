@@ -10,15 +10,39 @@ import {
 import { type ZodiacSign } from "../../types/zodiac";
 import { useDesc } from "../../contexts/DescContext";
 import { useWheel } from "../../hooks/useWheel";
+import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
+import type { Planet } from "../../types/planet";
 
-export const SignPanel = ({ sign }: { sign: ZodiacSign; desc: string }) => {
+export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
   const { open } = useDesc();
   const { getPlanetsInSign } = useWheel();
   const signInfo = ZodiacData[sign];
   const { info } = signInfo;
 
-  const planets = getPlanetsInSign(sign);
+  const planetsInSign = getPlanetsInSign(sign);
+  const { mainPlanets, otherPlanets, planets } = Array.isArray(planetsInSign[0])
+    ? {
+        mainPlanets: (planetsInSign as [Planet[], Planet[]])[0],
+        otherPlanets: (planetsInSign as [Planet[], Planet[]])[1],
+        planets: undefined,
+      }
+    : {
+        planets: planetsInSign as Planet[],
+        mainPlanets: undefined,
+        otherPlanets: undefined,
+      };
 
+  const {
+    settings: { otherProfileId },
+    type,
+  } = useWheel();
+  const { profiles } = useBirthProfiles();
+  const otherProfileName =
+    otherProfileId && profiles
+      ? profiles.find((x) => x.id === otherProfileId)?.name
+      : type === "transit"
+        ? "Transit"
+        : "Other";
   return (
     <div className="flex flex-col h-full">
       <div
@@ -56,23 +80,69 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign; desc: string }) => {
             <OverviewCard
               title="House"
               value={info.house}
-              onClick={() => open({ type: "house", value: info.house })}
+              onClick={() =>
+                open({
+                  type: "house",
+                  value: String(info.house),
+                  owner: "main",
+                })
+              }
             />
           </div>
           <div className="mt-3 space-y-2">
-            <PlanetGroup title="Rulers" planets={info.rulers} />
-            <PlanetGroup title="Exalted" planets={info.exalted} />
-            <PlanetGroup title="Detriment" planets={info.detriment} />
-            <PlanetGroup title="Fall" planets={info.fall} />
+            <PlanetGroup title="Rulers" planets={info.rulers} owner="main" />
+            <PlanetGroup title="Exalted" planets={info.exalted} owner="main" />
+            <PlanetGroup
+              title="Detriment"
+              planets={info.detriment}
+              owner="main"
+            />
+            <PlanetGroup title="Fall" planets={info.fall} owner="main" />
           </div>
         </Section>
-
         <Section title="Planets in this Sign">
           <div className="flex flex-wrap gap-1">
-            {planets.length === 0 ? (
-              <span className="text-gray-500">—</span>
-            ) : (
-              planets.map(({ name }) => <PlanetChip key={name} planet={name} />)
+            {planets &&
+              (planets.length === 0 ? (
+                <span className="text-gray-500">—</span>
+              ) : (
+                planets.map(({ name }) => (
+                  <PlanetChip key={name} planet={name} owner="main" />
+                ))
+              ))}
+
+            {mainPlanets && otherPlanets && (
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-gray-500">
+                    Your planets
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {mainPlanets.length === 0 ? (
+                      <span className="text-gray-400">—</span>
+                    ) : (
+                      mainPlanets.map(({ name }) => (
+                        <PlanetChip key={name} planet={name} owner="main" />
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-gray-500">
+                    {`${otherProfileName} Planets`}
+                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {otherPlanets.length === 0 ? (
+                      <span className="text-gray-400">—</span>
+                    ) : (
+                      otherPlanets.map(({ name }) => (
+                        <PlanetChip key={name} planet={name} owner="main" />
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </Section>

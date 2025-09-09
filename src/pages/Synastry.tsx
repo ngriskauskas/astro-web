@@ -1,16 +1,19 @@
 import { DescriptionSidePanel } from "../components/descriptions/DescriptionSidePanel";
 import { MultiZodiacWheel } from "../components/wheel/MultiZodiacWheel";
+import { DescProvider } from "../contexts/DescContext";
 import { MultiWheelProvider } from "../contexts/MultiWheelContext";
 
 export const Synastry = () => {
   return (
     <MultiWheelProvider type="synastry">
-      <div className="flex items-center justify-center mt-10">
-        <div className="w-[90%] max-w-5xl">
-          <MultiZodiacWheel />
+      <DescProvider>
+        <div className="flex mt-5">
+          <div className="w-[88%] max-w-5xl">
+            <MultiZodiacWheel />
+          </div>
         </div>
-      </div>
-      <DescriptionSidePanel />
+        <DescriptionSidePanel />
+      </DescProvider>
     </MultiWheelProvider>
   );
 };

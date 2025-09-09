@@ -142,8 +142,9 @@ export const SingleWheelProvider = ({
         adjusted.push({ ...planet, glyphAngle: planet.angle });
       } else {
         const prev = adjusted[i - 1];
-        const diff = planet.angle - prev.glyphAngle;
-        const glyphAngle = diff <= 4 ? prev.glyphAngle + 5 : planet.angle;
+        const diff = ((planet.angle - prev.glyphAngle + 540) % 360) - 180;
+        const glyphAngle =
+          Math.abs(diff) <= 4.5 ? (prev.glyphAngle + 6) % 360 : planet.angle;
         adjusted.push({ ...planet, glyphAngle });
       }
     });

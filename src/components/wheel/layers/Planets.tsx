@@ -1,4 +1,8 @@
-import { type PlanetName, type Planet, PlanetsData } from "../../../types/planet";
+import {
+  type PlanetName,
+  type Planet,
+  PlanetsData,
+} from "../../../types/planet";
 import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { polarToCartesian } from "./Utils";
@@ -15,6 +19,7 @@ interface PlanetProps {
   onLeavePlanet: () => void;
   hoverAspectedPlanets: PlanetName[];
   angles: PlanetAngle[];
+  owner?: "main" | "other";
 }
 
 export const Planets = ({
@@ -24,6 +29,7 @@ export const Planets = ({
   onLeavePlanet,
   hoverAspectedPlanets,
   angles,
+  owner,
 }: PlanetProps) => {
   const {
     settings: {
@@ -76,7 +82,9 @@ export const Planets = ({
               origin-[50%_50%] hover:scale-101"
               onMouseEnter={() => onHoverPlanet(name)}
               onMouseLeave={onLeavePlanet}
-              onClick={() => open({ type: "planet", value: planet.name })}
+              onClick={() =>
+                open({ type: "planet", value: planet.name, owner })
+              }
             >
               <circle
                 cx={tx}

@@ -17,21 +17,21 @@ export const DescriptionSidePanel = () => {
     switch (active.type) {
       case "planet":
         return (
-          <PlanetPanel planet={active.value as PlanetName} desc={active.desc} />
+          <PlanetPanel
+            planet={active.value as PlanetName}
+            owner={active.owner}
+          />
         );
-
       case "sign":
-        return (
-          <SignPanel sign={active.value as ZodiacSign} desc={active.desc} />
-        );
+        return <SignPanel sign={active.value as ZodiacSign} />;
       case "aspect":
-        return (
-          <AspectPanel aspect={active.value as Aspect} desc={active.desc} />
-        );
+        return <AspectPanel aspect={active.value as Aspect} />;
       case "house":
-        return <HousePanel house={active.value as string} desc={active.desc} />;
+        return (
+          <HousePanel house={active.value as string} owner={active.owner} />
+        );
       case "angle":
-        return <AnglePanel angle={active.value as string} desc={active.desc} />;
+        return <AnglePanel angle={active.value as string} />;
       default:
         return null;
     }

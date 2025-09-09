@@ -1,41 +1,25 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
-import { apiFetch } from "../utils/api";
-import type {
-  Aspect,
-  AspectType,
-  PlanetName,
-  ZodiacSign,
-} from "../types/zodiac";
+import { createContext, useContext, useState, type ReactNode } from "react";
+import type { ZodiacSign } from "../types/zodiac";
+import { type Aspect } from "../types/aspect";
+import { type PlanetName } from "../types/planet";
 
-interface BasicDescriptions {
-  aspects: Record<AspectType, string>;
-  houses: Record<string, string>;
-  planets: Record<string, string>;
-  signs: Record<ZodiacSign, string>;
+type ActiveType = "planet" | "house" | "sign" | "aspect" | "angle";
+
+interface Active {
+  type: ActiveType;
+  value: PlanetName | ZodiacSign | string | Aspect;
+  owner?: "main" | "other";
 }
 
-type DescriptionType = "planet" | "house" | "sign" | "aspect" | "angle";
-
-interface Description {
-  type: DescriptionType;
-  desc: string;
+interface Params {
+  type: ActiveType;
   value: PlanetName | ZodiacSign | string | Aspect;
-}
-
-interface DescriptionParams {
-  type: DescriptionType;
-  value: PlanetName | ZodiacSign | string | Aspect;
+  owner?: "main" | "other";
 }
 
 interface DesContextType {
-  active: Description | null;
-  open: (params: DescriptionParams) => void;
+  active: Active | null;
+  open: (params: Params) => void;
   close: () => void;
   goBack: () => void;
 }
@@ -43,20 +27,17 @@ interface DesContextType {
 const DescContext = createContext<DesContextType | undefined>(undefined);
 
 export const DescProvider = ({ children }: { children: ReactNode }) => {
-  const [active, setActive] = useState<Description | null>(null);
-  const [_, setHistory] = useState<Description[]>([]);
-  const [basicDescriptions, setBasicDescriptions] =
-    useState<BasicDescriptions | null>(null);
+  const [active, setActive] = useState<Active | null>(null);
+  const [_, setHistory] = useState<Active[]>([]);
 
-  const open = ({ type, value }: DescriptionParams) => {
-    if (!basicDescriptions) return;
-    const desc: Description = (() => {
+  const open = ({ type, value, owner }: Params) => {
+    const desc: Active = (() => {
       switch (type) {
         case "planet":
           return {
             type,
             value,
-            desc: basicDescriptions.planets[value as PlanetName],
+            owner,
           };
         case "house":
           const houseVal =
@@ -66,25 +47,25 @@ export const DescProvider = ({ children }: { children: ReactNode }) => {
           return {
             type,
             value: houseVal,
-            desc: basicDescriptions.houses[houseVal],
+            owner,
           };
         case "sign":
           return {
             type,
             value,
-            desc: basicDescriptions.signs[value as ZodiacSign],
+            owner,
           };
         case "aspect":
           return {
             type,
             value,
-            desc: basicDescriptions.aspects[(value as Aspect).type],
+            owner,
           };
         case "angle":
           return {
             type,
             value,
-            desc: basicDescriptions.houses[value],
+            owner,
           };
       }
     })();
@@ -110,16 +91,6 @@ export const DescProvider = ({ children }: { children: ReactNode }) => {
       return newHistory;
     });
   };
-
-  useEffect(() => {
-    const fetchDescriptions = async () => {
-      const data = (await apiFetch("/descriptions/basic", {
-        method: "GET",
-      })) as BasicDescriptions;
-      setBasicDescriptions(data);
-    };
-    fetchDescriptions();
-  }, []);
 
   return (
     <DescContext.Provider value={{ active, open, close, goBack }}>

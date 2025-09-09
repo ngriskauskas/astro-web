@@ -14,3 +14,7 @@ export const useWheel = () => {
 
   return (single ?? multi)!;
 };
+
+export const isMulti = (ctx: any) => {
+  return ctx && "mainPlanetAngles" in ctx;
+};

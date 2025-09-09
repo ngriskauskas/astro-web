@@ -9,18 +9,38 @@ import {
 } from "./Helpers";
 import { PlanetsData, type PlanetName } from "../../types/planet";
 import { useWheel } from "../../hooks/useWheel";
+import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
+import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 
 export const PlanetPanel = ({
   planet,
+  owner,
 }: {
   planet: PlanetName;
-  desc: string;
+  owner?: "main" | "other";
 }) => {
-  const { getPlanetAspects, getPlanet, getPlanetHouse } = useWheel();
-  const aspects = getPlanetAspects(planet);
-  const planetValue = getPlanet(planet);
-  const house = getPlanetHouse(planet);
+  const getPlanetData = () => {
+    if (owner) {
+      const { getPlanetAspects, getPlanet, getPlanetHouse } =
+        useWheel() as MultiWheelContextType;
+      const aspects = getPlanetAspects(planet, owner);
+      const planetValue = getPlanet(planet, owner);
+      const house = getPlanetHouse(planet, owner);
+      return { aspects, planetValue, house };
+    } else {
+      const { getPlanetAspects, getPlanet, getPlanetHouse } =
+        useWheel() as SingleWheelContextType;
+      const aspects = getPlanetAspects(planet);
+      const planetValue = getPlanet(planet);
+      const house = getPlanetHouse(planet);
+      return { aspects, planetValue, house };
+    }
+  };
+
+  const { aspects, planetValue, house } = getPlanetData();
+
   const planetInfo = PlanetsData[planet];
+
   return (
     <div className="flex flex-col h-full">
       <div
@@ -73,7 +93,7 @@ export const PlanetPanel = ({
               <span className="text-gray-500 text-xs uppercase tracking-wide">
                 House
               </span>
-              <HouseChip house={house} />
+              <HouseChip house={house} owner={owner} />
             </div>
           </div>
         </Section>
@@ -83,8 +103,8 @@ export const PlanetPanel = ({
               <span className="text-gray-500">—</span>
             ) : (
               aspects.map((aspect, index) => (
-                <div className="self-start">
-                  <AspectChip key={index} aspect={aspect} />
+                <div className="self-start" key={index}>
+                  <AspectChip aspect={aspect} />
                 </div>
               ))
             )}

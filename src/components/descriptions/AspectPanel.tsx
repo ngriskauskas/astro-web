@@ -2,7 +2,7 @@ import { AspectData, type Aspect } from "../../types/aspect";
 import { PlanetsData } from "../../types/planet";
 import { BackButton, CloseButton, Section } from "./Helpers";
 
-export const AspectPanel = ({ aspect }: { aspect: Aspect; desc: string }) => {
+export const AspectPanel = ({ aspect }: { aspect: Aspect }) => {
   const aspectInfo = AspectData[aspect.type];
   return (
     <div className="flex flex-col h-full">
