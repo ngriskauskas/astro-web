@@ -31,45 +31,6 @@ export const DescProvider = ({ children }: { children: ReactNode }) => {
   const [_, setHistory] = useState<Active[]>([]);
 
   const open = ({ type, value, owner }: Params) => {
-    const desc: Active = (() => {
-      switch (type) {
-        case "planet":
-          return {
-            type,
-            value,
-            owner,
-          };
-        case "house":
-          const houseVal =
-            typeof value === "string"
-              ? (value as string).replace("cusp", "")
-              : value;
-          return {
-            type,
-            value: houseVal,
-            owner,
-          };
-        case "sign":
-          return {
-            type,
-            value,
-            owner,
-          };
-        case "aspect":
-          return {
-            type,
-            value,
-            owner,
-          };
-        case "angle":
-          return {
-            type,
-            value,
-            owner,
-          };
-      }
-    })();
-
     if (active) {
       setHistory((prev) => [...prev, active]);
     }
