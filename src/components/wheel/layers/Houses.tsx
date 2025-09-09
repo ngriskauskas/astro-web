@@ -1,4 +1,6 @@
-import { type Cusp } from "../../../contexts/ChartContext";
+import { type Cusp } from "../../../types/cusp";
+import { useDesc } from "../../../contexts/DescContext";
+import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, midpointAngle, polarToCartesian } from "./Utils";
 
 export interface CuspAngle extends Cusp {
@@ -10,7 +12,7 @@ interface HouseProps {
   radius: number;
   innerRadius: number;
   angles: CuspAngle[];
-  showAngleLabels: boolean;
+  owner?: "main" | "other";
 }
 
 export const Houses = ({
@@ -18,15 +20,23 @@ export const Houses = ({
   innerRadius,
   center,
   angles,
-  showAngleLabels,
+  owner,
 }: HouseProps) => {
+  const {
+    settings: {
+      displayOptions: { angleLabels: showAngleLabels },
+    },
+  } = useWheel();
+
+  const { open } = useDesc();
+
   const outerRadius = radius;
 
   const houseAngles = angles
     .filter(({ name }) => !["asc", "dc", "ic", "mc"].includes(name))
-    .map(({ name, angle }) => ({
-      number: parseInt(name.replace("cusp", ""), 10),
-      angle,
+    .map((cusp) => ({
+      ...cusp,
+      number: parseInt(cusp.name.replace("cusp", ""), 10),
     }))
     .sort((a, b) => a.number - b.number);
 
@@ -36,7 +46,8 @@ export const Houses = ({
 
   return (
     <g>
-      {houseAngles.map(({ number, angle }, i) => {
+      {houseAngles.map((house, i) => {
+        const { number, angle } = house;
         const nextAngle = houseAngles[(i + 1) % houseAngles.length].angle;
 
         const wedgePath = createWedgePath(
@@ -73,6 +84,7 @@ export const Houses = ({
               fill="url(#houseGradient)"
               stroke="white"
               strokeWidth={1}
+              onClick={() => open({ type: "house", value: house.name, owner })}
             />
             <text
               x={tx}
@@ -86,7 +98,8 @@ export const Houses = ({
           </g>
         );
       })}
-      {keyAngles.map(({ name, angle, deg_min }) => {
+      {keyAngles.map((keyAngle) => {
+        const { name, angle, deg_min } = keyAngle;
         const { x: innerX, y: innerY } = polarToCartesian(
           center,
           innerRadius,
@@ -102,7 +115,11 @@ export const Houses = ({
           innerRadius + 18,
           angle + 4,
         );
-        const { x: dx, y: dy } = polarToCartesian(center, outerRadius - 15, angle + 2);
+        const { x: dx, y: dy } = polarToCartesian(
+          center,
+          outerRadius - 15,
+          angle + 2,
+        );
         const [deg, min] = deg_min;
         const degLabel = `${Math.round(deg)}° ${Math.round(min)}′`;
 
@@ -124,6 +141,9 @@ export const Houses = ({
               textAnchor="middle"
               dominantBaseline="middle"
               fill="white"
+              onClick={() =>
+                open({ type: "angle", value: keyAngle.name, owner })
+              }
             >
               {name.toUpperCase()}
             </text>

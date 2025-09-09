@@ -1,19 +1,19 @@
-import { SynastryContainer } from "../components/wheel/SynastryContainer";
-import { useBirthProfiles } from "../contexts/BirthProfilesContext";
+import { DescriptionSidePanel } from "../components/descriptions/DescriptionSidePanel";
+import { MultiZodiacWheel } from "../components/wheel/MultiZodiacWheel";
+import { DescProvider } from "../contexts/DescContext";
+import { MultiWheelProvider } from "../contexts/MultiWheelContext";
 
 export const Synastry = () => {
-  const { mainProfile, profiles } = useBirthProfiles();
-
   return (
-    <div className="flex items-center justify-center mt-10">
-      <div className="w-[90%] max-w-5xl">
-        {mainProfile && (
-          <SynastryContainer
-            profiles={profiles}
-            initialProfileId={mainProfile.id}
-          />
-        )}
-      </div>
-    </div>
+    <MultiWheelProvider type="synastry">
+      <DescProvider>
+        <div className="flex mt-5">
+          <div className="w-[88%] max-w-5xl">
+            <MultiZodiacWheel />
+          </div>
+        </div>
+        <DescriptionSidePanel />
+      </DescProvider>
+    </MultiWheelProvider>
   );
 };

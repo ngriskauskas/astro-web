@@ -1,6 +1,10 @@
-import { PlanetsData } from "../../../constants/zodiac";
-import { type Planet, type PlanetName } from "../../../contexts/ChartContext";
-import type { ObjectOptions } from "../ZodiacWheelSettings";
+import {
+  type PlanetName,
+  type Planet,
+  PlanetsData,
+} from "../../../types/planet";
+import { useDesc } from "../../../contexts/DescContext";
+import { useWheel } from "../../../hooks/useWheel";
 import { polarToCartesian } from "./Utils";
 
 export interface PlanetAngle extends Planet {
@@ -11,37 +15,40 @@ export interface PlanetAngle extends Planet {
 interface PlanetProps {
   center: number;
   radius: number;
-  angles: PlanetAngle[];
   onHoverPlanet: (name: PlanetName) => void;
   onLeavePlanet: () => void;
   hoverAspectedPlanets: PlanetName[];
-  options: ObjectOptions;
-  showAngleLabels: boolean;
+  angles: PlanetAngle[];
+  owner?: "main" | "other";
 }
 
 export const Planets = ({
   radius,
   center,
-  angles,
   onHoverPlanet,
   onLeavePlanet,
   hoverAspectedPlanets,
-  options,
-  showAngleLabels,
+  angles,
+  owner,
 }: PlanetProps) => {
+  const {
+    settings: {
+      displayOptions: { angleLabels: showAngleLabels },
+      objectOptions: options,
+    },
+  } = useWheel();
+
+  const { open } = useDesc();
+
   const innerRadius = radius - 10;
   const outerRadius = radius;
   return (
     <g>
-      {angles.map(({ name, angle, glyphAngle, retrograde, deg_min }) => {
-        if (name === "Chiron" && !options.showChiron) return;
-        if (
-          !options.lilith &&
-          (name === "mean Apogee" || name === "osc. Apogee")
-        )
-          return;
-        if (options.lilith === "true" && name === "mean Apogee") return;
-        if (options.lilith === "mean" && name === "osc. Apogee") return;
+      {angles.map((planet) => {
+        const { name, angle, glyphAngle, retrograde, deg_min } = planet;
+        if (name === "chiron" && !options.showChiron) return;
+        if (name === "lilith" && !options.showLilith) return;
+
         const { x: x1, y: y1 } = polarToCartesian(center, innerRadius, angle);
         const { x: x2, y: y2 } = polarToCartesian(center, outerRadius, angle);
         const { x: tx, y: ty } = polarToCartesian(
@@ -49,7 +56,11 @@ export const Planets = ({
           outerRadius - 25,
           glyphAngle,
         );
-        const {x: dx, y: dy} = polarToCartesian(center, outerRadius - 60, glyphAngle);
+        const { x: dx, y: dy } = polarToCartesian(
+          center,
+          outerRadius - 60,
+          glyphAngle,
+        );
 
         const isAspected = hoverAspectedPlanets.includes(name);
         const planetInfo = PlanetsData[name];
@@ -71,6 +82,9 @@ export const Planets = ({
               origin-[50%_50%] hover:scale-101"
               onMouseEnter={() => onHoverPlanet(name)}
               onMouseLeave={onLeavePlanet}
+              onClick={() =>
+                open({ type: "planet", value: planet.name, owner })
+              }
             >
               <circle
                 cx={tx}

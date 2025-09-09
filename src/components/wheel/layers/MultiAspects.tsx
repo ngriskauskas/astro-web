@@ -1,7 +1,7 @@
 import { polarToCartesian } from "./Utils";
-import { type PlanetAngle } from "./Planets";
-import type { Aspect, PlanetName } from "../../../contexts/ChartContext";
-import type { AspectOptions, ObjectOptions } from "../ZodiacWheelSettings";
+import type { PlanetName } from "../../../types/zodiac";
+import { useWheel } from "../../../hooks/useWheel";
+import type { MultiWheelContextType } from "../../../contexts/MultiWheelContext";
 
 const aspectColors: Record<string, string> = {
   conjunction: "#FFD700",
@@ -14,44 +14,35 @@ const aspectColors: Record<string, string> = {
 interface MultiAspectProps {
   center: number;
   radius: number;
-  mainAngles: PlanetAngle[];
-  otherAngles: PlanetAngle[];
-  aspects: Aspect[];
   hoveredPlanet: { planet: PlanetName; profile: "main" | "other" } | null;
-  options: AspectOptions;
-  objectOptions: ObjectOptions;
 }
 
 export const MultiAspects = ({
   radius,
   center,
-  mainAngles,
-  otherAngles,
-  aspects,
   hoveredPlanet,
-  options,
-  objectOptions,
 }: MultiAspectProps) => {
+  const {
+    mainPlanetAngles,
+    otherPlanetAngles,
+    aspects,
+    settings: { objectOptions, aspectOptions },
+  } = useWheel() as MultiWheelContextType;
+
   return (
     <g>
       {aspects.map(({ type, orb, planet1, planet2 }, i) => {
-        const { minOrb, show } = options[type];
+        const { minOrb, show } = aspectOptions[type];
         if (!show || orb > minOrb) return;
 
         if (
           !objectOptions.showChiron &&
-          (planet1.name === "Chiron" || planet2.name === "Chiron")
-        )
-          return;
-
-        if (
-          (planet1.name === "mean Apogee" || planet2.name === "mean Apogee") &&
-          (objectOptions.lilith === "true" || !objectOptions.lilith)
+          (planet1.name === "chiron" || planet2.name === "chiron")
         )
           return;
         if (
-          (planet1.name === "osc. Apogee" || planet2.name === "osc. Apogee") &&
-          (objectOptions.lilith === "mean" || !objectOptions.lilith)
+          !objectOptions.showLilith &&
+          (planet1.name === "lilith" || planet2.name === "lilith")
         )
           return;
 
@@ -62,20 +53,18 @@ export const MultiAspects = ({
             (hoveredPlanet.profile === "other" &&
               planet2.name === hoveredPlanet.planet));
 
-        //TODO prolly wrong
-        const planet1Angle = mainAngles.find(
+        const planet1Angle = mainPlanetAngles.find(
           ({ name }) => name === planet1.name,
         )!.angle;
-        const planet2Angle = otherAngles.find(
+        const planet2Angle = otherPlanetAngles.find(
           ({ name }) => name === planet2.name,
         )!.angle;
         const { x: x1, y: y1 } = polarToCartesian(center, radius, planet1Angle);
         const { x: x2, y: y2 } = polarToCartesian(center, radius, planet2Angle);
         return (
           <line
-            className={`transition-colors duration-200 ${
-              isHighlighted ? "opacity-100" : "opacity-50"
-            }`}
+            className={`transition-colors duration-200 ${isHighlighted ? "opacity-100" : "opacity-50"
+              }`}
             key={i}
             x1={x1}
             y1={y1}

@@ -1,19 +1,19 @@
-import { ZodiacWheelContainer } from "../components/wheel/ZodiacWheelContainer";
-import { useBirthProfiles } from "../contexts/BirthProfilesContext";
+import { DescriptionSidePanel } from "../components/descriptions/DescriptionSidePanel";
+import { ZodiacWheel } from "../components/wheel/ZodiacWheel";
+import { DescProvider } from "../contexts/DescContext";
+import { SingleWheelProvider } from "../contexts/SingleWheelContext";
 
 export const Charts = () => {
-  const { mainProfile, profiles } = useBirthProfiles();
-
   return (
-    <div className="flex items-center justify-center mt-5">
-      <div className="w-[90%] max-w-5xl">
-        {mainProfile && (
-          <ZodiacWheelContainer
-            profiles={profiles}
-            initialProfileId={mainProfile.id}
-          />
-        )}
-      </div>
-    </div>
+    <SingleWheelProvider type="natal">
+      <DescProvider>
+        <div className="flex mt-5">
+          <div className="w-[88%] max-w-5xl">
+            <ZodiacWheel />
+          </div>
+        </div>
+        <DescriptionSidePanel />
+      </DescProvider>
+    </SingleWheelProvider>
   );
 };

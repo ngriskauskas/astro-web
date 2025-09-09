@@ -1,13 +1,10 @@
 import { useState } from "react";
-import type { BirthProfile } from "../../contexts/BirthProfilesContext";
-import {
-  AYANAMSAS,
-  HOUSE_SYSTEMS,
-  ZODIAC_SYSTEMS,
-  type Ayanamsa,
-  type HouseSystem,
-  type ZodiacSystem,
-} from "../../contexts/ChartContext";
+import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
+import { AYANAMSAS, type Ayanamsa } from "../../types/ayanamsa";
+import { HOUSE_SYSTEMS, type HouseSystem } from "../../types/house-system";
+import { ZODIAC_SYSTEMS, type ZodiacSystem } from "../../types/zodiac-system";
+
+import { useWheel } from "../../hooks/useWheel";
 
 export interface AspectOptions {
   conjunction: {
@@ -34,7 +31,7 @@ export interface AspectOptions {
 
 export interface ObjectOptions {
   showChiron: boolean;
-  lilith: "true" | "mean" | false;
+  showLilith: boolean;
 }
 
 export interface DisplayOptions {
@@ -57,23 +54,28 @@ export interface ZodiacWheelOptions {
   };
 }
 
-interface ZodiacWheelSettingsProps {
-  options: ZodiacWheelOptions;
-  profiles?: BirthProfile[];
-  onChange: <K extends keyof ZodiacWheelOptions>(params: {
-    key: K;
-    value: ZodiacWheelOptions[K];
-  }) => void;
-}
+export const ZodiacWheelSettings = () => {
+  const {
+    type,
+    settings: {
+      aspectOptions,
+      profileId,
+      otherProfileId,
+      datetimeOptions,
+      objectOptions,
+      displayOptions,
+      houseSystem,
+      zodiacSystem,
+      ayanamsa,
+    },
+    setSettings,
+  } = useWheel();
 
-export const ZodiacWheelSettings = ({
-  options,
-  profiles,
-  onChange,
-}: ZodiacWheelSettingsProps) => {
+  const { profiles } = useBirthProfiles();
+
   const aspectKeys = Object.keys(
-    options.aspectOptions,
-  ) as (keyof typeof options.aspectOptions)[];
+    aspectOptions,
+  ) as (keyof typeof aspectOptions)[];
   const [aspectsOpen, setAspectsOpen] = useState(false);
   const [displayOpen, setDisplayOpen] = useState(false);
   const [objectOpen, setObjectOpen] = useState(false);
@@ -84,19 +86,22 @@ export const ZodiacWheelSettings = ({
   return (
     <div className="space-y-6 p-6 bg-white rounded-xl shadow-md text-xs">
       {/* Profile selector */}
-      {profiles && (
+      {type !== "time" && profiles && (
         <div>
           <div className="flex flex-col">
             <label className="font-medium text-gray-700 mb-1">Profile</label>
             <select
-              value={options.profileId}
+              value={profileId}
               onChange={(e) =>
-                onChange({ key: "profileId", value: Number(e.target.value) })
+                setSettings((prev) => ({
+                  ...prev,
+                  profileId: Number(e.target.value),
+                }))
               }
               className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
             >
               {profiles
-                .filter((p) => p.id !== options.otherProfileId)
+                .filter((p) => p.id !== otherProfileId)
                 .filter((p) => p.name === "My Profile")
                 .map((p) => (
                   <option key={p.id} value={p.id}>
@@ -104,7 +109,7 @@ export const ZodiacWheelSettings = ({
                   </option>
                 ))}
               {profiles
-                .filter((p) => p.id !== options.otherProfileId)
+                .filter((p) => p.id !== otherProfileId)
                 .filter((p) => p.name !== "My Profile")
                 .map((p) => (
                   <option key={p.id} value={p.id}>
@@ -113,23 +118,23 @@ export const ZodiacWheelSettings = ({
                 ))}
             </select>
           </div>
-          {options.otherProfileId && (
+          {otherProfileId && (
             <div className="flex flex-col mt-4">
               <label className="font-medium text-gray-700 mb-1">
                 Other Profile
               </label>
               <select
-                value={options.otherProfileId}
+                value={otherProfileId}
                 onChange={(e) =>
-                  onChange({
-                    key: "otherProfileId",
-                    value: Number(e.target.value),
-                  })
+                  setSettings((prev) => ({
+                    ...prev,
+                    otherProfileId: Number(e.target.value),
+                  }))
                 }
                 className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
               >
                 {profiles
-                  .filter((p) => p.id !== options.profileId)
+                  .filter((p) => p.id !== profileId)
                   .filter((p) => p.name === "My Profile")
                   .map((p) => (
                     <option key={p.id} value={p.id}>
@@ -137,7 +142,7 @@ export const ZodiacWheelSettings = ({
                     </option>
                   ))}
                 {profiles
-                  .filter((p) => p.id !== options.profileId)
+                  .filter((p) => p.id !== profileId)
                   .filter((p) => p.name !== "My Profile")
                   .map((p) => (
                     <option key={p.id} value={p.id}>
@@ -150,7 +155,7 @@ export const ZodiacWheelSettings = ({
         </div>
       )}
       {/* Date and Time Picker */}
-      {options.datetimeOptions && (
+      {datetimeOptions && (
         <div className="grid grid-cols-1 gap-4">
           {/* Date */}
           <div className="flex flex-col">
@@ -159,15 +164,15 @@ export const ZodiacWheelSettings = ({
             </label>
             <input
               type="date"
-              value={options.datetimeOptions.date}
+              value={datetimeOptions.date}
               onChange={(e) =>
-                onChange({
-                  key: "datetimeOptions",
-                  value: {
-                    ...options.datetimeOptions!,
+                setSettings((prev) => ({
+                  ...prev,
+                  datetimeOptions: {
+                    ...prev.datetimeOptions!,
                     date: e.target.value,
                   },
-                })
+                }))
               }
               className="border rounded px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400"
             />
@@ -180,15 +185,15 @@ export const ZodiacWheelSettings = ({
             </label>
             <input
               type="time"
-              value={options.datetimeOptions.time}
+              value={datetimeOptions.time}
               onChange={(e) =>
-                onChange({
-                  key: "datetimeOptions",
-                  value: {
-                    ...options.datetimeOptions!,
+                setSettings((prev) => ({
+                  ...prev,
+                  datetimeOptions: {
+                    ...prev.datetimeOptions!,
                     time: e.target.value,
                   },
-                })
+                }))
               }
               className="border rounded px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400"
             />
@@ -203,9 +208,12 @@ export const ZodiacWheelSettings = ({
             Zodiac System
           </label>
           <select
-            value={options.zodiacSystem}
+            value={zodiacSystem}
             onChange={(e) =>
-              onChange({ key: "zodiacSystem", value: e.target.value as any })
+              setSettings((prev) => ({
+                ...prev,
+                zodiacSystem: e.target.value as ZodiacSystem,
+              }))
             }
             className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
           >
@@ -219,9 +227,12 @@ export const ZodiacWheelSettings = ({
         <div className="flex flex-col">
           <label className="font-medium text-gray-700 mb-1">House System</label>
           <select
-            value={options.houseSystem}
+            value={houseSystem}
             onChange={(e) =>
-              onChange({ key: "houseSystem", value: e.target.value as any })
+              setSettings((prev) => ({
+                ...prev,
+                houseSystem: e.target.value as HouseSystem,
+              }))
             }
             className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
           >
@@ -234,13 +245,16 @@ export const ZodiacWheelSettings = ({
         </div>
       </div>
       {/* Ayanamsa (only for sidereal) */}
-      {options.zodiacSystem === "sidereal" && (
+      {zodiacSystem === "sidereal" && (
         <div className="flex flex-col">
           <label className="font-medium text-gray-700 mb-1">Ayanamsa</label>
           <select
-            value={options.ayanamsa || ""}
+            value={ayanamsa || ""}
             onChange={(e) =>
-              onChange({ key: "ayanamsa", value: e.target.value as any })
+              setSettings((prev) => ({
+                ...prev,
+                ayanamsa: e.target.value as Ayanamsa,
+              }))
             }
             className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
           >
@@ -267,15 +281,15 @@ export const ZodiacWheelSettings = ({
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={options.objectOptions.showChiron}
+                checked={objectOptions.showChiron}
                 onChange={(e) =>
-                  onChange({
-                    key: "objectOptions",
-                    value: {
-                      ...options.objectOptions,
+                  setSettings((prev) => ({
+                    ...prev,
+                    objectOptions: {
+                      ...prev.objectOptions,
                       showChiron: e.target.checked,
                     },
-                  })
+                  }))
                 }
                 className="w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-indigo-400"
               />
@@ -283,31 +297,23 @@ export const ZodiacWheelSettings = ({
             </label>
             {/* Lilith */}
             <div className="flex flex-col">
-              <label className="font-medium text-gray-700 mb-1">Lilith</label>
-              <select
-                value={
-                  options.objectOptions.lilith === false
-                    ? "false"
-                    : options.objectOptions.lilith
-                }
-                onChange={(e) =>
-                  onChange({
-                    key: "objectOptions",
-                    value: {
-                      ...options.objectOptions,
-                      lilith:
-                        e.target.value === "false"
-                          ? false
-                          : (e.target.value as "true" | "mean"),
-                    },
-                  })
-                }
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              >
-                <option value="false">Hide</option>
-                <option value="true">True</option>
-                <option value="mean">Mean</option>
-              </select>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={objectOptions.showLilith}
+                  onChange={(e) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      objectOptions: {
+                        ...prev.objectOptions,
+                        showLilith: e.target.checked,
+                      },
+                    }))
+                  }
+                  className="w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-indigo-400"
+                />
+                <span className="text-gray-700 font-medium">Show Llilith</span>
+              </label>
             </div>
           </div>
         )}
@@ -332,18 +338,18 @@ export const ZodiacWheelSettings = ({
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    checked={options.aspectOptions[aspect].show}
+                    checked={aspectOptions[aspect].show}
                     onChange={(e) =>
-                      onChange({
-                        key: "aspectOptions",
-                        value: {
-                          ...options.aspectOptions,
+                      setSettings((prev) => ({
+                        ...prev,
+                        aspectOptions: {
+                          ...prev.aspectOptions,
                           [aspect]: {
-                            ...options.aspectOptions[aspect],
+                            ...prev.aspectOptions[aspect],
                             show: e.target.checked,
                           },
                         },
-                      })
+                      }))
                     }
                     className="w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-indigo-400"
                   />
@@ -354,18 +360,18 @@ export const ZodiacWheelSettings = ({
 
                 <input
                   type="number"
-                  value={options.aspectOptions[aspect].minOrb}
+                  value={aspectOptions[aspect].minOrb}
                   onChange={(e) =>
-                    onChange({
-                      key: "aspectOptions",
-                      value: {
-                        ...options.aspectOptions,
+                    setSettings((prev) => ({
+                      ...prev,
+                      aspectOptions: {
+                        ...prev.aspectOptions,
                         [aspect]: {
-                          ...options.aspectOptions[aspect],
+                          ...prev.aspectOptions[aspect],
                           minOrb: Number(e.target.value),
                         },
                       },
-                    })
+                    }))
                   }
                   className="w-12 border rounded px-1 py-0.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 />
@@ -389,15 +395,15 @@ export const ZodiacWheelSettings = ({
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={options.displayOptions.tickMarks}
+                checked={displayOptions.tickMarks}
                 onChange={(e) =>
-                  onChange({
-                    key: "displayOptions",
-                    value: {
-                      ...options.displayOptions,
+                  setSettings((prev) => ({
+                    ...prev,
+                    displayOptions: {
+                      ...prev.displayOptions,
                       tickMarks: e.target.checked,
                     },
-                  })
+                  }))
                 }
                 className="w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-indigo-400"
               />
@@ -408,15 +414,15 @@ export const ZodiacWheelSettings = ({
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={options.displayOptions.angleLabels}
+                checked={displayOptions.angleLabels}
                 onChange={(e) =>
-                  onChange({
-                    key: "displayOptions",
-                    value: {
-                      ...options.displayOptions,
+                  setSettings((prev) => ({
+                    ...prev,
+                    displayOptions: {
+                      ...prev.displayOptions,
                       angleLabels: e.target.checked,
                     },
-                  })
+                  }))
                 }
                 className="w-4 h-4 rounded border-gray-300 focus:ring-2 focus:ring-indigo-400"
               />

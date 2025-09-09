@@ -1,82 +1,13 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { apiFetch } from "../utils/api";
-
-export const ZodiacSigns = [
-  "aries",
-  "taurus",
-  "gemini",
-  "cancer",
-  "leo",
-  "virgo",
-  "libra",
-  "scorpio",
-  "sagittarius",
-  "capricorn",
-  "aquarius",
-  "pisces",
-];
-export type ZodiacSign =
-  | "aries"
-  | "taurus"
-  | "gemini"
-  | "cancer"
-  | "leo"
-  | "virgo"
-  | "libra"
-  | "scorpio"
-  | "sagittarius"
-  | "capricorn"
-  | "aquarius"
-  | "pisces";
-
-export type AspectType =
-  | "conjunction"
-  | "opposition"
-  | "square"
-  | "trine"
-  | "sextile";
-
-export type PlanetName =
-  | "Sun"
-  | "Moon"
-  | "Mercury"
-  | "Venus"
-  | "Mars"
-  | "Jupiter"
-  | "Saturn"
-  | "Uranus"
-  | "Neptune"
-  | "Pluto"
-  | "Chiron"
-  | "true Node"
-  | "South Node"
-  | "mean Apogee"
-  | "osc. Apogee";
-
-export interface Cusp {
-  name: string;
-  position: number;
-  sign: ZodiacSign;
-  deg_in_sign: number;
-  deg_min: [number, number];
-}
-
-export interface Planet {
-  name: PlanetName;
-  position: number;
-  sign: ZodiacSign;
-  deg_in_sign: number;
-  deg_min: [number, number];
-  retrograde: boolean;
-}
-
-export interface Aspect {
-  type: AspectType;
-  angle: number;
-  orb: number;
-  planet1: Planet;
-  planet2: Planet;
-}
+import {
+  type Planet,
+  type Cusp,
+  type Aspect,
+  type HouseSystem,
+  type ZodiacSystem,
+  type Ayanamsa,
+} from "../types/zodiac";
 
 export interface MultiChart {
   main: {
@@ -95,31 +26,6 @@ export interface SingleChart {
   cusps: Record<string, Cusp>;
   aspects: Aspect[];
 }
-
-export const HOUSE_SYSTEMS = [
-  "whole_sign",
-  "placidus",
-  "koch",
-  "equal",
-  "campanus",
-  "regio",
-] as const;
-export type HouseSystem = (typeof HOUSE_SYSTEMS)[number];
-
-export const ZODIAC_SYSTEMS = ["tropical", "sidereal"] as const;
-export type ZodiacSystem = (typeof ZODIAC_SYSTEMS)[number];
-
-export const AYANAMSAS = [
-  "faganBradely",
-  "lahiri",
-  "deLuce",
-  "raman",
-  "ushaSashi",
-  "krishnamurit",
-  "djwhwalKhul",
-  "yukteshwar",
-] as const;
-export type Ayanamsa = (typeof AYANAMSAS)[number];
 
 interface ChartOptions {
   house_system: HouseSystem;

@@ -1,5 +1,6 @@
-import { ZodiacData } from "../../../constants/zodiac";
-import { type ZodiacSign } from "../../../contexts/ChartContext";
+import { type ZodiacSign, ZodiacData } from "../../../types/zodiac";
+import { useDesc } from "../../../contexts/DescContext";
+import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, polarToCartesian } from "./Utils";
 
 export interface SignAngle {
@@ -10,11 +11,18 @@ export interface SignAngle {
 interface SignProps {
   center: number;
   radius: number;
-  angles: SignAngle[];
-  showTickMarks: boolean;
 }
 
-export const Signs = ({ radius, center, angles, showTickMarks }: SignProps) => {
+export const Signs = ({ radius, center }: SignProps) => {
+  const {
+    signAngles: angles,
+    settings: {
+      displayOptions: { tickMarks: showTickMarks },
+    },
+  } = useWheel();
+
+  const { open } = useDesc();
+
   const innerRadius = radius - 50;
   const outerRadius = radius;
   return (
@@ -76,8 +84,16 @@ export const Signs = ({ radius, center, angles, showTickMarks }: SignProps) => {
               fill={`url(#grad-${sign})`}
               stroke="white"
               fillRule="evenodd"
+              onClick={() => open({ type: "sign", value: sign })}
             />
-            <image href={glyph} x={x - 12} y={y - 12} width={25} height={25} />
+            <image
+              href={glyph}
+              x={x - 12}
+              y={y - 12}
+              width={25}
+              height={25}
+              onClick={() => open({ type: "sign", value: sign })}
+            />
             {showTickMarks &&
               Array.from({ length: 29 }, (_, i) => {
                 const tickAngle = angle + (i + 1);

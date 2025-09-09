@@ -12,6 +12,7 @@ export const TransitContainer = ({
   initialProfileId,
   profiles,
 }: {
+  const { profles } = useBirthProfiles();
   initialProfileId: number;
   profiles: BirthProfile[];
 }) => {

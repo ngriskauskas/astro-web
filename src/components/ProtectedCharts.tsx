@@ -4,16 +4,17 @@ import { useBirthProfiles } from "../contexts/BirthProfilesContext";
 import toast from "react-hot-toast";
 
 export const ProtectedCharts = () => {
-  const { mainProfile } = useBirthProfiles();
+  const { mainProfile, loading } = useBirthProfiles();
   const hasToasted = useRef(false);
 
   useEffect(() => {
-    if (!mainProfile && !hasToasted.current) {
+    if (!loading && !mainProfile && !hasToasted.current) {
       toast.error("Please create your birth profile first");
       hasToasted.current = true;
     }
-  }, [mainProfile]);
+  }, [mainProfile, loading]);
 
+  if (loading) return <div>Loading ...</div>;
   if (!mainProfile) return <Navigate to="/profile" replace />;
 
   return <Outlet />;

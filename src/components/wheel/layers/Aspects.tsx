@@ -1,7 +1,7 @@
 import { polarToCartesian } from "./Utils";
-import { type PlanetAngle } from "./Planets";
-import type { Aspect, PlanetName } from "../../../contexts/ChartContext";
-import type { AspectOptions, ObjectOptions } from "../ZodiacWheelSettings";
+import { useWheel } from "../../../hooks/useWheel";
+import type { SingleWheelContextType } from "../../../contexts/SingleWheelContext";
+import { type PlanetName } from "../../../types/zodiac";
 
 const aspectColors: Record<string, string> = {
   conjunction: "#FFD700",
@@ -14,22 +14,15 @@ const aspectColors: Record<string, string> = {
 interface AspectProps {
   center: number;
   radius: number;
-  angles: PlanetAngle[];
-  aspects: Aspect[];
   hoveredPlanet: PlanetName | null;
-  options: AspectOptions;
-  objectOptions: ObjectOptions;
 }
 
-export const Aspects = ({
-  radius,
-  center,
-  angles,
-  aspects,
-  hoveredPlanet,
-  options,
-  objectOptions,
-}: AspectProps) => {
+export const Aspects = ({ radius, center, hoveredPlanet }: AspectProps) => {
+  const {
+    planetAngles: angles,
+    aspects,
+    settings: { aspectOptions: options, objectOptions },
+  } = useWheel() as SingleWheelContextType;
   return (
     <g>
       {aspects.map(({ type, orb, planet1, planet2 }, i) => {
@@ -38,18 +31,13 @@ export const Aspects = ({
 
         if (
           !objectOptions.showChiron &&
-          (planet1.name === "Chiron" || planet2.name === "Chiron")
+          (planet1.name === "chiron" || planet2.name === "chiron")
         )
           return;
 
         if (
-          (planet1.name === "mean Apogee" || planet2.name === "mean Apogee") &&
-          (objectOptions.lilith === "true" || !objectOptions.lilith)
-        )
-          return;
-        if (
-          (planet1.name === "osc. Apogee" || planet2.name === "osc. Apogee") &&
-          (objectOptions.lilith === "mean" || !objectOptions.lilith)
+          !objectOptions.showLilith &&
+          (planet1.name === "lilith" || planet2.name === "lilith")
         )
           return;
 
@@ -67,9 +55,8 @@ export const Aspects = ({
         const { x: x2, y: y2 } = polarToCartesian(center, radius, planet2Angle);
         return (
           <line
-            className={`transition-colors duration-200 ${
-              isHighlighted ? "opacity-100" : "opacity-50"
-            }`}
+            className={`transition-colors duration-200 ${isHighlighted ? "opacity-100" : "opacity-50"
+              }`}
             key={i}
             x1={x1}
             y1={y1}
