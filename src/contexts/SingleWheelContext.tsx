@@ -4,11 +4,14 @@ import { ZodiacSigns, type ZodiacSign } from "../types/zodiac";
 import { type ZodiacWheelOptions } from "../components/wheel/ZodiacWheelSettings";
 import { useBirthProfiles } from "./BirthProfilesContext";
 import { type PlanetAngle } from "../components/wheel/layers/Planets";
-import { type CuspAngle } from "../components/wheel/layers/Houses";
+import {
+  type CuspAngle,
+  type KeyAngleAngle,
+} from "../components/wheel/layers/Houses";
 import { type SignAngle } from "../components/wheel/layers/Signs";
 import { useAuth } from "./AuthContext";
 import { type Aspect } from "../types/aspect";
-import type { Planet, PlanetName } from "../types/planet";
+import type { Planet } from "../types/planet";
 
 export interface SingleWheelContextType {
   settings: ZodiacWheelOptions;
@@ -16,13 +19,9 @@ export interface SingleWheelContextType {
   planetAngles: PlanetAngle[];
   cuspAngles: CuspAngle[];
   signAngles: SignAngle[];
+  keyAngles: KeyAngleAngle[];
   aspects: Aspect[];
   type: "natal" | "time";
-  getPlanetsInSign: (sign: ZodiacSign) => Planet[];
-  getPlanetsInHouse: (house: string) => Planet[];
-  getPlanetAspects: (planet: PlanetName) => Aspect[];
-  getPlanet: (planet: PlanetName) => Planet;
-  getPlanetHouse: (planet: PlanetName) => number;
 }
 
 export const SingleWheelContext = createContext<
@@ -43,6 +42,7 @@ export const SingleWheelProvider = ({
   const [planetAngles, setPlanetAngles] = useState<PlanetAngle[]>([]);
   const [signAngles, setSignAngles] = useState<SignAngle[]>([]);
   const [cuspAngles, setCuspAngles] = useState<CuspAngle[]>([]);
+  const [keyAngles, setKeyAngles] = useState<KeyAngleAngle[]>([]);
   const [aspects, setAspects] = useState<Aspect[]>([]);
 
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
@@ -118,51 +118,92 @@ export const SingleWheelProvider = ({
     settings.zodiacSystem,
   ]);
 
-  const calcCuspAngles = (chart: SingleChart) => {
-    const ascPos = chart.cusps["cusp1"].position;
+  const round = (num: number): number => {
+    return Math.round(num * 100) / 100;
+  };
 
-    return Object.entries(chart.cusps).map(([_key, cusp]) => ({
+  const calcCuspAngles = (chart: SingleChart) => {
+    const ascPos = chart.cusps[1].position;
+
+    const cusps = Object.entries(chart.cusps).map(([_key, cusp]) => ({
       ...cusp,
-      angle: (cusp.position - ascPos + 360) % 360,
+      angle: round((cusp.position - ascPos + 360) % 360),
+    }));
+
+    return cusps.map((cusp) => {
+      const nextId = cusp.name === 12 ? 1 : cusp.name + 1;
+      const next = cusps.find((c) => c.name === nextId)!;
+
+      return {
+        ...cusp,
+        endAngle: next.angle,
+      };
+    });
+  };
+
+  const calcKeyAngles = (chart: SingleChart) => {
+    const ascPos = chart.cusps[1].position;
+
+    return Object.entries(chart.keys).map(([_key, cusp]) => ({
+      ...cusp,
+      angle: round((cusp.position - ascPos + 360) % 360),
     }));
   };
-  const calcPlanetAngles = (chart: SingleChart) => {
-    const ascPos = chart.cusps["cusp1"].position;
 
-    const planetAngles = Object.entries(chart.planets)
+  const calcInitialPlanetAngles = (
+    ascPos: number,
+    planets: Record<string, Planet>,
+  ) =>
+    Object.entries(planets)
       .map(([_key, planet]) => ({
         ...planet,
-        angle: (planet.position - ascPos + 360) % 360,
+        angle: round((planet.position - ascPos + 360) % 360),
+        glyphAngle: round((planet.position - ascPos + 360) % 360),
       }))
       .sort((a, b) => a.angle - b.angle);
 
-    const adjusted: PlanetAngle[] = [];
-    planetAngles.forEach((planet, i) => {
-      if (i === 0) {
-        adjusted.push({ ...planet, glyphAngle: planet.angle });
-      } else {
-        const prev = adjusted[i - 1];
+  const adjustGlyphAngles = (planets: PlanetAngle[]) => {
+    const main: PlanetAngle[] = [];
+    planets.forEach((planet, i) => {
+      if (i === 0) main.push({ ...planet, glyphAngle: planet.angle });
+      else {
+        const prev = main[i - 1];
         const diff = ((planet.angle - prev.glyphAngle + 540) % 360) - 180;
-        const glyphAngle =
-          Math.abs(diff) <= 4.5 ? (prev.glyphAngle + 6) % 360 : planet.angle;
-        adjusted.push({ ...planet, glyphAngle });
+        const glyphAngle = round(
+          Math.abs(diff) <= 4.5 ? (prev.glyphAngle + 5.5) % 360 : planet.angle,
+        );
+        main.push({ ...planet, glyphAngle });
       }
     });
+    planets.forEach((planet, i) => {
+      const prev = i === 0 ? main[main.length - 1] : main[i - 1];
+      const diff = ((planet.angle - prev.glyphAngle + 540) % 360) - 180;
+      const glyphAngle = round(
+        Math.abs(diff) <= 4.5 ? (prev.glyphAngle + 5.5) % 360 : planet.angle,
+      );
+      main[i] = { ...planet, glyphAngle };
+    });
 
-    return adjusted;
+    return main;
+  };
+
+  const calcPlanetAngles = (chart: SingleChart) => {
+    const ascPos = chart.cusps[1].position;
+
+    const rawPlanetAngles = calcInitialPlanetAngles(ascPos, chart.planets);
+
+    return adjustGlyphAngles(rawPlanetAngles);
   };
 
   const calcSignAngles = (chart: SingleChart) => {
-    const ascSign = chart.cusps["cusp1"].sign;
+    const ascSign = chart.cusps[1].sign;
 
     const ascIndex = ZodiacSigns.indexOf(ascSign);
 
-    const startAngleFirstSign = -chart.cusps["cusp1"].deg_in_sign;
+    const startAngleFirstSign = -chart.cusps[1].deg_in_sign;
     return ZodiacSigns.map((s, i) => {
       const offset = (i - ascIndex + 12) % 12;
-      const angle =
-        Math.round(((startAngleFirstSign + offset * 30 + 360) % 360) * 100) /
-        100;
+      const angle = round((startAngleFirstSign + offset * 30 + 360) % 360);
       const sign = s as ZodiacSign;
       return { sign, angle };
     });
@@ -173,59 +214,9 @@ export const SingleWheelProvider = ({
     setPlanetAngles(calcPlanetAngles(chart));
     setCuspAngles(calcCuspAngles(chart));
     setSignAngles(calcSignAngles(chart));
+    setKeyAngles(calcKeyAngles(chart));
     setAspects(chart.aspects);
   }, [chart]);
-
-  const getPlanetsInSign = (sign: ZodiacSign) => {
-    const planets = planetAngles.filter((x) => x.sign === sign);
-    return (planets as Planet[]) ?? [];
-  };
-
-  const getPlanetsInHouse = (house: string) => {
-    const houseNum = parseInt(house);
-    const nextHouseNum = houseNum === 12 ? 1 : houseNum + 1;
-    const startCusp = cuspAngles.find(
-      (x) => x.name.replace("cusp", "") === String(houseNum),
-    );
-    const endCusp = cuspAngles.find(
-      (x) => x.name.replace("cusp", "") === String(nextHouseNum),
-    );
-
-    const start = startCusp!.position;
-    const end = endCusp!.position;
-    return planetAngles.filter((planet) => {
-      if (start < end) {
-        return planet.position >= start && planet.position < end;
-      } else {
-        return planet.position >= start || planet.position < end;
-      }
-    });
-  };
-
-  const getPlanetAspects = (planet: PlanetName) => {
-    return aspects
-      .filter((x) => x.planet1.name === planet || x.planet2.name === planet)
-      .filter(({ type, orb }) => orb <= settings.aspectOptions[type].minOrb)
-      .map((x) => {
-        if (x.planet1.name === planet) return x;
-        return { ...x, planet1: x.planet2, planet2: x.planet1 };
-      })
-      .sort((a, b) => a.orb - b.orb);
-  };
-
-  const getPlanet = (planet: PlanetName) => {
-    return planetAngles.find((x) => x.name === planet)!;
-  };
-
-  const getPlanetHouse = (planet: PlanetName): number => {
-    for (let house = 1; house <= 12; house++) {
-      const planetsInHouse = getPlanetsInHouse(String(house));
-      if (planetsInHouse.some((p) => p.name === planet)) {
-        return house;
-      }
-    }
-    throw new Error(`House not found for planet ${planet}`);
-  };
 
   return (
     <SingleWheelContext.Provider
@@ -235,13 +226,9 @@ export const SingleWheelProvider = ({
         planetAngles,
         signAngles,
         cuspAngles,
+        keyAngles,
         aspects,
         type,
-        getPlanetsInSign,
-        getPlanetsInHouse,
-        getPlanetAspects,
-        getPlanet,
-        getPlanetHouse,
       }}
     >
       {children}

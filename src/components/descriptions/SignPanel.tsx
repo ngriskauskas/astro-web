@@ -2,6 +2,8 @@ import { ZodiacData } from "../../types/zodiac";
 import {
   BackButton,
   CloseButton,
+  DescSection,
+  HouseChip,
   OverviewCard,
   PlanetChip,
   PlanetGroup,
@@ -11,26 +13,22 @@ import { type ZodiacSign } from "../../types/zodiac";
 import { useDesc } from "../../contexts/DescContext";
 import { useWheel } from "../../hooks/useWheel";
 import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
-import type { Planet } from "../../types/planet";
+import { useSignData } from "../../hooks/chart/useChartData";
+import { useSignDesc } from "../../hooks/useDescData";
 
 export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
   const { open } = useDesc();
-  const { getPlanetsInSign } = useWheel();
   const signInfo = ZodiacData[sign];
   const { info } = signInfo;
 
-  const planetsInSign = getPlanetsInSign(sign);
-  const { mainPlanets, otherPlanets, planets } = Array.isArray(planetsInSign[0])
-    ? {
-        mainPlanets: (planetsInSign as [Planet[], Planet[]])[0],
-        otherPlanets: (planetsInSign as [Planet[], Planet[]])[1],
-        planets: undefined,
-      }
-    : {
-        planets: planetsInSign as Planet[],
-        mainPlanets: undefined,
-        otherPlanets: undefined,
-      };
+  const {
+    planets,
+    mainPlanets,
+    otherPlanets,
+    houses,
+    mainHouses,
+    otherHouses,
+  } = useSignData(sign);
 
   const {
     settings: { otherProfileId },
@@ -43,6 +41,17 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
       : type === "transit"
         ? "Transit"
         : "Other";
+
+  const { loading, signDesc } = useSignDesc({
+    sign,
+    planets,
+    mainPlanets,
+    otherPlanets,
+    houses,
+    mainHouses,
+    otherHouses,
+  });
+
   return (
     <div className="flex flex-col h-full">
       <div
@@ -83,7 +92,7 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
               onClick={() =>
                 open({
                   type: "house",
-                  value: String(info.house),
+                  value: info.house,
                   owner: mainPlanets ? "main" : undefined,
                 })
               }
@@ -112,37 +121,36 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
             />
           </div>
         </Section>
-        <Section title="Planets in this Sign">
-          <div className="flex flex-wrap gap-1">
+        <Section title="Planets in this Sign" loading={loading}>
+          <div className="flex flex-col gap-2 w-full">
             {planets &&
               (planets.length === 0 ? (
                 <span className="text-gray-500">—</span>
               ) : (
                 planets.map(({ name }) => (
-                  <PlanetChip
-                    key={name}
-                    planet={name}
-                    owner={mainPlanets ? "main" : undefined}
-                  />
+                  <DescSection key={name} desc={signDesc?.planets![name] ?? ""}>
+                    <PlanetChip planet={name} />
+                  </DescSection>
                 ))
               ))}
 
             {mainPlanets && otherPlanets && (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
                   <span className="text-xs font-medium text-gray-500">
                     Your planets
                   </span>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-col gap-2 w-full">
                     {mainPlanets.length === 0 ? (
-                      <span className="text-gray-400">—</span>
+                      <span>—</span>
                     ) : (
                       mainPlanets.map(({ name }) => (
-                        <PlanetChip
+                        <DescSection
                           key={name}
-                          planet={name}
-                          owner={mainPlanets ? "main" : undefined}
-                        />
+                          desc={signDesc?.mainPlanets![name] ?? ""}
+                        >
+                          <PlanetChip planet={name} owner="main" />
+                        </DescSection>
                       ))
                     )}
                   </div>
@@ -152,18 +160,65 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
                   <span className="text-xs font-medium text-gray-500">
                     {`${otherProfileName} Planets`}
                   </span>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-col gap-2">
                     {otherPlanets.length === 0 ? (
-                      <span className="text-gray-400">—</span>
+                      <span>—</span>
                     ) : (
                       otherPlanets.map(({ name }) => (
-                        <PlanetChip
+                        <DescSection
                           key={name}
-                          planet={name}
-                          owner={mainPlanets ? "main" : undefined}
-                        />
+                          desc={signDesc?.otherPlanets![name] ?? ""}
+                        >
+                          <PlanetChip planet={name} owner="other" />
+                        </DescSection>
                       ))
                     )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </Section>
+        <Section title="Houses in this Sign" loading={loading}>
+          <div className="flex flex-col gap-2 w-full">
+            {houses &&
+              houses.map(({ name }) => (
+                <DescSection key={name} desc={signDesc?.houses![name] ?? ""}>
+                  <HouseChip house={name} />
+                </DescSection>
+              ))}
+
+            {mainHouses && otherHouses && (
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-gray-500">
+                    Your Houses
+                  </span>
+                  <div className="flex flex-col gap-2 w-full">
+                    {mainHouses.map(({ name }) => (
+                      <DescSection
+                        key={name}
+                        desc={signDesc?.mainHouses![name] ?? ""}
+                      >
+                        <HouseChip house={name} owner="main" />
+                      </DescSection>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-gray-500">
+                    {`${otherProfileName} Houses`}
+                  </span>
+                  <div className="flex flex-col gap-2 w-full">
+                    {otherHouses.map(({ name }) => (
+                      <DescSection
+                        key={name}
+                        desc={signDesc?.otherHouses![name] ?? ""}
+                      >
+                        <HouseChip house={name} owner="other" />
+                      </DescSection>
+                    ))}
                   </div>
                 </div>
               </div>

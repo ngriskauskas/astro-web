@@ -19,6 +19,7 @@ export const ZodiacWheel = () => {
     aspects,
     planetAngles,
     cuspAngles,
+    keyAngles,
     settings: { aspectOptions },
   } = useWheel() as SingleWheelContextType;
 
@@ -38,6 +39,7 @@ export const ZodiacWheel = () => {
             <Background radius={radius} />
             <Houses
               angles={cuspAngles}
+              keyAngles={keyAngles}
               center={radius}
               radius={radius - 55}
               innerRadius={radius - 175}

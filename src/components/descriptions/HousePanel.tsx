@@ -1,40 +1,43 @@
 import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
 import { useDesc } from "../../contexts/DescContext";
-import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
-import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
+import type { OwnerType } from "../../contexts/MultiWheelContext";
 import { useWheel } from "../../hooks/useWheel";
-import { HouseData } from "../../types/cusp";
+import { HouseData, type CuspType } from "../../types/cusp";
 import { ZodiacData } from "../../types/zodiac";
 import {
   BackButton,
   CloseButton,
+  DescSection,
   OverviewCard,
   PlanetChip,
   Section,
+  SignChip,
 } from "./Helpers";
+import { useHouseData } from "../../hooks/chart/useChartData";
+import { useHouseDesc } from "../../hooks/useDescData";
 
 export const HousePanel = ({
-  house,
+  houseName,
   owner,
 }: {
-  house: string;
-  owner?: "main" | "other";
+  houseName: CuspType;
+  owner?: OwnerType;
 }) => {
-  const houseInfo = HouseData[house];
+  const houseInfo = HouseData[houseName];
   const { open } = useDesc();
 
-  const getPlanets = () => {
-    if (owner) {
-      const { getPlanetsInHouse } = useWheel() as MultiWheelContextType;
-      const [mainPlanets, otherPlanets] = getPlanetsInHouse(house, owner);
+  const { house, planets, mainPlanets, otherPlanets, signs } = useHouseData(
+    houseName,
+    owner,
+  );
 
-      return { mainPlanets, otherPlanets };
-    } else {
-      const { getPlanetsInHouse } = useWheel() as SingleWheelContextType;
-      const planets = getPlanetsInHouse(house);
-      return { planets };
-    }
-  };
+  const { loading, houseDesc } = useHouseDesc({
+    signs,
+    planets,
+    mainPlanets,
+    otherPlanets,
+    house,
+  });
 
   const {
     settings: { otherProfileId },
@@ -48,11 +51,6 @@ export const HousePanel = ({
       : type === "transit"
         ? "Transit"
         : "Other";
-
-  const planetData = getPlanets();
-  const planets = planetData.planets;
-  const mainPlanets = planetData.mainPlanets;
-  const otherPlanets = planetData.otherPlanets;
 
   return (
     <div className="flex flex-col h-full">
@@ -95,28 +93,41 @@ export const HousePanel = ({
             />
           </div>
         </Section>
-        <Section title="Planets in this House">
+        <Section title="Planets in this House" loading={loading}>
           <div className="flex flex-wrap gap-1">
             {planets &&
               (planets.length === 0 ? (
                 <span className="text-gray-500">—</span>
               ) : (
-                planets.map(({ name }) => (
-                  <PlanetChip key={name} planet={name} owner={owner} />
-                ))
+                <div className="flex flex-col gap-3 w-full">
+                  {planets.map(({ name }) => (
+                    <DescSection
+                      key={name}
+                      desc={houseDesc?.planets![name] ?? ""}
+                    >
+                      <PlanetChip planet={name} owner={owner} />
+                    </DescSection>
+                  ))}
+                </div>
               ))}
+
             {mainPlanets && otherPlanets && (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-4 w-full">
                 <div className="flex flex-col gap-1">
                   <span className="text-xs font-medium text-gray-500">
                     Your planets
                   </span>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-col gap-2">
                     {mainPlanets.length === 0 ? (
-                      <span className="text-gray-400">—</span>
+                      <span className="text-gray-500">—</span>
                     ) : (
                       mainPlanets.map(({ name }) => (
-                        <PlanetChip key={name} planet={name} owner={owner} />
+                        <DescSection
+                          key={name}
+                          desc={houseDesc?.mainPlanets![name] ?? ""}
+                        >
+                          <PlanetChip planet={name} owner="main" />
+                        </DescSection>
                       ))
                     )}
                   </div>
@@ -126,18 +137,32 @@ export const HousePanel = ({
                   <span className="text-xs font-medium text-gray-500">
                     {`${otherProfileName} Planets`}
                   </span>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-col gap-2">
                     {otherPlanets.length === 0 ? (
-                      <span className="text-gray-400">—</span>
+                      <span className="text-gray-500">—</span>
                     ) : (
                       otherPlanets.map(({ name }) => (
-                        <PlanetChip key={name} planet={name} owner={owner} />
+                        <DescSection
+                          key={name}
+                          desc={houseDesc?.otherPlanets![name] ?? ""}
+                        >
+                          <PlanetChip planet={name} owner="other" />
+                        </DescSection>
                       ))
                     )}
                   </div>
                 </div>
               </div>
             )}
+          </div>
+        </Section>
+        <Section title="Signs in this House" loading={loading}>
+          <div className="flex flex-col gap-2 w-full">
+            {signs.map(({ sign }) => (
+              <DescSection key={sign} desc={houseDesc?.signs[sign] ?? ""}>
+                <SignChip sign={sign} />
+              </DescSection>
+            ))}
           </div>
         </Section>
       </div>

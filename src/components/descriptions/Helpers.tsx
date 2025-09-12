@@ -5,16 +5,19 @@ import { ZodiacData } from "../../types/zodiac";
 import { PlanetsData, type PlanetName } from "../../types/planet";
 import { useState } from "react";
 import { AspectData, type Aspect } from "../../types/aspect";
-import { HouseData } from "../../types/cusp";
+import { HouseData, type CuspType } from "../../types/cusp";
+import type { OwnerType } from "../../contexts/MultiWheelContext";
 
 export const Section = ({
   title,
   children,
   startOpen = true,
+  loading = false,
 }: {
   title: string;
   children: React.ReactNode;
   startOpen?: boolean;
+  loading?: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(startOpen);
   return (
@@ -26,11 +29,53 @@ export const Section = ({
         <h3 className="text-sm font-medium text-gray-600">{title}</h3>
         {isOpen ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
       </div>
-      {isOpen && (
-        <div className="p-3 text-sm text-gray-800 leading-relaxed">
-          {children}
-        </div>
-      )}
+      {isOpen &&
+        (loading ? (
+          <div>Loading...</div>
+        ) : (
+          <div className="p-3 text-sm text-gray-800 leading-relaxed">
+            {children}
+          </div>
+        ))}
+    </div>
+  );
+};
+
+export const DescSection = ({
+  title,
+  children,
+  desc,
+}: {
+  title?: string;
+  children?: React.ReactNode;
+  desc: string;
+}) => {
+  const [isOpen, setIsOpen] = useState(true);
+  return (
+    <div>
+      <div className="cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+        {title && (
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-gray-500 text-xs uppercase tracking-wide">
+              {title}
+            </span>
+
+            {isOpen ? <FiChevronUp size={12} /> : <FiChevronDown size={12} />}
+          </div>
+        )}
+        {children && (
+          <div className="flex items-center justify-between">
+            {children}
+            {!title &&
+              (isOpen ? (
+                <FiChevronUp size={12} />
+              ) : (
+                <FiChevronDown size={12} />
+              ))}
+          </div>
+        )}
+      </div>
+      {isOpen && <div className="text-xs text-gray-600 mt-1 pl-2">{desc}</div>}
     </div>
   );
 };
@@ -86,7 +131,7 @@ export const OverviewCard = ({
       ) : (
         glyph
       )}
-      <span className="font-medium text-sm">{value}</span>
+      <span className="font-medium text-sm capitalize">{value}</span>
     </div>
   </div>
 );
@@ -96,7 +141,7 @@ export const PlanetChip = ({
   owner,
 }: {
   planet: PlanetName;
-  owner?: "main" | "other";
+  owner?: OwnerType;
 }) => {
   const { open } = useDesc();
   return (
@@ -198,15 +243,15 @@ export const HouseChip = ({
   house,
   owner,
 }: {
-  house: number;
-  owner?: "main" | "other";
+  house: CuspType;
+  owner?: OwnerType;
 }) => {
   const { open } = useDesc();
   const houseInfo = HouseData[house];
   return (
     <div
       className="flex items-center gap-1 px-1 py-1 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md"
-      onClick={() => open({ type: "house", value: String(house), owner })}
+      onClick={() => open({ type: "house", value: house, owner })}
     >
       <span className="font-xs">{houseInfo.name}</span>
     </div>

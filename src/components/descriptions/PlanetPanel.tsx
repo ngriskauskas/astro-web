@@ -2,44 +2,32 @@ import {
   AspectChip,
   BackButton,
   CloseButton,
+  DescSection,
   HouseChip,
   Section,
   SignChip,
   SignGroup,
 } from "./Helpers";
 import { PlanetsData, type PlanetName } from "../../types/planet";
-import { useWheel } from "../../hooks/useWheel";
-import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
-import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
+import { usePlanetDesc } from "../../hooks/useDescData";
+import { usePlanetData } from "../../hooks/chart/useChartData";
+import type { OwnerType } from "../../contexts/MultiWheelContext";
+import type { Aspect } from "../../types/aspect";
 
 export const PlanetPanel = ({
-  planet,
+  planetName,
   owner,
 }: {
-  planet: PlanetName;
-  owner?: "main" | "other";
+  planetName: PlanetName;
+  owner?: OwnerType;
 }) => {
-  const getPlanetData = () => {
-    if (owner) {
-      const { getPlanetAspects, getPlanet, getPlanetHouse } =
-        useWheel() as MultiWheelContextType;
-      const aspects = getPlanetAspects(planet, owner);
-      const planetValue = getPlanet(planet, owner);
-      const house = getPlanetHouse(planet, owner);
-      return { aspects, planetValue, house };
-    } else {
-      const { getPlanetAspects, getPlanet, getPlanetHouse } =
-        useWheel() as SingleWheelContextType;
-      const aspects = getPlanetAspects(planet);
-      const planetValue = getPlanet(planet);
-      const house = getPlanetHouse(planet);
-      return { aspects, planetValue, house };
-    }
-  };
-
-  const { aspects, planetValue, house } = getPlanetData();
-
-  const planetInfo = PlanetsData[planet];
+  const { aspects, planet, house } = usePlanetData(planetName, owner);
+  const { loading, planetDesc } = usePlanetDesc({
+    planet,
+    house,
+    sign: planet.sign,
+  });
+  const planetInfo = PlanetsData[planetName];
 
   return (
     <div className="flex flex-col h-full">
@@ -49,7 +37,7 @@ export const PlanetPanel = ({
       >
         <BackButton />
         <span className="text-2xl">{planetInfo.glyph}</span>
-        <h2 className="text-xl font-semibold capitalize">{planet}</h2>
+        <h2 className="text-xl font-semibold capitalize">{planetName}</h2>
         <CloseButton />
       </div>
       <div className="p-2 flex-1 overflow-y-auto">
@@ -67,34 +55,26 @@ export const PlanetPanel = ({
             <SignGroup title="Fall in" signs={planetInfo.info.fallIn} />
           </div>
         </Section>
-        <Section title="Details">
+        <Section title="Details" loading={loading}>
           <div className="flex flex-col gap-3">
-            {planetValue.retrograde && (
-              <div className="flex flex-col items-start gap-1">
-                <span className="text-gray-500 text-sm">Retrograde ℞</span>
-              </div>
+            {planet.retrograde && (
+              <DescSection
+                title="Retrograde ℞"
+                desc={planetDesc?.retrograde ?? ""}
+              />
             )}
 
-            <div className="flex flex-col items-start gap-1">
-              <span className="text-gray-500 text-xs uppercase tracking-wide">
-                Sign
+            <DescSection title="Sign" desc={planetDesc?.sign ?? ""}>
+              <SignChip sign={planet.sign} />
+              <span className="text-gray-600 text-[13px] ml-1">
+                {`${Math.round(planet.deg_min[0])}° ${Math.round(
+                  planet.deg_min[1],
+                )}′`}
               </span>
-              <div className="flex items-center gap-1">
-                <SignChip sign={planetValue.sign} />
-                <span className="text-gray-600 text-[13px] ml-1">
-                  {`${Math.round(planetValue.deg_min[0])}° ${Math.round(
-                    planetValue.deg_min[1],
-                  )}′`}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-start gap-1">
-              <span className="text-gray-500 text-xs uppercase tracking-wide">
-                House
-              </span>
+            </DescSection>
+            <DescSection title="House" desc={planetDesc?.house ?? ""}>
               <HouseChip house={house} owner={owner} />
-            </div>
+            </DescSection>
           </div>
         </Section>
         <Section title="Aspects">
@@ -102,7 +82,7 @@ export const PlanetPanel = ({
             {aspects.length === 0 ? (
               <span className="text-gray-500">—</span>
             ) : (
-              aspects.map((aspect, index) => (
+              aspects.map((aspect: Aspect, index: number) => (
                 <div className="self-start" key={index}>
                   <AspectChip aspect={aspect} />
                 </div>

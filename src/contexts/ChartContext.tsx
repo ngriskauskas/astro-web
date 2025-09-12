@@ -1,29 +1,30 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { apiFetch } from "../utils/api";
-import {
-  type Planet,
-  type Cusp,
-  type Aspect,
-  type HouseSystem,
-  type ZodiacSystem,
-  type Ayanamsa,
-} from "../types/zodiac";
+import type { Planet, PlanetName } from "../types/planet";
+import type { Cusp, CuspType, KeyAngle } from "../types/cusp";
+import type { Aspect } from "../types/aspect";
+import type { HouseSystem } from "../types/house-system";
+import type { ZodiacSystem } from "../types/zodiac-system";
+import type { Ayanamsa } from "../types/ayanamsa";
 
 export interface MultiChart {
   main: {
-    planets: Record<string, Planet>;
-    cusps: Record<string, Cusp>;
+    planets: Record<PlanetName, Planet>;
+    cusps: Record<CuspType, Cusp>;
+    keys: Record<KeyType, KeyAngle>;
   };
   other: {
-    planets: Record<string, Planet>;
-    cusps: Record<string, Cusp>;
+    planets: Record<PlanetName, Planet>;
+    cusps: Record<CuspType, Cusp>;
+    keys: Record<KeyType, KeyAngle>;
   };
   aspects: Aspect[];
 }
 
 export interface SingleChart {
-  planets: Record<string, Planet>;
-  cusps: Record<string, Cusp>;
+  planets: Record<PlanetName, Planet>;
+  cusps: Record<CuspType, Cusp>;
+  keys: Record<KeyType, KeyAngle>;
   aspects: Aspect[];
 }
 

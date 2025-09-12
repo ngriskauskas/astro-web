@@ -24,6 +24,8 @@ export const MultiZodiacWheel = () => {
     otherCuspAngles,
     mainPlanetAngles,
     otherPlanetAngles,
+    mainKeyAngles,
+    otherKeyAngles,
     aspects,
     settings: { aspectOptions },
   } = useWheel() as MultiWheelContextType;
@@ -47,6 +49,7 @@ export const MultiZodiacWheel = () => {
               radius={radius - 55}
               innerRadius={radius - 145}
               angles={mainCuspAngles}
+              keyAngles={mainKeyAngles}
               owner="main"
             />
             <Houses
@@ -54,6 +57,7 @@ export const MultiZodiacWheel = () => {
               radius={radius - 145}
               innerRadius={radius - 240}
               angles={otherCuspAngles}
+              keyAngles={otherKeyAngles}
               owner="other"
             />
             <Signs center={radius} radius={radius - 5} />

@@ -1,19 +1,20 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { ZodiacSign } from "../types/zodiac";
 import { type Aspect } from "../types/aspect";
-import { type PlanetName } from "../types/planet";
+import { type Planet, type PlanetName } from "../types/planet";
+import type { Cusp, CuspType } from "../types/cusp";
 
 type ActiveType = "planet" | "house" | "sign" | "aspect" | "angle";
 
 interface Active {
   type: ActiveType;
-  value: PlanetName | ZodiacSign | string | Aspect;
+  value: PlanetName | ZodiacSign | CuspType | Aspect;
   owner?: "main" | "other";
 }
 
 interface Params {
   type: ActiveType;
-  value: PlanetName | ZodiacSign | string | Aspect;
+  value: PlanetName | ZodiacSign | CuspType | Aspect;
   owner?: "main" | "other";
 }
 
@@ -38,12 +39,7 @@ export const DescProvider = ({ children }: { children: ReactNode }) => {
     setActive({
       owner,
       type,
-      value:
-        type === "house"
-          ? typeof value === "string"
-            ? (value as string).replace("cusp", "")
-            : value
-          : value,
+      value,
     });
   };
 
@@ -63,7 +59,14 @@ export const DescProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <DescContext.Provider value={{ active, open, close, goBack }}>
+    <DescContext.Provider
+      value={{
+        active,
+        open,
+        close,
+        goBack,
+      }}
+    >
       {children}
     </DescContext.Provider>
   );

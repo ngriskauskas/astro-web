@@ -26,6 +26,7 @@ import { ElementData, type ElementInfo } from "./element";
 import { ModalityData, type ModalityInfo } from "./modality";
 import { PolarityData, type PolarityInfo } from "./polarity";
 import { type PlanetName } from "./planet";
+import type { CuspType } from "./cusp";
 
 export const ZodiacSigns = [
   "aries",
@@ -64,7 +65,7 @@ interface ZodiacInfo {
     element: ElementInfo;
     modality: ModalityInfo;
     polarity: PolarityInfo;
-    house: number;
+    house: CuspType;
     rulers: PlanetName[];
     exalted: PlanetName[];
     detriment: PlanetName[];
