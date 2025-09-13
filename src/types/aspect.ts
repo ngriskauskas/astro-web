@@ -1,3 +1,4 @@
+import type { OwnerType } from "../contexts/MultiWheelContext";
 import { type Planet } from "./planet";
 
 export interface Aspect {
@@ -5,7 +6,9 @@ export interface Aspect {
   angle: number;
   orb: number;
   planet1: Planet;
+  planet1Owner?: OwnerType;
   planet2: Planet;
+  plaer2Owner?: OwnerType;
 }
 
 export type AspectType =

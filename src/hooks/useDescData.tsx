@@ -5,6 +5,7 @@ import type { ZodiacSign } from "../types/zodiac";
 import { apiFetch } from "../utils/api";
 import type { SignAngle } from "../components/wheel/layers/Signs";
 import { useWheel } from "./useWheel";
+import type { Aspect, AspectType } from "../types/aspect";
 
 type signDescriptions = Partial<Record<ZodiacSign, string>>;
 type planetDescriptions = Partial<Record<PlanetName, string>>;
@@ -56,7 +57,15 @@ interface SignDescParams {
   otherPlanets?: Planet[];
 }
 
-export interface AspectDesc {}
+export interface AspectDesc {
+  description: string;
+}
+
+interface AspectDescParams {
+  aspect: AspectType;
+  planet1: PlanetName;
+  planet2: PlanetName;
+}
 
 export const usePlanetDesc = (params: PlanetDescParams) => {
   const [loading, setLoading] = useState(true);
@@ -139,4 +148,26 @@ export const useSignDesc = (params: SignDescParams) => {
   ]);
 
   return { loading, signDesc };
+};
+
+export const useAspectDesc = (params: AspectDescParams) => {
+  const [loading, setLoading] = useState(true);
+  const [aspectDesc, setAspectDesc] = useState<AspectDesc>();
+
+  const { type } = useWheel();
+
+  useEffect(() => {
+    const fetchDesc = async () => {
+      const data = await apiFetch("/descriptions/aspect", {
+        method: "POST",
+        body: JSON.stringify({ ...params, type }),
+      });
+      setAspectDesc(data);
+      setLoading(false);
+    };
+
+    fetchDesc();
+  }, [params.aspect, type]);
+
+  return { loading, aspectDesc };
 };

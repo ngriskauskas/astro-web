@@ -66,8 +66,13 @@ export const getPlanetAspects = (
     )
     .filter(({ type, orb }) => orb <= ctx.settings.aspectOptions[type].minOrb)
     .map((x) => {
-      if (x.planet1.name === planet) return x;
-      return { ...x, planet1: x.planet2, planet2: x.planet1 };
+      if (x.planet1.name === planet) return { ...x, planet1Owner: owner };
+      return {
+        ...x,
+        planet1: x.planet2,
+        planet2: x.planet1,
+        planet1Owner: owner,
+      };
     })
     .sort((a, b) => a.orb - b.orb);
 };
