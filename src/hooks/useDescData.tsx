@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import type { Planet, PlanetName } from "../types/planet";
-import type { Cusp, CuspType } from "../types/cusp";
+import type { Cusp, CuspType, KeyType } from "../types/cusp";
 import type { ZodiacSign } from "../types/zodiac";
 import { apiFetch } from "../utils/api";
 import type { SignAngle } from "../components/wheel/layers/Signs";
 import { useWheel } from "./useWheel";
-import type { Aspect, AspectType } from "../types/aspect";
+import type { AspectType } from "../types/aspect";
 
 type signDescriptions = Partial<Record<ZodiacSign, string>>;
 type planetDescriptions = Partial<Record<PlanetName, string>>;
@@ -67,6 +67,15 @@ interface AspectDescParams {
   planet2: PlanetName;
 }
 
+export interface KeyAngleDesc {
+  sign: string;
+}
+
+interface KeyAngleDescParams {
+  sign: ZodiacSign;
+  angle: KeyType;
+}
+
 export const usePlanetDesc = (params: PlanetDescParams) => {
   const [loading, setLoading] = useState(true);
   const [planetDesc, setPlanetDesc] = useState<PlanetDesc>();
@@ -74,8 +83,8 @@ export const usePlanetDesc = (params: PlanetDescParams) => {
   const { type } = useWheel();
 
   useEffect(() => {
-    setLoading(true);
     const fetchDesc = async () => {
+      setLoading(true);
       const data = await apiFetch("/descriptions/planet", {
         method: "POST",
         body: JSON.stringify({ ...params, type }),
@@ -98,6 +107,7 @@ export const useHouseDesc = (params: HouseDescParams) => {
 
   useEffect(() => {
     const fetchDesc = async () => {
+      setLoading(true);
       const data = await apiFetch("/descriptions/house", {
         method: "POST",
         body: JSON.stringify({ ...params, type }),
@@ -127,6 +137,7 @@ export const useSignDesc = (params: SignDescParams) => {
 
   useEffect(() => {
     const fetchDesc = async () => {
+      setLoading(true);
       const data = await apiFetch("/descriptions/sign", {
         method: "POST",
         body: JSON.stringify({ ...params, type }),
@@ -158,6 +169,7 @@ export const useAspectDesc = (params: AspectDescParams) => {
 
   useEffect(() => {
     const fetchDesc = async () => {
+      setLoading(true);
       const data = await apiFetch("/descriptions/aspect", {
         method: "POST",
         body: JSON.stringify({ ...params, type }),
@@ -170,4 +182,27 @@ export const useAspectDesc = (params: AspectDescParams) => {
   }, [params.aspect, type]);
 
   return { loading, aspectDesc };
+};
+
+export const useKeyAngleDesc = (params: KeyAngleDescParams) => {
+  const [loading, setLoading] = useState(true);
+  const [keyAngleDesc, setKeyAngleDesc] = useState<KeyAngleDesc>();
+
+  const { type } = useWheel();
+
+  useEffect(() => {
+    const fetchDesc = async () => {
+      setLoading(true);
+      const data = await apiFetch("/descriptions/key_angle", {
+        method: "POST",
+        body: JSON.stringify({ ...params, type }),
+      });
+      setKeyAngleDesc(data);
+      setLoading(false);
+    };
+
+    fetchDesc();
+  }, [params.angle, params.sign, type]);
+
+  return { loading, keyAngleDesc };
 };

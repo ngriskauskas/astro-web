@@ -1,7 +1,7 @@
 import type { CuspAngle } from "../../components/wheel/layers/Houses";
 import type { SignAngle } from "../../components/wheel/layers/Signs";
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
-import type { CuspType } from "../../types/cusp";
+import type { CuspType, KeyType } from "../../types/cusp";
 import type { Planet, PlanetName } from "../../types/planet";
 import type { ZodiacSign } from "../../types/zodiac";
 
@@ -124,4 +124,12 @@ export const getHousesInSign = (
         inHouse((signAngle.angle + 30) % 360, house))
     );
   });
+};
+
+export const getSignInKeyAngle = (
+  ctx: SingleWheelContextType,
+  keyAngle: KeyType,
+): ZodiacSign => {
+  const angleObj = ctx.keyAngles.find((ka) => ka.name === keyAngle)!;
+  return angleObj.sign;
 };

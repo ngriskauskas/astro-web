@@ -1,5 +1,5 @@
 import type { OwnerType } from "../../contexts/MultiWheelContext";
-import type { CuspType } from "../../types/cusp";
+import type { CuspType, KeyType } from "../../types/cusp";
 import type { PlanetName } from "../../types/planet";
 import type { ZodiacSign } from "../../types/zodiac";
 import { isMulti, useWheel } from "../useWheel";
@@ -23,6 +23,8 @@ export const useWheelData = (owner?: OwnerType) => {
       getSignsInHouse: (house: CuspType) =>
         multi.getSignsInHouse(ctx, house, owner),
       getHousesInSign: (sign: ZodiacSign) => multi.getHousesInSign(ctx, sign),
+      getSignInKeyAngle: (keyAngle: KeyType) =>
+        multi.getSignInKeyAngle(ctx, keyAngle, owner),
     };
   } else {
     return {
@@ -38,6 +40,8 @@ export const useWheelData = (owner?: OwnerType) => {
       getHouse: (house: CuspType) => single.getHouse(ctx, house),
       getSignsInHouse: (house: CuspType) => single.getSignsInHouse(ctx, house),
       getHousesInSign: (sign: ZodiacSign) => single.getHousesInSign(ctx, sign),
+      getSignInKeyAngle: (keyAngle: KeyType) =>
+        single.getSignInKeyAngle(ctx, keyAngle),
     };
   }
 };

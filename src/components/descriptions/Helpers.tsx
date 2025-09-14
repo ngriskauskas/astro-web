@@ -1,5 +1,11 @@
 import { useDesc } from "../../contexts/DescContext";
-import { FiX, FiArrowLeft, FiChevronUp, FiChevronDown } from "react-icons/fi";
+import {
+  FiX,
+  FiArrowLeft,
+  FiChevronUp,
+  FiChevronDown,
+  FiLoader,
+} from "react-icons/fi";
 import type { ZodiacSign } from "../../types/zodiac";
 import { ZodiacData } from "../../types/zodiac";
 import { PlanetsData, type PlanetName } from "../../types/planet";
@@ -7,6 +13,12 @@ import { useState } from "react";
 import { AspectData, type Aspect } from "../../types/aspect";
 import { HouseData, type CuspType } from "../../types/cusp";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
+
+const Spinner = () => (
+  <div className="flex justify-center items-center py-3">
+    <FiLoader className="w-5 h-5 text-gray-600 animate-spin" />
+  </div>
+);
 
 export const Section = ({
   title,
@@ -31,7 +43,7 @@ export const Section = ({
       </div>
       {isOpen &&
         (loading ? (
-          <div>Loading...</div>
+          <Spinner />
         ) : (
           <div className="p-3 text-sm text-gray-800 leading-relaxed">
             {children}
@@ -116,9 +128,8 @@ export const OverviewCard = ({
   onClick?: () => void;
 }) => (
   <div
-    className={`flex flex-col items-center p-1 bg-white border rounded shadow-sm ${
-      onClick ? "cursor-pointer hover:shadow-md" : ""
-    }`}
+    className={`flex flex-col items-center p-1 bg-white border rounded shadow-sm ${onClick ? "cursor-pointer hover:shadow-md" : ""
+      }`}
     onClick={onClick}
   >
     <span className="text-gray-400 text-xs uppercase tracking-wide mb-1 text-center">

@@ -6,7 +6,7 @@ import type {
   OwnerType,
 } from "../../contexts/MultiWheelContext";
 import type { Aspect } from "../../types/aspect";
-import type { CuspType } from "../../types/cusp";
+import type { CuspType, KeyType } from "../../types/cusp";
 import type { Planet, PlanetName } from "../../types/planet";
 import type { ZodiacSign } from "../../types/zodiac";
 
@@ -188,4 +188,21 @@ export const getHousesInSign = (
       );
     }),
   ];
+};
+
+export const getSignInKeyAngle = (
+  ctx: MultiWheelContextType,
+  keyAngle: KeyType,
+  owner: OwnerType = "main",
+): ZodiacSign => {
+  const keyAnglesArray =
+    owner === "main" ? ctx.mainKeyAngles : ctx.otherKeyAngles;
+
+  const angleObj = keyAnglesArray.find((ka) => ka.name === keyAngle)!;
+
+  const signAngle = ctx.signAngles.find((s) => {
+    return angleObj.angle >= s.angle && angleObj.angle < (s.angle + 30) % 360;
+  })!;
+
+  return signAngle.sign;
 };
