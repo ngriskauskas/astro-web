@@ -15,6 +15,7 @@ import {
 } from "./Helpers";
 import { useHouseData } from "../../hooks/chart/useChartData";
 import { useHouseDesc } from "../../hooks/useDescData";
+import { useProfileNames } from "../../hooks/chart/getNames";
 
 export const HousePanel = ({
   houseName,
@@ -39,18 +40,7 @@ export const HousePanel = ({
     house,
   });
 
-  const {
-    settings: { otherProfileId },
-    type,
-  } = useWheel();
-  const { profiles } = useBirthProfiles();
-
-  const otherProfileName =
-    otherProfileId && profiles
-      ? profiles.find((x) => x.id === otherProfileId)?.name
-      : type === "transit"
-        ? "Transit"
-        : "Other";
+  const { otherProfileName } = useProfileNames();
 
   return (
     <div className="flex flex-col h-full">

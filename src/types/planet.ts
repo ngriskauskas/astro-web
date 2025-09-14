@@ -16,6 +16,23 @@ export type PlanetName =
   | "south node"
   | "lilith";
 
+export const PLANET_ORDER = [
+  "sun",
+  "moon",
+  "mercury",
+  "venus",
+  "mars",
+  "jupiter",
+  "saturn",
+  "uranus",
+  "neptune",
+  "pluto",
+  "chiron",
+  "north node",
+  "south node",
+  "lilith",
+] as const;
+
 export interface Planet {
   name: PlanetName;
   position: number;

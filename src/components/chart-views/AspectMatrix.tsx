@@ -2,13 +2,23 @@ import { useState } from "react";
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { useWheel } from "../../hooks/useWheel";
 import { AspectData } from "../../types/aspect";
-import { PlanetsData } from "../../types/planet";
+import { PLANET_ORDER, PlanetsData, type Planet } from "../../types/planet";
 import { useDesc } from "../../contexts/DescContext";
+import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
+import { useWheelData } from "../../hooks/chart/useWheelData";
 
 export const AspectMatrix = () => {
-  const { planetAngles, aspects } = useWheel() as SingleWheelContextType;
   const [hoveredPlanet, setHoveredPlanet] = useState<string | null>(null);
   const { open } = useDesc();
+
+  const sortByPlanetOrder = (arr: Planet[]) =>
+    [...arr].sort(
+      (a, b) => PLANET_ORDER.indexOf(a.name) - PLANET_ORDER.indexOf(b.name),
+    );
+
+  const { planetAngles } = useWheel() as SingleWheelContextType;
+  const planets = sortByPlanetOrder(planetAngles);
+  const aspects = useWheelData().getFilteredAspects();
 
   return (
     <div className="overflow-x-auto ml-4">
@@ -16,12 +26,11 @@ export const AspectMatrix = () => {
         <thead className="bg-gray-100 text-sm font-semibold">
           <tr>
             <th className="px-4 py-2 border border-gray-300"></th>
-            {planetAngles.map((p) => (
+            {planets.map((p) => (
               <th
                 key={p.name}
-                className={`px-4 py-2 text-xl border border-gray-300 cursor-pointer transition-colors ${
-                  hoveredPlanet === p.name ? "bg-yellow-100" : ""
-                }`}
+                className={`px-4 py-2 text-xl border border-gray-300 cursor-pointer transition-colors ${hoveredPlanet === p.name ? "bg-yellow-100" : ""
+                  }`}
                 onMouseEnter={() => setHoveredPlanet(p.name)}
                 onMouseLeave={() => setHoveredPlanet(null)}
               >
@@ -31,24 +40,22 @@ export const AspectMatrix = () => {
           </tr>
         </thead>
         <tbody>
-          {planetAngles.map((rowPlanet, rowIndex) => (
+          {planets.map((rowPlanet, rowIndex) => (
             <tr
               key={rowPlanet.name}
-              className={`text-sm transition-colors ${
-                hoveredPlanet === rowPlanet.name ? "bg-yellow-50" : ""
-              }`}
+              className={`text-sm transition-colors ${hoveredPlanet === rowPlanet.name ? "bg-yellow-50" : ""
+                }`}
             >
               <td
-                className={`px-4 py-2 text-xl font-semibold border border-gray-300 bg-gray-50 cursor-pointer transition-colors ${
-                  hoveredPlanet === rowPlanet.name ? "bg-yellow-100" : ""
-                }`}
+                className={`px-4 py-2 text-xl font-semibold border border-gray-300 bg-gray-50 cursor-pointer transition-colors ${hoveredPlanet === rowPlanet.name ? "bg-yellow-100" : ""
+                  }`}
                 onMouseEnter={() => setHoveredPlanet(rowPlanet.name)}
                 onMouseLeave={() => setHoveredPlanet(null)}
               >
                 {PlanetsData[rowPlanet.name].glyph}
               </td>
 
-              {planetAngles.map((colPlanet, colIndex) => {
+              {planets.map((colPlanet, colIndex) => {
                 if (rowIndex === colIndex) {
                   return (
                     <td
@@ -85,14 +92,12 @@ export const AspectMatrix = () => {
                 return (
                   <td
                     key={colPlanet.name}
-                    className={`px-4 py-2 text-lg font-bold border border-gray-300 transition-all ${
-                      aspect ? "cursor-pointer" : ""
-                    } ${
-                      hoveredPlanet === rowPlanet.name ||
-                      hoveredPlanet === colPlanet.name
+                    className={`px-4 py-2 text-lg font-bold border border-gray-300 transition-all ${aspect ? "cursor-pointer" : ""
+                      } ${hoveredPlanet === rowPlanet.name ||
+                        hoveredPlanet === colPlanet.name
                         ? "ring-2 ring-yellow-300"
                         : ""
-                    }`}
+                      }`}
                     style={{
                       backgroundColor: color ? `${color}20` : undefined,
                       color: color ?? undefined,

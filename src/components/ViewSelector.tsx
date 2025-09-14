@@ -3,6 +3,7 @@ import { MultiZodiacWheel } from "./wheel/MultiZodiacWheel";
 import { ZodiacWheel } from "./wheel/ZodiacWheel";
 import { PlacementsTable } from "./chart-views/PlacementsTable";
 import { AspectMatrix } from "./chart-views/AspectMatrix";
+import { MultiAspectMatrix } from "./chart-views/MultiAspectMatrix";
 
 export const ViewSelector = ({ isMulti = false }: { isMulti?: boolean }) => {
   const [view, setView] = useState("wheel");
@@ -14,7 +15,7 @@ export const ViewSelector = ({ isMulti = false }: { isMulti?: boolean }) => {
       case "placements":
         return <PlacementsTable />;
       case "aspectMatrix":
-        return <AspectMatrix />;
+        return isMulti ? <MultiAspectMatrix /> : <AspectMatrix />;
     }
   };
 
@@ -34,13 +35,8 @@ export const ViewSelector = ({ isMulti = false }: { isMulti?: boolean }) => {
           className="p-2 border rounded text-sm"
         >
           <option value="wheel">Zodiac Wheel</option>
-          <option value="placements">Basic</option>
+          {!isMulti && <option value="placements">Basic</option>}
           <option value="aspectMatrix">Aspect Matrix</option>
-          <option value="houses">House Overview</option>
-          <option value="elements">Elements and Qualities</option>
-          <option value="dignity">Planetary Strength</option>
-          <option value="graph">Aspect Graph</option>
-          <option value="summary">Summary / Insights</option>
         </select>
       </div>
       <div className="w-full max-w-5xl h-[600px]">{renderView()}</div>

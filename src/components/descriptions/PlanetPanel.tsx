@@ -14,6 +14,8 @@ import { usePlanetData } from "../../hooks/chart/useChartData";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
 import type { Aspect } from "../../types/aspect";
 import { formatDegMin } from "../../utils/funcs";
+import { useWheel } from "../../hooks/useWheel";
+import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
 
 export const PlanetPanel = ({
   planetName,

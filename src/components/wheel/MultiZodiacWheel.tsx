@@ -128,10 +128,6 @@ export const MultiZodiacWheel = () => {
           </div>
         )}
       </div>
-
-      <div className="flex-[1] max-h-[600px] overflow-y-auto my-5">
-        <ZodiacWheelSettings />
-      </div>
     </div>
   );
 };

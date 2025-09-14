@@ -15,6 +15,7 @@ import { useWheel } from "../../hooks/useWheel";
 import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
 import { useSignData } from "../../hooks/chart/useChartData";
 import { useSignDesc } from "../../hooks/useDescData";
+import { useProfileNames } from "../../hooks/chart/getNames";
 
 export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
   const { open } = useDesc();
@@ -30,18 +31,6 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
     otherHouses,
   } = useSignData(sign);
 
-  const {
-    settings: { otherProfileId },
-    type,
-  } = useWheel();
-  const { profiles } = useBirthProfiles();
-  const otherProfileName =
-    otherProfileId && profiles
-      ? profiles.find((x) => x.id === otherProfileId)?.name
-      : type === "transit"
-        ? "Transit"
-        : "Other";
-
   const { loading, signDesc } = useSignDesc({
     sign,
     planets,
@@ -51,6 +40,8 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
     mainHouses,
     otherHouses,
   });
+
+  const { otherProfileName } = useProfileNames();
 
   return (
     <div className="flex flex-col h-full">
