@@ -7,6 +7,7 @@ import { HousePanel } from "./HousePanel";
 import { type PlanetName } from "../../types/planet";
 import { type Aspect } from "../../types/aspect";
 import { AnglePanel } from "./AnglePanel";
+import type { CuspType } from "../../types/cusp";
 
 export const DescriptionSidePanel = () => {
   const { active } = useDesc();
@@ -18,7 +19,7 @@ export const DescriptionSidePanel = () => {
       case "planet":
         return (
           <PlanetPanel
-            planet={active.value as PlanetName}
+            planetName={active.value as PlanetName}
             owner={active.owner}
           />
         );
@@ -28,7 +29,10 @@ export const DescriptionSidePanel = () => {
         return <AspectPanel aspect={active.value as Aspect} />;
       case "house":
         return (
-          <HousePanel house={active.value as string} owner={active.owner} />
+          <HousePanel
+            houseName={active.value as CuspType}
+            owner={active.owner}
+          />
         );
       case "angle":
         return <AnglePanel angle={active.value as string} />;

@@ -3,8 +3,20 @@ import { ModalityData, type ModalityInfo } from "./modality";
 import { PolarityData, type PolarityInfo } from "./polarity";
 import { type ZodiacSign } from "./zodiac";
 
+export type CuspType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
 export interface Cusp {
-  name: string;
+  name: CuspType;
+  position: number;
+  sign: ZodiacSign;
+  deg_in_sign: number;
+  deg_min: [number, number];
+}
+
+export type KeyType = "asc" | "mc" | "ic" | "dc";
+
+export interface KeyAngle {
+  name: KeyType;
   position: number;
   sign: ZodiacSign;
   deg_in_sign: number;
@@ -19,7 +31,7 @@ interface AngleInfo {
   };
 }
 
-export const AngleData: Record<string, AngleInfo> = {
+export const AngleData: Record<KeyType, AngleInfo> = {
   asc: {
     name: "Ascendant",
     color: "#E63946", // Aries-like red
@@ -66,7 +78,7 @@ interface HouseInfo {
   };
 }
 
-export const HouseData: Record<string, HouseInfo> = {
+export const HouseData: Record<CuspType, HouseInfo> = {
   1: {
     name: "1st House",
     color: ElementData["fire"].color,

@@ -1,9 +1,15 @@
-import { type Cusp } from "../../../types/cusp";
+import { type Cusp, type KeyAngle } from "../../../types/cusp";
 import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, midpointAngle, polarToCartesian } from "./Utils";
+import type { OwnerType } from "../../../contexts/MultiWheelContext";
 
 export interface CuspAngle extends Cusp {
+  angle: number;
+  endAngle: number;
+}
+
+export interface KeyAngleAngle extends KeyAngle {
   angle: number;
 }
 
@@ -12,7 +18,8 @@ interface HouseProps {
   radius: number;
   innerRadius: number;
   angles: CuspAngle[];
-  owner?: "main" | "other";
+  keyAngles: KeyAngleAngle[];
+  owner?: OwnerType;
 }
 
 export const Houses = ({
@@ -21,6 +28,7 @@ export const Houses = ({
   center,
   angles,
   owner,
+  keyAngles,
 }: HouseProps) => {
   const {
     settings: {
@@ -32,32 +40,21 @@ export const Houses = ({
 
   const outerRadius = radius;
 
-  const houseAngles = angles
-    .filter(({ name }) => !["asc", "dc", "ic", "mc"].includes(name))
-    .map((cusp) => ({
-      ...cusp,
-      number: parseInt(cusp.name.replace("cusp", ""), 10),
-    }))
-    .sort((a, b) => a.number - b.number);
-
-  const keyAngles = angles.filter(({ name }) =>
-    ["asc", "dc", "ic", "mc"].includes(name),
-  );
+  const houseAngles = angles.sort((a, b) => a.name - b.name);
 
   return (
     <g>
-      {houseAngles.map((house, i) => {
-        const { number, angle } = house;
-        const nextAngle = houseAngles[(i + 1) % houseAngles.length].angle;
+      {houseAngles.map((house) => {
+        const { name, angle, endAngle } = house;
 
         const wedgePath = createWedgePath(
           center,
           innerRadius,
           outerRadius,
           angle,
-          nextAngle,
+          endAngle,
         );
-        const midAngle = midpointAngle(angle, nextAngle);
+        const midAngle = midpointAngle(angle, endAngle);
 
         const { x: tx, y: ty } = polarToCartesian(
           center,
@@ -66,7 +63,7 @@ export const Houses = ({
         );
 
         return (
-          <g key={number}>
+          <g key={name}>
             <radialGradient
               id="houseGradient"
               cx="50%"
@@ -93,7 +90,7 @@ export const Houses = ({
               dominantBaseline="middle"
               fill="white"
             >
-              {number}
+              {name}
             </text>
           </g>
         );

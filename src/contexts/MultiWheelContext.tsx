@@ -3,14 +3,17 @@ import { type MultiChart, useCharts } from "./ChartContext";
 import { type ZodiacWheelOptions } from "../components/wheel/ZodiacWheelSettings";
 import { useBirthProfiles } from "./BirthProfilesContext";
 import { type PlanetAngle } from "../components/wheel/layers/Planets";
-import { type CuspAngle } from "../components/wheel/layers/Houses";
+import {
+  type CuspAngle,
+  type KeyAngleAngle,
+} from "../components/wheel/layers/Houses";
 import { type SignAngle } from "../components/wheel/layers/Signs";
 import { useAuth } from "./AuthContext";
 import { ZodiacSigns, type ZodiacSign } from "../types/zodiac";
 import { type Aspect } from "../types/aspect";
 import type { Planet, PlanetName } from "../types/planet";
 
-type OwnerType = "main" | "other";
+export type OwnerType = "main" | "other";
 
 export interface MultiWheelContextType {
   settings: ZodiacWheelOptions;
@@ -19,14 +22,11 @@ export interface MultiWheelContextType {
   otherPlanetAngles: PlanetAngle[];
   mainCuspAngles: CuspAngle[];
   otherCuspAngles: CuspAngle[];
+  mainKeyAngles: KeyAngleAngle[];
+  otherKeyAngles: KeyAngleAngle[];
   signAngles: SignAngle[];
   aspects: Aspect[];
   type: "synastry" | "transit";
-  getPlanetsInSign: (sign: ZodiacSign) => [Planet[], Planet[]];
-  getPlanetsInHouse: (house: string, owner: OwnerType) => [Planet[], Planet[]];
-  getPlanetAspects: (planet: PlanetName, owner: OwnerType) => Aspect[];
-  getPlanet: (planet: PlanetName, owner: OwnerType) => Planet;
-  getPlanetHouse: (planet: PlanetName, owner: OwnerType) => number;
 }
 
 export const MultiWheelContext = createContext<
@@ -49,6 +49,8 @@ export const MultiWheelProvider = ({
   const [signAngles, setSignAngles] = useState<SignAngle[]>([]);
   const [mainCuspAngles, setMainCuspAngles] = useState<CuspAngle[]>([]);
   const [otherCuspAngles, setOtherCuspAngles] = useState<CuspAngle[]>([]);
+  const [mainKeyAngles, setMainKeyAngles] = useState<KeyAngleAngle[]>([]);
+  const [otherKeyAngles, setOtherKeyAngles] = useState<KeyAngleAngle[]>([]);
   const [aspects, setAspects] = useState<Aspect[]>([]);
 
   const now = new Date();
@@ -125,16 +127,56 @@ export const MultiWheelProvider = ({
     settings.datetimeOptions,
   ]);
 
-  const calcCuspAngles = (chart: MultiChart) => {
-    const ascPos = chart.main.cusps["cusp1"].position;
+  const round = (num: number): number => {
+    return Math.round(num * 100) / 100;
+  };
 
-    const main = Object.entries(chart.main.cusps).map(([_key, cusp]) => ({
+  const calcCuspAngles = (chart: MultiChart) => {
+    const ascPos = chart.main.cusps[1].position;
+
+    const mainCusps = Object.entries(chart.main.cusps).map(([_key, cusp]) => ({
       ...cusp,
-      angle: (cusp.position - ascPos + 360) % 360,
+      angle: round((cusp.position - ascPos + 360) % 360),
     }));
-    const other = Object.entries(chart.other.cusps).map(([_key, cusp]) => ({
+    const otherCusps = Object.entries(chart.other.cusps).map(
+      ([_key, cusp]) => ({
+        ...cusp,
+        angle: round((cusp.position - ascPos + 360) % 360),
+      }),
+    );
+
+    const main = mainCusps.map((cusp) => {
+      const nextid = cusp.name === 12 ? 1 : cusp.name + 1;
+      const next = mainCusps.find((c) => c.name === nextid)!;
+
+      return {
+        ...cusp,
+        endAngle: next.angle,
+      };
+    });
+    const other = otherCusps.map((cusp) => {
+      const nextid = cusp.name === 12 ? 1 : cusp.name + 1;
+      const next = otherCusps.find((c) => c.name === nextid)!;
+
+      return {
+        ...cusp,
+        endAngle: next.angle,
+      };
+    });
+
+    return { main, other };
+  };
+
+  const calcKeyAngles = (chart: MultiChart) => {
+    const ascPos = chart.main.cusps[1].position;
+
+    const main = Object.entries(chart.main.keys).map(([_key, cusp]) => ({
       ...cusp,
-      angle: (cusp.position - ascPos + 360) % 360,
+      angle: round((cusp.position - ascPos + 360) % 360),
+    }));
+    const other = Object.entries(chart.other.keys).map(([_key, cusp]) => ({
+      ...cusp,
+      angle: round((cusp.position - ascPos + 360) % 360),
     }));
 
     return { main, other };
@@ -147,8 +189,8 @@ export const MultiWheelProvider = ({
     Object.entries(planets)
       .map(([_key, planet]) => ({
         ...planet,
-        angle: (planet.position - ascPos + 360) % 360,
-        glyphAngle: (planet.position - ascPos + 360) % 360,
+        angle: round((planet.position - ascPos + 360) % 360),
+        glyphAngle: round((planet.position - ascPos + 360) % 360),
       }))
       .sort((a, b) => a.angle - b.angle);
 
@@ -159,16 +201,18 @@ export const MultiWheelProvider = ({
       else {
         const prev = main[i - 1];
         const diff = ((planet.angle - prev.glyphAngle + 540) % 360) - 180;
-        const glyphAngle =
-          Math.abs(diff) <= 4.5 ? (prev.glyphAngle + 5.5) % 360 : planet.angle;
+        const glyphAngle = round(
+          Math.abs(diff) <= 4.5 ? (prev.glyphAngle + 5.5) % 360 : planet.angle,
+        );
         main.push({ ...planet, glyphAngle });
       }
     });
     planets.forEach((planet, i) => {
       const prev = i === 0 ? main[main.length - 1] : main[i - 1];
       const diff = ((planet.angle - prev.glyphAngle + 540) % 360) - 180;
-      const glyphAngle =
-        Math.abs(diff) <= 4.5 ? (prev.glyphAngle + 5.5) % 360 : planet.angle;
+      const glyphAngle = round(
+        Math.abs(diff) <= 4.5 ? (prev.glyphAngle + 5.5) % 360 : planet.angle,
+      );
       main[i] = { ...planet, glyphAngle };
     });
 
@@ -176,7 +220,7 @@ export const MultiWheelProvider = ({
   };
 
   const calcPlanetAngles = (chart: MultiChart) => {
-    const ascPos = chart.main.cusps["cusp1"].position;
+    const ascPos = chart.main.cusps[1].position;
 
     const rawMainPlanetAngles = calcInitialPlanetAngles(
       ascPos,
@@ -195,16 +239,14 @@ export const MultiWheelProvider = ({
   };
 
   const calcSignAngles = (chart: MultiChart) => {
-    const ascSign = chart.main.cusps["cusp1"].sign;
+    const ascSign = chart.main.cusps[1].sign;
 
     const ascIndex = ZodiacSigns.indexOf(ascSign);
 
-    const startAngleFirstSign = -chart.main.cusps["cusp1"].deg_in_sign;
+    const startAngleFirstSign = -chart.main.cusps[1].deg_in_sign;
     return ZodiacSigns.map((s, i) => {
       const offset = (i - ascIndex + 12) % 12;
-      const angle =
-        Math.round(((startAngleFirstSign + offset * 30 + 360) % 360) * 100) /
-        100;
+      const angle = round((startAngleFirstSign + offset * 30 + 360) % 360);
       const sign = s as ZodiacSign;
       return { sign, angle };
     });
@@ -220,101 +262,14 @@ export const MultiWheelProvider = ({
     setMainCuspAngles(mainCAngles);
     setOtherCuspAngles(otherCAngles);
 
+    const { main: mainKAngles, other: otherKAngles } = calcKeyAngles(chart);
+    setMainKeyAngles(mainKAngles);
+    setOtherKeyAngles(otherKAngles);
+
     setSignAngles(calcSignAngles(chart));
     setAspects(chart.aspects);
   }, [chart]);
 
-  const getPlanetsInSign = (sign: ZodiacSign): [Planet[], Planet[]] => {
-    const mainPlanets = mainPlanetAngles.filter((x) => x.sign === sign);
-    const otherPlanets = otherPlanetAngles.filter((x) => x.sign === sign);
-    return [mainPlanets, otherPlanets];
-  };
-
-  const computePlanets = (
-    planetAngles: PlanetAngle[],
-    cuspAngles: CuspAngle[],
-    house: string,
-  ) => {
-    const houseNum = parseInt(house);
-    const nextHouseNum = houseNum === 12 ? 1 : houseNum + 1;
-
-    const startCusp = cuspAngles.find(
-      (x) => x.name.replace("cusp", "") === String(houseNum),
-    );
-    const endCusp = cuspAngles.find(
-      (x) => x.name.replace("cusp", "") === String(nextHouseNum),
-    );
-
-    if (!startCusp || !endCusp) return [];
-
-    const start = startCusp.position;
-    const end = endCusp.position;
-
-    return planetAngles.filter((planet) => {
-      if (start < end) {
-        return planet.position >= start && planet.position < end;
-      } else {
-        return planet.position >= start || planet.position < end;
-      }
-    });
-  };
-
-  const getPlanetsInHouse = (
-    house: string,
-    owner: OwnerType = "main",
-  ): [Planet[], Planet[]] => {
-    const mainPlanets = computePlanets(
-      mainPlanetAngles,
-      owner === "main" ? mainCuspAngles : otherCuspAngles,
-      house,
-    );
-    const otherPlanets = computePlanets(
-      otherPlanetAngles,
-      owner === "main" ? mainCuspAngles : otherCuspAngles,
-      house,
-    );
-    return [mainPlanets, otherPlanets];
-  };
-
-  const getPlanetAspects = (planet: PlanetName, owner: OwnerType = "main") => {
-    return aspects
-      .filter((x) =>
-        owner === "main"
-          ? x.planet1.name === planet
-          : x.planet2.name === planet,
-      )
-      .filter(({ type, orb }) => orb <= settings.aspectOptions[type].minOrb)
-      .map((x) => {
-        if (x.planet1.name === planet) return x;
-        return { ...x, planet1: x.planet2, planet2: x.planet1 };
-      })
-      .sort((a, b) => a.orb - b.orb);
-  };
-
-  const getPlanet = (
-    planet: PlanetName,
-    owner: OwnerType = "main",
-  ): PlanetAngle => {
-    const angles = owner === "other" ? otherPlanetAngles : mainPlanetAngles;
-    return angles.find((x) => x.name === planet)!;
-  };
-
-  const getPlanetHouse = (
-    planet: PlanetName,
-    owner: OwnerType = "main",
-  ): number => {
-    const angles = owner === "other" ? otherPlanetAngles : mainPlanetAngles;
-    const cusps = owner === "other" ? otherCuspAngles : mainCuspAngles;
-
-    for (let house = 1; house <= 12; house++) {
-      const planetsInHouse = computePlanets(angles, cusps, String(house));
-      if (planetsInHouse.some((p) => p.name === planet)) {
-        return house;
-      }
-    }
-
-    throw new Error(`House not found for planet ${planet} (owner: ${owner})`);
-  };
   return (
     <MultiWheelContext.Provider
       value={{
@@ -324,14 +279,11 @@ export const MultiWheelProvider = ({
         otherPlanetAngles,
         mainCuspAngles,
         otherCuspAngles,
+        mainKeyAngles,
+        otherKeyAngles,
         signAngles,
         aspects,
         type,
-        getPlanetAspects,
-        getPlanetsInHouse,
-        getPlanetsInSign,
-        getPlanet,
-        getPlanetHouse,
       }}
     >
       {children}

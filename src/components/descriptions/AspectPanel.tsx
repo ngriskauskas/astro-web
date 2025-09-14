@@ -1,9 +1,32 @@
+import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
+import { useAspectDesc } from "../../hooks/useDescData";
+import { useWheel } from "../../hooks/useWheel";
 import { AspectData, type Aspect } from "../../types/aspect";
 import { PlanetsData } from "../../types/planet";
-import { BackButton, CloseButton, Section } from "./Helpers";
+import { BackButton, CloseButton, PlanetChip, Section } from "./Helpers";
 
 export const AspectPanel = ({ aspect }: { aspect: Aspect }) => {
   const aspectInfo = AspectData[aspect.type];
+  const { loading, aspectDesc } = useAspectDesc({
+    aspect: aspect.type,
+    planet1: aspect.planet1.name,
+    planet2: aspect.planet2.name,
+  });
+
+  const {
+    settings: { otherProfileId },
+    type,
+  } = useWheel();
+  const { profiles } = useBirthProfiles();
+
+  const otherProfileName =
+    otherProfileId && profiles
+      ? profiles.find((x) => x.id === otherProfileId)?.name
+      : type === "transit"
+        ? "Transit"
+        : "Other";
+  const isMulti = type === "transit" || type === "synastry";
+
   return (
     <div className="flex flex-col h-full">
       <div
@@ -34,6 +57,43 @@ export const AspectPanel = ({ aspect }: { aspect: Aspect }) => {
           <div className="p-2 bg-white border rounded shadow-sm text-sm mb-3">
             {aspectInfo.description}
           </div>
+        </Section>
+        <Section title="Details" loading={loading}>
+          <div className="mb-2">
+            <span className="font-small">Orb: </span>
+            {aspect.orb.toFixed(2)}°
+          </div>
+          {isMulti ? (
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <span className="text-gray-400 text-xs uppercase tracking-wide mb-1 text-center">
+                  {aspect.planet1Owner === "other"
+                    ? `${otherProfileName}'s`
+                    : "Yours"}
+                </span>
+                <PlanetChip planet={aspect.planet1.name} />
+              </div>
+              <div>
+                <span className="text-gray-400 text-xs uppercase tracking-wide mb-1 text-center">
+                  {aspect.planet1Owner === "main"
+                    ? `${otherProfileName}'s`
+                    : "Yours"}
+                </span>
+
+                <PlanetChip planet={aspect.planet2.name} />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-6">
+              <PlanetChip planet={aspect.planet1.name} />
+              <PlanetChip planet={aspect.planet2.name} />
+            </div>
+          )}
+          {aspectDesc && (
+            <div className="text-xs text-gray-600 mt-2 pl-2">
+              {aspectDesc.description}
+            </div>
+          )}
         </Section>
       </div>
     </div>

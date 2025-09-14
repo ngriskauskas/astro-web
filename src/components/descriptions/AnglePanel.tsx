@@ -1,7 +1,19 @@
-import { AngleData } from "../../types/cusp";
-import { BackButton, CloseButton, Section } from "./Helpers";
+import type { OwnerType } from "../../contexts/MultiWheelContext";
+import { useKeyAngleData } from "../../hooks/chart/useChartData";
+import { useKeyAngleDesc } from "../../hooks/useDescData";
+import { AngleData, type KeyType } from "../../types/cusp";
+import { BackButton, CloseButton, Section, SignChip } from "./Helpers";
 
-export const AnglePanel = ({ angle }: { angle: string }) => {
+export const AnglePanel = ({
+  angle,
+  owner,
+}: {
+  angle: KeyType;
+  owner?: OwnerType;
+}) => {
+  const { sign } = useKeyAngleData(angle, owner);
+
+  const { loading, keyAngleDesc } = useKeyAngleDesc({ sign, angle });
   const angleInfo = AngleData[angle];
 
   return (
@@ -19,6 +31,16 @@ export const AnglePanel = ({ angle }: { angle: string }) => {
           <div className="p-2 bg-white border rounded shadow-sm text-sm mb-3">
             {angleInfo.info.description}
           </div>
+        </Section>
+        <Section title="Details" loading={loading}>
+          <div className="w-fit">
+            <SignChip sign={sign} />
+          </div>
+          {keyAngleDesc && (
+            <div className="text-xs text-gray-600 mt-2 pl-2">
+              {keyAngleDesc.sign}
+            </div>
+          )}
         </Section>
       </div>
     </div>
