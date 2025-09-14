@@ -81,9 +81,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw new Error("Login failed");
     }
 
-    const { token } = await res.json();
+    const { token, refresh } = await res.json();
 
     localStorage.setItem("token", token);
+    localStorage.setItem("refresh", refresh);
     setToken(token);
   };
 
@@ -98,9 +99,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw new Error("OAuth login failed");
     }
 
-    const { token } = await res.json();
+    const { token, refresh } = await res.json();
 
     localStorage.setItem("token", token);
+    localStorage.setItem("refresh", refresh);
     setToken(token);
   };
 
