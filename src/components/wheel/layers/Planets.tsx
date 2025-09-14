@@ -6,6 +6,8 @@ import {
 import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { polarToCartesian } from "./Utils";
+import type { OwnerType } from "../../../contexts/MultiWheelContext";
+import { formatDegMin } from "../../../utils/funcs";
 
 export interface PlanetAngle extends Planet {
   angle: number;
@@ -19,7 +21,7 @@ interface PlanetProps {
   onLeavePlanet: () => void;
   hoverAspectedPlanets: PlanetName[];
   angles: PlanetAngle[];
-  owner?: "main" | "other";
+  owner?: OwnerType;
 }
 
 export const Planets = ({
@@ -64,8 +66,6 @@ export const Planets = ({
 
         const isAspected = hoverAspectedPlanets.includes(name);
         const planetInfo = PlanetsData[name];
-        const [deg, min] = deg_min;
-        const degLabel = `${Math.round(deg)}° ${Math.round(min)}′`;
         return (
           <g key={name}>
             <line
@@ -133,7 +133,7 @@ export const Planets = ({
                   fontFamily='"Segoe UI Symbol", "Noto Sans Symbols", sans-serif'
                   pointerEvents="none"
                 >
-                  {degLabel}
+                  {formatDegMin(deg_min)}
                 </text>
               )}
             </g>
