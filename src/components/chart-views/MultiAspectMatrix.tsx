@@ -30,11 +30,11 @@ export const MultiAspectMatrix = () => {
     <div className="overflow-x-auto">
       <div className="relative flex items-center">
         <div className="absolute -left-4 top-1/2 transform -translate-y-1/2 w-20 text-right font-semibold whitespace-nowrap rotate-[-90deg]">
-          {`${otherProfileName}'s Planets`}
+          {`${otherProfileName} Planets`}
         </div>
         <div className="ml-11">
           <div className="text-center font-semibold mb-1">
-            {`${mainProfileName}'s Planets`}
+            {`${mainProfileName} Planets`}
           </div>
           <table className="table-fixed border border-gray-300 rounded-lg shadow-md overflow-hidden text-center">
             <thead className="bg-gray-100 text-sm font-semibold">
