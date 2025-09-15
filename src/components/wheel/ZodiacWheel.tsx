@@ -5,7 +5,6 @@ import { Houses } from "./layers/Houses";
 import { Planets } from "./layers/Planets";
 import { Aspects } from "./layers/Aspects";
 import { useWheel } from "../../hooks/useWheel";
-import { ZodiacWheelSettings } from "./ZodiacWheelSettings";
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { type PlanetName } from "../../types/planet";
 
@@ -77,9 +76,6 @@ export const ZodiacWheel = () => {
             Loading...
           </div>
         )}
-      </div>
-      <div className="flex-[1] max-h-[600px] overflow-y-auto my-5">
-        <ZodiacWheelSettings />
       </div>
     </div>
   );

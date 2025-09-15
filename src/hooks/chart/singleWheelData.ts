@@ -1,6 +1,7 @@
 import type { CuspAngle } from "../../components/wheel/layers/Houses";
 import type { SignAngle } from "../../components/wheel/layers/Signs";
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
+import type { Aspect } from "../../types/aspect";
 import type { CuspType, KeyType } from "../../types/cusp";
 import type { Planet, PlanetName } from "../../types/planet";
 import type { ZodiacSign } from "../../types/zodiac";
@@ -132,4 +133,12 @@ export const getSignInKeyAngle = (
 ): ZodiacSign => {
   const angleObj = ctx.keyAngles.find((ka) => ka.name === keyAngle)!;
   return angleObj.sign;
+};
+
+export const getFilteredAspects = (ctx: SingleWheelContextType): Aspect[] => {
+  const aspectOptions = ctx.settings.aspectOptions;
+  return ctx.aspects.filter(
+    ({ type, orb }) =>
+      aspectOptions[type].show && aspectOptions[type].minOrb >= orb,
+  );
 };

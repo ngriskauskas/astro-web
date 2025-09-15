@@ -25,6 +25,7 @@ export const useWheelData = (owner?: OwnerType) => {
       getHousesInSign: (sign: ZodiacSign) => multi.getHousesInSign(ctx, sign),
       getSignInKeyAngle: (keyAngle: KeyType) =>
         multi.getSignInKeyAngle(ctx, keyAngle, owner),
+      getFilteredAspects: () => multi.getFilteredAspects(ctx),
     };
   } else {
     return {
@@ -42,6 +43,7 @@ export const useWheelData = (owner?: OwnerType) => {
       getHousesInSign: (sign: ZodiacSign) => single.getHousesInSign(ctx, sign),
       getSignInKeyAngle: (keyAngle: KeyType) =>
         single.getSignInKeyAngle(ctx, keyAngle),
+      getFilteredAspects: () => single.getFilteredAspects(ctx),
     };
   }
 };

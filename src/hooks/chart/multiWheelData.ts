@@ -206,3 +206,11 @@ export const getSignInKeyAngle = (
 
   return signAngle.sign;
 };
+
+export const getFilteredAspects = (ctx: MultiWheelContextType): Aspect[] => {
+  const aspectOptions = ctx.settings.aspectOptions;
+  return ctx.aspects.filter(
+    ({ type, orb }) =>
+      aspectOptions[type].show && aspectOptions[type].minOrb >= orb,
+  );
+};

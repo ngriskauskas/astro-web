@@ -128,8 +128,9 @@ export const OverviewCard = ({
   onClick?: () => void;
 }) => (
   <div
-    className={`flex flex-col items-center p-1 bg-white border rounded shadow-sm ${onClick ? "cursor-pointer hover:shadow-md" : ""
-      }`}
+    className={`flex flex-col items-center p-1 bg-white border rounded shadow-sm ${
+      onClick ? "cursor-pointer hover:shadow-md" : ""
+    }`}
     onClick={onClick}
   >
     <span className="text-gray-400 text-xs uppercase tracking-wide mb-1 text-center">
@@ -155,10 +156,15 @@ export const PlanetChip = ({
   owner?: OwnerType;
 }) => {
   const { open } = useDesc();
+  const color = PlanetsData[planet].color;
   return (
     <div
-      className="flex items-center gap-1 px-1 py-0.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md"
+      className="flex items-center gap-1 px-1.5 py-0.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md transition-all justify-center"
       onClick={() => open({ type: "planet", value: planet, owner })}
+      style={{
+        backgroundColor: `${color}11`, // color with low opacity
+        borderColor: `${color}55`,
+      }}
     >
       <span className="text-base">{PlanetsData[planet].glyph}</span>
       <span className="capitalize">{planet}</span>
@@ -195,12 +201,18 @@ export const PlanetGroup = ({
 export const SignChip = ({ sign }: { sign: ZodiacSign }) => {
   const { open } = useDesc();
   const signData = ZodiacData[sign];
+  const color = signData.color;
+
   return (
     <div
-      className="flex items-center gap-1 px-1 py-1 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md"
+      className="flex items-center gap-1 px-1.5 py-0.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md transition-all justify-center"
       onClick={() => open({ type: "sign", value: sign })}
+      style={{
+        backgroundColor: `${color}11`, // subtle pastel background
+        borderColor: `${color}55`, // faint colored border
+      }}
     >
-      <img src={signData.glyph} alt={sign} className="w-4 h-4" />
+      <img src={signData.glyph} alt={sign} className="w-4.5 h-6" />
       <span className="capitalize">{sign}</span>
     </div>
   );
@@ -259,10 +271,16 @@ export const HouseChip = ({
 }) => {
   const { open } = useDesc();
   const houseInfo = HouseData[house];
+  const color = houseInfo.color;
+
   return (
     <div
-      className="flex items-center gap-1 px-1 py-1 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md"
+      className="flex items-center gap-1 px-1 py-1.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md transition-all justify-center"
       onClick={() => open({ type: "house", value: house, owner })}
+      style={{
+        backgroundColor: `${color}11`,
+        borderColor: `${color}55`,
+      }}
     >
       <span className="font-xs">{houseInfo.name}</span>
     </div>

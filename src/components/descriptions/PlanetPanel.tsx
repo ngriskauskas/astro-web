@@ -13,6 +13,9 @@ import { usePlanetDesc } from "../../hooks/useDescData";
 import { usePlanetData } from "../../hooks/chart/useChartData";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
 import type { Aspect } from "../../types/aspect";
+import { formatDegMin } from "../../utils/funcs";
+import { useWheel } from "../../hooks/useWheel";
+import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
 
 export const PlanetPanel = ({
   planetName,
@@ -67,9 +70,7 @@ export const PlanetPanel = ({
             <DescSection title="Sign" desc={planetDesc?.sign ?? ""}>
               <SignChip sign={planet.sign} />
               <span className="text-gray-600 text-[13px] ml-1">
-                {`${Math.round(planet.deg_min[0])}° ${Math.round(
-                  planet.deg_min[1],
-                )}′`}
+                {formatDegMin(planet.deg_min)}
               </span>
             </DescSection>
             <DescSection title="House" desc={planetDesc?.house ?? ""}>
