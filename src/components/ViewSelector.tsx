@@ -4,8 +4,17 @@ import { ZodiacWheel } from "./wheel/ZodiacWheel";
 import { PlacementsTable } from "./chart-views/PlacementsTable";
 import { AspectMatrix } from "./chart-views/AspectMatrix";
 import { MultiAspectMatrix } from "./chart-views/MultiAspectMatrix";
+import { CurrentTimings } from "./chart-views/CurrentTimings";
 
-export const ViewSelector = ({ isMulti = false }: { isMulti?: boolean }) => {
+type PageType = "natal" | "time" | "transit" | "synastry";
+
+export const ViewSelector = ({
+  isMulti = false,
+  page,
+}: {
+  isMulti?: boolean;
+  page: PageType;
+}) => {
   const [view, setView] = useState("wheel");
 
   const renderView = () => {
@@ -16,6 +25,8 @@ export const ViewSelector = ({ isMulti = false }: { isMulti?: boolean }) => {
         return <PlacementsTable />;
       case "aspectMatrix":
         return isMulti ? <MultiAspectMatrix /> : <AspectMatrix />;
+      case "timings":
+        return <CurrentTimings />;
     }
   };
 
@@ -36,6 +47,7 @@ export const ViewSelector = ({ isMulti = false }: { isMulti?: boolean }) => {
         >
           <option value="wheel">Zodiac Wheel</option>
           {!isMulti && <option value="placements">Basic</option>}
+          {page === "time" && <option value="timings">Timings</option>}
           <option value="aspectMatrix">Aspect Matrix</option>
         </select>
       </div>
