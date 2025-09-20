@@ -53,7 +53,7 @@ export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
           <DateChip date={aspect.end_date} />
         </div>
         {ranges.length > 0 && (
-          <div className="flex gap-2 mt-1">
+          <div className="flex gap-2 mt-1 items-center">
             <span className="font-semibold w-[80px] shrink-0 text-xs text-gray-500">
               Exact Dates:
             </span>

@@ -31,13 +31,13 @@ export const ViewSelector = ({
   };
 
   return (
-    <div className="mt-5 flex flex-col items-center">
-      <div className="flex items-center mb-4 gap-2">
+    <div className="mt-5 flex flex-col">
+      <div className="flex items-center mb-4 gap-2 ml-8">
         <label
           htmlFor="chart-view"
           className="text-sm font-medium text-gray-700"
         >
-          Chart View:
+          View:
         </label>
         <select
           id="chart-view"
