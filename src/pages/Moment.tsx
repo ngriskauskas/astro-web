@@ -9,12 +9,16 @@ export const Moment = () => {
   const [searchParams] = useSearchParams();
   const dateParam = searchParams.get("date");
   const defaultTime = "23:59:00";
+  const zodiacSystemParam = searchParams.get("zodiac_system");
+  const ayanamsaParam = searchParams.get("ayanamsa");
 
   return (
     <SingleWheelProvider
       type="moment"
       initialDate={dateParam || undefined}
       initialTime={(dateParam && defaultTime) || undefined}
+      initialZodiacSystem={zodiacSystemParam || undefined}
+      initialAyanamsa={ayanamsaParam || undefined}
     >
       <DescProvider>
         <div className="flex mt-5">

@@ -1,24 +1,38 @@
 import type { RetrogradeTiming } from "../../../hooks/timings/getTimings";
-import { DateChip, PlanetChip } from "../../descriptions/Helpers";
+import { DateChip, PlanetChip, SectionSmall } from "../../descriptions/Helpers";
+import type { TimingEvent } from "../CurrentTimings";
 
-export const RetrogradeTimingCard = ({
-  retrograde,
-}: {
-  retrograde: RetrogradeTiming;
-}) => {
+export const RetrogradeTimingCard = ({ event }: { event: TimingEvent }) => {
+  const retrograde = event.data as RetrogradeTiming;
+
+  const eventLabel =
+    event.event === "start" ? "enters retrograde" : "leaves retrograde";
+
+  const dateToShow =
+    event.event === "start" ? retrograde.start_date : retrograde.end_date;
+
   return (
     <div className="rounded-xl border bg-white shadow-sm p-4">
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">
-        Retrograde
-      </h3>
-      <div className="mb-2 inline-block">
-        <PlanetChip planet={retrograde.planet} />
+      <div className="flex justify-between items-center mb-3">
+        <div className="flex items-center gap-2">
+          <PlanetChip planet={retrograde.planet} />
+          <span className="text-sm font-semibold tracking-wide text-gray-500">
+            {eventLabel}
+          </span>
+        </div>
+        <DateChip date={dateToShow} format />
       </div>
-      <div className="flex items-center gap-2">
-        <DateChip date={retrograde.start_date} />
-        <span className="text-gray-400">→</span>
-        <DateChip date={retrograde.end_date} />
-      </div>
+      <SectionSmall title="Dates" startOpen={false}>
+        <div className="flex items-center gap-2 text-sm mt-2">
+          <DateChip date={retrograde.start_date} />
+          <span>→</span>
+          <DateChip date={retrograde.end_date} />
+        </div>
+      </SectionSmall>
+      <div className="mb-2"></div>
+      <SectionSmall title="Description" startOpen={false}>
+        some words
+      </SectionSmall>
     </div>
   );
 };

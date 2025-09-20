@@ -13,6 +13,8 @@ import { useAuth } from "./AuthContext";
 import { type Aspect } from "../types/aspect";
 import type { Planet } from "../types/planet";
 import { getLocalISODate, getLocalISOTime } from "../utils/funcs";
+import type { ZodiacSystem } from "../types/zodiac-system";
+import type { Ayanamsa } from "../types/ayanamsa";
 
 export interface SingleWheelContextType {
   settings: ZodiacWheelOptions;
@@ -34,11 +36,15 @@ export const SingleWheelProvider = ({
   type,
   initialDate,
   initialTime,
+  initialZodiacSystem,
+  initialAyanamsa,
 }: {
   children: ReactNode;
   type: "natal" | "time" | "moment";
   initialDate?: string;
   initialTime?: string;
+  initialZodiacSystem: string;
+  initialAyanamsa: string;
 }) => {
   const { user } = useAuth();
   const [chart, setChart] = useState<SingleChart | undefined>();
@@ -52,9 +58,9 @@ export const SingleWheelProvider = ({
 
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
     profileId: mainProfile?.id,
-    zodiacSystem: "tropical",
+    zodiacSystem: (initialZodiacSystem as ZodiacSystem) || "tropical",
     houseSystem: "placidus",
-    ayanamsa: "lahiri",
+    ayanamsa: (initialAyanamsa as Ayanamsa) || "lahiri",
     aspectOptions: {
       conjunction: { show: true, minOrb: 6 },
       opposition: { show: true, minOrb: 6 },

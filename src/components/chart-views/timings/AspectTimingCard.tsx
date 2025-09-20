@@ -1,95 +1,98 @@
-import { Link } from "react-router-dom";
 import type { AspectTiming } from "../../../hooks/timings/getTimings";
-import { AspectChip, DateChip } from "../../descriptions/Helpers";
+import {
+  AspectChip,
+  DateChip,
+  Section,
+  SectionSmall,
+} from "../../descriptions/Helpers";
 
 import { useState } from "react";
 
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
+import type { TimingEvent } from "../CurrentTimings";
 
-export const AspectTimingCard = ({ aspect }: { aspect: AspectTiming }) => {
+export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
+  const aspect = event.data as AspectTiming;
   const [expanded, setExpanded] = useState(false);
 
   const ranges = aspect.exact_date_ranges || [];
   const hasMultipleRanges = ranges.length > 1;
   const displayedRanges = expanded ? ranges : ranges.slice(0, 1);
 
-  return (
-    <div className="rounded-xl border bg-white shadow-sm p-2 ">
-      {/* Header */}
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-3">
-        Aspect
-      </h3>
-      {/* Columns */}
-      <div className="flex flex-row justify-between mr-1">
-        {/* Left: AspectChip */}
-        <div>
-          <div className="inline-block">
-            <AspectChip
-              aspect={{
-                type: aspect.aspect_type,
-                planet1: aspect.planet1,
-                planet2: aspect.planet2,
-              }}
-            />
-          </div>
-        </div>
+  const eventLabel =
+    event.event === "start"
+      ? "starts"
+      : event.event === "end"
+        ? "ends"
+        : "exact";
 
-        {/* Right: Dates */}
-        <div className="w-[180px] flex-shrink-0 flex flex-col gap-2 text-xs">
-          {/* Start / End */}
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-1">
-              <DateChip date={aspect.start_date} />
-              <span>→</span>
-              <DateChip date={aspect.end_date} />
+  const dateToShow =
+    event.event === "start"
+      ? aspect.start_date
+      : event.event === "end"
+        ? aspect.end_date
+        : event.date;
+
+  return (
+    <div className="rounded-xl border bg-white shadow-sm p-4 space-y-2">
+      <div className="flex justify-between items-center mb-3">
+        <div className="flex items-center gap-2">
+          <AspectChip
+            aspect={{
+              type: aspect.aspect_type,
+              planet1: aspect.planet1,
+              planet2: aspect.planet2,
+            }}
+          />
+          <span className="text-sm font-semibold tracking-wide text-gray-500">
+            {eventLabel}
+          </span>
+        </div>
+        <DateChip date={dateToShow} format />
+      </div>
+      <SectionSmall title="Dates" startOpen={false}>
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <span className="font-semibold w-[80px]">Date Range:</span>
+          <DateChip date={aspect.start_date} />
+          <span>→</span>
+          <DateChip date={aspect.end_date} />
+        </div>
+        {ranges.length > 0 && (
+          <div className="flex gap-2 mt-1">
+            <span className="font-semibold w-[80px] shrink-0 text-xs text-gray-500">
+              Exact Dates:
+            </span>
+            <div className="flex flex-wrap gap-2 flex-1 text-xs text-gray-500">
+              {displayedRanges.map(([start, end], i) =>
+                start === end ? (
+                  <DateChip key={i} date={start} />
+                ) : (
+                  <div key={i} className="flex items-center gap-2">
+                    <DateChip date={start} />
+                    <span>→</span>
+                    <DateChip date={end} />
+                  </div>
+                ),
+              )}
             </div>
-          </div>
-          {/* Exact Dates */}
-          {ranges.length > 0 && (
-            <div className="flex flex-col gap-1 mt-2">
+            {hasMultipleRanges && (
               <button
                 onClick={() => setExpanded(!expanded)}
-                className={`flex items-center justify-between w-full text-left ${
-                  hasMultipleRanges ? "cursor-pointer " : ""
-                }`}
+                className="flex items-center gap-1 text-gray-500 text-xs cursor-pointer"
               >
-                <span className="font-semibold text-gray-500 text-xs">
-                  Exact Dates
-                </span>
-                {hasMultipleRanges && (
-                  <span>
-                    {expanded ? (
-                      <FiChevronUp size={14} />
-                    ) : (
-                      <FiChevronDown size={14} />
-                    )}
-                  </span>
+                {expanded ? (
+                  <FiChevronUp size={16} />
+                ) : (
+                  <FiChevronDown size={16} />
                 )}
               </button>
-
-              <div
-                className={`flex flex-wrap gap-2 transition-all duration-200 ${
-                  expanded ? "max-h-full" : "max-h-[2.5rem] "
-                }`}
-              >
-                {displayedRanges.map(([start, end], i) =>
-                  start === end ? (
-                    <div key={i} className="flex items-center gap-1">
-                      <DateChip date={start} />
-                    </div>
-                  ) : (
-                    <div key={i} className="flex items-center gap-1">
-                      <DateChip date={start} />
-                      <span>→</span>
-                      <DateChip date={end} />
-                    </div>
-                  ),
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+            )}
+          </div>
+        )}
+      </SectionSmall>
+      <SectionSmall title="Description" startOpen={false}>
+        some words
+      </SectionSmall>
     </div>
   );
 };

@@ -14,6 +14,7 @@ import { AspectData, type AspectDisplay } from "../../types/aspect";
 import { HouseData, type CuspType } from "../../types/cusp";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
 import { Link } from "react-router-dom";
+import { useWheel } from "../../hooks/useWheel";
 
 const Spinner = () => (
   <div className="flex justify-center items-center py-3">
@@ -50,6 +51,34 @@ export const Section = ({
             {children}
           </div>
         ))}
+    </div>
+  );
+};
+
+export const SectionSmall = ({
+  title,
+  children,
+  startOpen = true,
+}: {
+  title: string;
+  children: React.ReactNode;
+  startOpen?: boolean;
+}) => {
+  const [isOpen, setIsOpen] = useState(startOpen);
+  return (
+    <div className="rounded-md border border-gray-200 shadow-xs bg-gray-50">
+      <div
+        className="flex items-center justify-between p-2 cursor-pointer"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <h3 className="text-sm font-medium text-gray-600">{title}</h3>
+        {isOpen ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
+      </div>
+      {isOpen && (
+        <div className="p-2 text-sm text-gray-800 leading-relaxed">
+          {children}
+        </div>
+      )}
     </div>
   );
 };
@@ -209,8 +238,8 @@ export const SignChip = ({ sign }: { sign: ZodiacSign }) => {
       className="flex items-center gap-1 px-1.5 py-0.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md transition-all justify-center"
       onClick={() => open({ type: "sign", value: sign })}
       style={{
-        backgroundColor: `${color}11`, // subtle pastel background
-        borderColor: `${color}55`, // faint colored border
+        backgroundColor: `${color}11`,
+        borderColor: `${color}55`,
       }}
     >
       <img src={signData.glyph} alt={sign} className="w-4.5 h-6" />
@@ -243,11 +272,15 @@ export const SignGroup = ({
 
 export const AspectChip = ({ aspect }: { aspect: AspectDisplay }) => {
   const { open } = useDesc();
-
+  const color = AspectData[aspect.type].color;
   return (
     <div
       className="flex items-center gap-1 px-1 py-0.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md"
       onClick={() => open({ type: "aspect", value: aspect })}
+      style={{
+        backgroundColor: `${color}11`,
+        borderColor: `${color}55`,
+      }}
     >
       <span className="text-base">{PlanetsData[aspect.planet1].glyph}</span>
       <span className="capitalize">{aspect.planet1}</span>
@@ -286,15 +319,32 @@ export const HouseChip = ({
   );
 };
 
-export const DateChip = ({ date }: { date: string }) => {
+export const DateChip = ({
+  date,
+  format = false,
+}: {
+  date: string;
+  format?: boolean;
+}) => {
+  const {
+    settings: { zodiacSystem, ayanamsa },
+  } = useWheel();
   const urlDate = encodeURIComponent(date);
-
+  const urlZodiac = encodeURIComponent(zodiacSystem);
+  const urlAyanamsa = encodeURIComponent(ayanamsa || "");
+  const displayDate = format
+    ? new Date(`${date}T00:00`).toLocaleDateString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+      })
+    : date;
   return (
     <Link
-      to={`/moment?date=${urlDate}`}
+      to={`/moment?date=${urlDate}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`}
       className="inline-flex items-center gap-1 px-2 py-1 bg-white border rounded shadow-sm text-xs font-medium hover:shadow-md hover:bg-gray-50"
     >
-      <span className="font-medium">{date}</span>
+      <span className="font-medium text-gray-600">{displayDate}</span>
     </Link>
   );
 };

@@ -59,7 +59,6 @@ export const CurrentTimings = () => {
     { date: r.end_date, event: "end", data: r, type: "retrograde" },
   ]);
 
-  // combine all events
   const allEvents: TimingEvent[] = [
     ...aspectEvents,
     ...ingressEvents,
@@ -69,24 +68,31 @@ export const CurrentTimings = () => {
   const today = new Date(getLocalISODate());
   const oneWeekAgo = new Date(today);
   oneWeekAgo.setDate(today.getDate() - 7);
-
+  const oneYearAgo = new Date(today);
+  oneYearAgo.setDate(today.getDate() - 365);
   const oneWeekAhead = new Date(today);
   oneWeekAhead.setDate(today.getDate() + 7);
 
   const pastEvents = allEvents
     .filter((e) => {
       const d = new Date(e.date);
-      return d >= oneWeekAgo && d < today;
+      return d >= oneYearAgo && d < today;
     })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  const todayEvents = allEvents
-    .filter((e) => isToday(e.date))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
+  const todayEvents = allEvents.filter((e) => isToday(e.date));
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const tomorrowEvents = allEvents.filter((e) => {
+    const d = new Date(e.date);
+    return d.toDateString() === tomorrow.toDateString();
+  });
   const upcomingEvents = allEvents
     .filter((e) => {
       const d = new Date(e.date);
-      return d > today && d <= oneWeekAhead;
+      return d > tomorrow && d <= oneWeekAhead;
     })
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -96,6 +102,15 @@ export const CurrentTimings = () => {
         <CollapsibleSection title="Today" defaultOpen={true}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {todayEvents.map((event, i) => (
+              <EventCard event={event} key={i} />
+            ))}
+          </div>
+        </CollapsibleSection>
+      )}
+      {tomorrowEvents.length > 0 && (
+        <CollapsibleSection title="Tomorrow" defaultOpen={true}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {tomorrowEvents.map((event, i) => (
               <EventCard event={event} key={i} />
             ))}
           </div>
@@ -126,20 +141,23 @@ export const CurrentTimings = () => {
 };
 
 const EventCard = ({ event }: { event: TimingEvent }) => {
-  switch (event.type) {
-    case "aspect":
-      return <AspectTimingCard aspect={event.data as AspectTiming} />;
-    case "ingress":
-      return <IngressTimingCard ingress={event.data as IngressTiming} />;
-    case "retrograde":
-      return (
-        <RetrogradeTimingCard retrograde={event.data as RetrogradeTiming} />
-      );
-    default:
-      return null;
-  }
+  return (
+    <div className="h-auto self-start">
+      {(() => {
+        switch (event.type) {
+          case "aspect":
+            return <AspectTimingCard event={event} />;
+          case "ingress":
+            return <IngressTimingCard ingress={event.data as IngressTiming} />;
+          case "retrograde":
+            return <RetrogradeTimingCard event={event} />;
+          default:
+            return null;
+        }
+      })()}
+    </div>
+  );
 };
-
 const CollapsibleSection = ({
   title,
   children,
