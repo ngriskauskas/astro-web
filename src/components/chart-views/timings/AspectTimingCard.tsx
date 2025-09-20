@@ -1,10 +1,5 @@
 import type { AspectTiming } from "../../../hooks/timings/getTimings";
-import {
-  AspectChip,
-  DateChip,
-  Section,
-  SectionSmall,
-} from "../../descriptions/Helpers";
+import { AspectChip, DateChip, SectionSmall } from "../../descriptions/Helpers";
 
 import { useState } from "react";
 

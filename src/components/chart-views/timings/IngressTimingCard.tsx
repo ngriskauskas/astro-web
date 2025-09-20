@@ -9,7 +9,7 @@ import {
 export const IngressTimingCard = ({ ingress }: { ingress: IngressTiming }) => {
   return (
     <div className="rounded-xl border bg-white shadow-sm p-4">
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between items-start mb-3">
         <div className="flex items-center gap-3">
           <PlanetChip planet={ingress.planet} />
           <span className="text-gray-500 text-sm tracking-wide font-semibold">

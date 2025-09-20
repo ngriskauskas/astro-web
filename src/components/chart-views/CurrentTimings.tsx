@@ -68,15 +68,14 @@ export const CurrentTimings = () => {
   const today = new Date(getLocalISODate());
   const oneWeekAgo = new Date(today);
   oneWeekAgo.setDate(today.getDate() - 7);
-  const oneYearAgo = new Date(today);
-  oneYearAgo.setDate(today.getDate() - 365);
+
   const oneWeekAhead = new Date(today);
   oneWeekAhead.setDate(today.getDate() + 7);
 
   const pastEvents = allEvents
     .filter((e) => {
       const d = new Date(e.date);
-      return d >= oneYearAgo && d < today;
+      return d >= oneWeekAgo && d < today;
     })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
