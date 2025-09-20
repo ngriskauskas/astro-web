@@ -43,8 +43,8 @@ export const SingleWheelProvider = ({
   type: "natal" | "time" | "moment";
   initialDate?: string;
   initialTime?: string;
-  initialZodiacSystem: string;
-  initialAyanamsa: string;
+  initialZodiacSystem?: string;
+  initialAyanamsa?: string;
 }) => {
   const { user } = useAuth();
   const [chart, setChart] = useState<SingleChart | undefined>();
