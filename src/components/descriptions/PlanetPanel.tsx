@@ -14,8 +14,6 @@ import { usePlanetData } from "../../hooks/chart/useChartData";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
 import type { Aspect } from "../../types/aspect";
 import { formatDegMin } from "../../utils/funcs";
-import { useWheel } from "../../hooks/useWheel";
-import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
 
 export const PlanetPanel = ({
   planetName,
@@ -85,7 +83,15 @@ export const PlanetPanel = ({
             ) : (
               aspects.map((aspect: Aspect, index: number) => (
                 <div className="self-start" key={index}>
-                  <AspectChip aspect={aspect} />
+                  <AspectChip
+                    aspect={{
+                      type: aspect.type,
+                      orb: aspect.orb,
+                      planet1: aspect.planet1.name,
+                      planet2: aspect.planet2.name,
+                      planet1Owner: aspect.planet1Owner,
+                    }}
+                  />
                 </div>
               ))
             )}

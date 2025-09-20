@@ -1,16 +1,16 @@
 import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
 import { useAspectDesc } from "../../hooks/useDescData";
 import { useWheel } from "../../hooks/useWheel";
-import { AspectData, type Aspect } from "../../types/aspect";
+import { AspectData, type AspectDisplay } from "../../types/aspect";
 import { PlanetsData } from "../../types/planet";
 import { BackButton, CloseButton, PlanetChip, Section } from "./Helpers";
 
-export const AspectPanel = ({ aspect }: { aspect: Aspect }) => {
+export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
   const aspectInfo = AspectData[aspect.type];
   const { loading, aspectDesc } = useAspectDesc({
     aspect: aspect.type,
-    planet1: aspect.planet1.name,
-    planet2: aspect.planet2.name,
+    planet1: aspect.planet1,
+    planet2: aspect.planet2,
   });
 
   const {
@@ -35,16 +35,12 @@ export const AspectPanel = ({ aspect }: { aspect: Aspect }) => {
       >
         <BackButton />
         <h2 className="text-xl font-semibold capitalize flex items-center gap-2">
-          <span className="text-xl">
-            {PlanetsData[aspect.planet1.name].glyph}
-          </span>
-          <span className="capitalize">{aspect.planet1.name}</span>
+          <span className="text-xl">{PlanetsData[aspect.planet1].glyph}</span>
+          <span className="capitalize">{aspect.planet1}</span>
           <span className="text-xl">{aspectInfo.glyph}</span>
-          <span className="text-xl">
-            {PlanetsData[aspect.planet2.name].glyph}
-          </span>
+          <span className="text-xl">{PlanetsData[aspect.planet2].glyph}</span>
 
-          <span className="capitalize">{aspect.planet2.name}</span>
+          <span className="capitalize">{aspect.planet2}</span>
         </h2>
         <CloseButton />
       </div>
@@ -59,10 +55,12 @@ export const AspectPanel = ({ aspect }: { aspect: Aspect }) => {
           </div>
         </Section>
         <Section title="Details" loading={loading}>
-          <div className="mb-2">
-            <span className="font-small">Orb: </span>
-            {aspect.orb.toFixed(2)}°
-          </div>
+          {aspect.orb && (
+            <div className="mb-2">
+              <span className="font-small">Orb: </span>
+              {aspect.orb.toFixed(2)}°
+            </div>
+          )}
           {isMulti ? (
             <div className="grid grid-cols-2 gap-6">
               <div>
@@ -71,7 +69,7 @@ export const AspectPanel = ({ aspect }: { aspect: Aspect }) => {
                     ? `${otherProfileName}'s`
                     : "Yours"}
                 </span>
-                <PlanetChip planet={aspect.planet1.name} />
+                <PlanetChip planet={aspect.planet1} />
               </div>
               <div>
                 <span className="text-gray-400 text-xs uppercase tracking-wide mb-1 text-center">
@@ -80,13 +78,13 @@ export const AspectPanel = ({ aspect }: { aspect: Aspect }) => {
                     : "Yours"}
                 </span>
 
-                <PlanetChip planet={aspect.planet2.name} />
+                <PlanetChip planet={aspect.planet2} />
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-6">
-              <PlanetChip planet={aspect.planet1.name} />
-              <PlanetChip planet={aspect.planet2.name} />
+              <PlanetChip planet={aspect.planet1} />
+              <PlanetChip planet={aspect.planet2} />
             </div>
           )}
           {aspectDesc && (

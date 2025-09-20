@@ -11,7 +11,8 @@ import { type SignAngle } from "../components/wheel/layers/Signs";
 import { useAuth } from "./AuthContext";
 import { ZodiacSigns, type ZodiacSign } from "../types/zodiac";
 import { type Aspect } from "../types/aspect";
-import type { Planet, PlanetName } from "../types/planet";
+import type { Planet } from "../types/planet";
+import { getLocalISODate, getLocalISOTime } from "../utils/funcs";
 
 export type OwnerType = "main" | "other";
 
@@ -53,7 +54,6 @@ export const MultiWheelProvider = ({
   const [otherKeyAngles, setOtherKeyAngles] = useState<KeyAngleAngle[]>([]);
   const [aspects, setAspects] = useState<Aspect[]>([]);
 
-  const now = new Date();
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
     profileId: mainProfile?.id,
     otherProfileId: type === "synastry" ? profiles[0].id : undefined,
@@ -79,13 +79,8 @@ export const MultiWheelProvider = ({
       type === "synastry"
         ? undefined
         : {
-            date:
-              now.getFullYear() +
-              "-" +
-              String(now.getMonth() + 1).padStart(2, "0") +
-              "-" +
-              String(now.getDate()).padStart(2, "0"),
-            time: now.toTimeString().slice(0, 8),
+            date: getLocalISODate(),
+            time: getLocalISOTime(),
           },
   });
 

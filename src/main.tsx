@@ -20,6 +20,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ProtectedCharts } from "./components/ProtectedCharts.tsx";
 import { ProtectedUserLocation } from "./components/ProtectedUserLocation.tsx";
 import { DescProvider } from "./contexts/DescContext.tsx";
+import { Moment } from "./pages/Moment.tsx";
 
 const clientid = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 createRoot(document.getElementById("root")!).render(
@@ -34,9 +35,7 @@ createRoot(document.getElementById("root")!).render(
                 <ProtectedRoute>
                   <BirthProfilesProvider>
                     <ChartProvider>
-                      <DescProvider>
-                        <App />
-                      </DescProvider>
+                      <App />
                     </ChartProvider>
                   </BirthProfilesProvider>
                 </ProtectedRoute>
@@ -54,6 +53,15 @@ createRoot(document.getElementById("root")!).render(
                     </ProtectedUserLocation>
                   }
                 />
+                <Route
+                  path="moment"
+                  element={
+                    <ProtectedUserLocation>
+                      <Moment />
+                    </ProtectedUserLocation>
+                  }
+                />
+
                 <Route path="charts" element={<Charts />} />
                 <Route path="synastry" element={<Synastry />} />
                 <Route

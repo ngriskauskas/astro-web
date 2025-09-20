@@ -1,26 +1,21 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { ZodiacSign } from "../types/zodiac";
-import { type Aspect } from "../types/aspect";
-import { type Planet, type PlanetName } from "../types/planet";
-import type { Cusp, CuspType } from "../types/cusp";
+import { type Aspect, type AspectDisplay } from "../types/aspect";
+import { type PlanetName } from "../types/planet";
+import type { CuspType } from "../types/cusp";
+import type { OwnerType } from "./MultiWheelContext";
 
 type ActiveType = "planet" | "house" | "sign" | "aspect" | "angle";
 
 interface Active {
   type: ActiveType;
-  value: PlanetName | ZodiacSign | CuspType | Aspect;
-  owner?: "main" | "other";
-}
-
-interface Params {
-  type: ActiveType;
-  value: PlanetName | ZodiacSign | CuspType | Aspect;
-  owner?: "main" | "other";
+  value: PlanetName | ZodiacSign | CuspType | AspectDisplay;
+  owner?: OwnerType;
 }
 
 interface DesContextType {
   active: Active | null;
-  open: (params: Params) => void;
+  open: (params: Active) => void;
   close: () => void;
   goBack: () => void;
 }
@@ -31,7 +26,7 @@ export const DescProvider = ({ children }: { children: ReactNode }) => {
   const [active, setActive] = useState<Active | null>(null);
   const [_, setHistory] = useState<Active[]>([]);
 
-  const open = ({ type, value, owner }: Params) => {
+  const open = ({ type, value, owner }: Active) => {
     if (active) {
       setHistory((prev) => [...prev, active]);
     }

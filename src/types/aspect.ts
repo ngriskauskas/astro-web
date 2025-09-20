@@ -1,5 +1,5 @@
 import type { OwnerType } from "../contexts/MultiWheelContext";
-import { type Planet } from "./planet";
+import { type Planet, type PlanetName } from "./planet";
 
 export interface Aspect {
   type: AspectType;
@@ -8,7 +8,14 @@ export interface Aspect {
   planet1: Planet;
   planet1Owner?: OwnerType;
   planet2: Planet;
-  plaer2Owner?: OwnerType;
+}
+
+export interface AspectDisplay {
+  type: AspectType;
+  orb?: number;
+  planet1: PlanetName;
+  planet2: PlanetName;
+  planet1Owner?: OwnerType;
 }
 
 export type AspectType =

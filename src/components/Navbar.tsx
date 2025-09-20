@@ -24,6 +24,10 @@ export const Navbar = () => {
         <Link to="/current-time" className="text-gray-700 hover:text-gray-900">
           Now
         </Link>
+        <Link to="/moment" className="text-gray-700 hover:text-gray-900">
+          Moment
+        </Link>
+
         <Link to="/transits" className="text-gray-700 hover:text-gray-900">
           Transits
         </Link>

@@ -10,9 +10,10 @@ import type { ZodiacSign } from "../../types/zodiac";
 import { ZodiacData } from "../../types/zodiac";
 import { PlanetsData, type PlanetName } from "../../types/planet";
 import { useState } from "react";
-import { AspectData, type Aspect } from "../../types/aspect";
+import { AspectData, type AspectDisplay } from "../../types/aspect";
 import { HouseData, type CuspType } from "../../types/cusp";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
+import { Link } from "react-router-dom";
 
 const Spinner = () => (
   <div className="flex justify-center items-center py-3">
@@ -240,7 +241,7 @@ export const SignGroup = ({
   </div>
 );
 
-export const AspectChip = ({ aspect }: { aspect: Aspect }) => {
+export const AspectChip = ({ aspect }: { aspect: AspectDisplay }) => {
   const { open } = useDesc();
 
   return (
@@ -248,16 +249,14 @@ export const AspectChip = ({ aspect }: { aspect: Aspect }) => {
       className="flex items-center gap-1 px-1 py-0.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md"
       onClick={() => open({ type: "aspect", value: aspect })}
     >
-      <span className="text-base">
-        {PlanetsData[aspect.planet1.name].glyph}
-      </span>
-      <span className="capitalize">{aspect.planet1.name}</span>
+      <span className="text-base">{PlanetsData[aspect.planet1].glyph}</span>
+      <span className="capitalize">{aspect.planet1}</span>
       <span className="text-base">{AspectData[aspect.type].glyph}</span>
-      <span className="text-base">
-        {PlanetsData[aspect.planet2.name].glyph}
-      </span>
-      <span className="capitalize">{aspect.planet2.name}</span>
-      <span className="text-gray-500 text-[10px] ml-1">{aspect.orb}°</span>
+      <span className="text-base">{PlanetsData[aspect.planet2].glyph}</span>
+      <span className="capitalize">{aspect.planet2}</span>
+      {aspect.orb && (
+        <span className="text-gray-500 text-[10px] ml-1">{aspect.orb}°</span>
+      )}
     </div>
   );
 };
@@ -284,5 +283,18 @@ export const HouseChip = ({
     >
       <span className="font-xs">{houseInfo.name}</span>
     </div>
+  );
+};
+
+export const DateChip = ({ date }: { date: string }) => {
+  const urlDate = encodeURIComponent(date);
+
+  return (
+    <Link
+      to={`/moment?date=${urlDate}`}
+      className="inline-flex items-center gap-1 px-2 py-1 bg-white border rounded shadow-sm text-xs font-medium hover:shadow-md hover:bg-gray-50"
+    >
+      <span className="font-medium">{date}</span>
+    </Link>
   );
 };

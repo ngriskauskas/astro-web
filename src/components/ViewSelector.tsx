@@ -6,7 +6,7 @@ import { AspectMatrix } from "./chart-views/AspectMatrix";
 import { MultiAspectMatrix } from "./chart-views/MultiAspectMatrix";
 import { CurrentTimings } from "./chart-views/CurrentTimings";
 
-type PageType = "natal" | "time" | "transit" | "synastry";
+type PageType = "natal" | "time" | "transit" | "synastry" | "moment";
 
 export const ViewSelector = ({
   isMulti = false,
