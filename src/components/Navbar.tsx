@@ -18,17 +18,17 @@ export const Navbar = () => {
         <div className="text-xl font-bold text-gray-800 mr-15">
           <Link to="/">Astro</Link>
         </div>
-        <Link to="/charts" className="text-gray-700 hover:text-gray-900">
+        <Link to="/natal" className="text-gray-700 hover:text-gray-900">
           Charts
         </Link>
-        <Link to="/current-time" className="text-gray-700 hover:text-gray-900">
+        <Link to="/time" className="text-gray-700 hover:text-gray-900">
           Now
         </Link>
         <Link to="/moment" className="text-gray-700 hover:text-gray-900">
           Moment
         </Link>
 
-        <Link to="/transits" className="text-gray-700 hover:text-gray-900">
+        <Link to="/transit" className="text-gray-700 hover:text-gray-900">
           Transits
         </Link>
         <Link to="/synastry" className="text-gray-700 hover:text-gray-900">

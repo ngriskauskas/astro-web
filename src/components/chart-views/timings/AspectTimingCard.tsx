@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import type { TimingEvent } from "../CurrentTimings";
+import { useWheel } from "../../../hooks/useWheel";
 
 export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
   const aspect = event.data as AspectTiming;
@@ -28,6 +29,7 @@ export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
         ? aspect.end_date
         : event.date;
 
+  const { type } = useWheel();
   return (
     <div className="rounded-xl border bg-white shadow-sm p-4 space-y-2">
       <div className="flex justify-between items-center mb-3">
@@ -37,6 +39,7 @@ export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
               type: aspect.aspect_type,
               planet1: aspect.planet1,
               planet2: aspect.planet2,
+              planet1Owner: type === "transit" ? "main" : undefined,
             }}
           />
           <span className="text-sm font-semibold tracking-wide text-gray-500">

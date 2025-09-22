@@ -15,6 +15,7 @@ import type { Planet } from "../types/planet";
 import { getLocalISODate, getLocalISOTime } from "../utils/funcs";
 import type { ZodiacSystem } from "../types/zodiac-system";
 import type { Ayanamsa } from "../types/ayanamsa";
+import { useSearchParams } from "react-router-dom";
 
 export interface SingleWheelContextType {
   settings: ZodiacWheelOptions;
@@ -34,18 +35,11 @@ export const SingleWheelContext = createContext<
 export const SingleWheelProvider = ({
   children,
   type,
-  initialDate,
-  initialTime,
-  initialZodiacSystem,
-  initialAyanamsa,
 }: {
   children: ReactNode;
   type: "natal" | "time" | "moment";
-  initialDate?: string;
-  initialTime?: string;
-  initialZodiacSystem?: string;
-  initialAyanamsa?: string;
 }) => {
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const [chart, setChart] = useState<SingleChart | undefined>();
   const { getNatalChart, getCurrentChart } = useCharts();
@@ -58,9 +52,9 @@ export const SingleWheelProvider = ({
 
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
     profileId: mainProfile?.id,
-    zodiacSystem: (initialZodiacSystem as ZodiacSystem) || "tropical",
+    zodiacSystem: "tropical",
     houseSystem: "placidus",
-    ayanamsa: (initialAyanamsa as Ayanamsa) || "lahiri",
+    ayanamsa: "lahiri",
     aspectOptions: {
       conjunction: { show: true, minOrb: 6 },
       opposition: { show: true, minOrb: 6 },
@@ -80,8 +74,8 @@ export const SingleWheelProvider = ({
       type !== "moment"
         ? undefined
         : {
-            date: initialDate || getLocalISODate(),
-            time: initialTime || getLocalISOTime(),
+            date: getLocalISODate(),
+            time: getLocalISOTime(),
           },
   });
 
@@ -121,6 +115,25 @@ export const SingleWheelProvider = ({
     });
     setChart(data);
   };
+  useEffect(() => {
+    const dateParam = searchParams.get("date");
+    const timeParam = "23:59:00";
+    const zodiacParam = searchParams.get("zodiac_system");
+    const ayanamsaParam = searchParams.get("ayanamsa");
+
+    setSettings((prev) => ({
+      ...prev,
+      datetimeOptions: {
+        date: dateParam || prev.datetimeOptions?.date || getLocalISODate(),
+        time:
+          (dateParam && timeParam) ||
+          prev.datetimeOptions?.time ||
+          getLocalISOTime(),
+      },
+      zodiacSystem: (zodiacParam as ZodiacSystem) || prev.zodiacSystem,
+      ayanamsa: (ayanamsaParam as Ayanamsa) || prev.ayanamsa,
+    }));
+  }, [searchParams]);
 
   useEffect(() => {
     let interval: number;

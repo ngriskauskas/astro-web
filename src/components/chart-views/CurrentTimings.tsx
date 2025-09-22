@@ -1,15 +1,15 @@
 import { useState, type ReactNode } from "react";
 import {
+  convertToEvents,
   useCurrentTimings,
   type AspectTiming,
   type IngressTiming,
   type RetrogradeTiming,
-} from "../../hooks/timings/getTimings";
+} from "../../hooks/timings/useTimings";
 import { AspectTimingCard } from "./timings/AspectTimingCard";
 import { IngressTimingCard } from "./timings/IngressTimingCard";
 import { RetrogradeTimingCard } from "./timings/RetrogradeTimingCard";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
-import { getLocalISODate } from "../../utils/funcs";
 
 export interface TimingEvent {
   date: string;
@@ -18,82 +18,13 @@ export interface TimingEvent {
   data: AspectTiming | RetrogradeTiming | IngressTiming;
 }
 
-const isToday = (d: string | Date) => {
-  const today = new Date(getLocalISODate());
-  const date = new Date(d);
-  return (
-    date.getFullYear() === today.getFullYear() &&
-    date.getMonth() === today.getMonth() &&
-    date.getDate() === today.getDate()
-  );
-};
-
 export const CurrentTimings = () => {
-  const {
-    loading,
-    timings: { aspects, ingresses, retrogrades },
-  } = useCurrentTimings();
+  const { loading, timings } = useCurrentTimings();
 
   if (loading) return <div>Loading...</div>;
 
-  const aspectEvents: TimingEvent[] = aspects.flatMap((a) => [
-    { date: a.start_date, event: "start", data: a, type: "aspect" },
-    { date: a.end_date, event: "end", data: a, type: "aspect" },
-    ...a.exact_date_ranges.map(([start]) => ({
-      date: start,
-      event: "exact",
-      data: a,
-      type: "aspect",
-    })),
-  ]) as TimingEvent[];
-
-  const ingressEvents: TimingEvent[] = ingresses.map((i) => ({
-    date: i.date,
-    event: "exact",
-    data: i,
-    type: "ingress",
-  }));
-
-  const retrogradeEvents: TimingEvent[] = retrogrades.flatMap((r) => [
-    { date: r.start_date, event: "start", data: r, type: "retrograde" },
-    { date: r.end_date, event: "end", data: r, type: "retrograde" },
-  ]);
-
-  const allEvents: TimingEvent[] = [
-    ...aspectEvents,
-    ...ingressEvents,
-    ...retrogradeEvents,
-  ];
-
-  const today = new Date(getLocalISODate());
-  const oneWeekAgo = new Date(today);
-  oneWeekAgo.setDate(today.getDate() - 7);
-
-  const oneWeekAhead = new Date(today);
-  oneWeekAhead.setDate(today.getDate() + 7);
-
-  const pastEvents = allEvents
-    .filter((e) => {
-      const d = new Date(e.date);
-      return d >= oneWeekAgo && d < today;
-    })
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-  const todayEvents = allEvents.filter((e) => isToday(e.date));
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-
-  const tomorrowEvents = allEvents.filter((e) => {
-    const d = new Date(e.date);
-    return d.toDateString() === tomorrow.toDateString();
-  });
-  const upcomingEvents = allEvents
-    .filter((e) => {
-      const d = new Date(e.date);
-      return d > tomorrow && d <= oneWeekAhead;
-    })
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const { todayEvents, upcomingEvents, pastEvents, tomorrowEvents } =
+    convertToEvents(timings);
 
   return (
     <div className="space-y-8 ml-4 pb-4">

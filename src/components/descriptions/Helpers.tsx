@@ -328,6 +328,7 @@ export const DateChip = ({
 }) => {
   const {
     settings: { zodiacSystem, ayanamsa },
+    type,
   } = useWheel();
   const urlDate = encodeURIComponent(date);
   const urlZodiac = encodeURIComponent(zodiacSystem);
@@ -339,9 +340,14 @@ export const DateChip = ({
         day: "numeric",
       })
     : date;
+
+  const toLink =
+    type === "time"
+      ? `/moment?date=${urlDate}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`
+      : `/transit?date=${urlDate}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`;
   return (
     <Link
-      to={`/moment?date=${urlDate}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`}
+      to={toLink}
       className="inline-flex items-center gap-1 px-2 py-1 bg-white border rounded shadow-sm text-xs font-medium hover:shadow-md hover:bg-gray-50"
     >
       <span className="font-medium text-gray-600">{displayDate}</span>

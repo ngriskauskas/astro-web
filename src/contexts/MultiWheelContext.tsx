@@ -13,6 +13,9 @@ import { ZodiacSigns, type ZodiacSign } from "../types/zodiac";
 import { type Aspect } from "../types/aspect";
 import type { Planet } from "../types/planet";
 import { getLocalISODate, getLocalISOTime } from "../utils/funcs";
+import type { ZodiacSystem } from "../types/zodiac-system";
+import type { Ayanamsa } from "../types/ayanamsa";
+import { useSearchParams } from "react-router-dom";
 
 export type OwnerType = "main" | "other";
 
@@ -41,6 +44,7 @@ export const MultiWheelProvider = ({
   children: ReactNode;
   type: "synastry" | "transit";
 }) => {
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const [chart, setChart] = useState<MultiChart | undefined>();
   const { getSynastryChart, getTransitChart } = useCharts();
@@ -109,6 +113,26 @@ export const MultiWheelProvider = ({
     });
     setChart(data);
   };
+
+  useEffect(() => {
+    const dateParam = searchParams.get("date");
+    const timeParam = "23:59:00";
+    const zodiacParam = searchParams.get("zodiac_system");
+    const ayanamsaParam = searchParams.get("ayanamsa");
+
+    setSettings((prev) => ({
+      ...prev,
+      datetimeOptions: {
+        date: dateParam || prev.datetimeOptions?.date || getLocalISODate(),
+        time:
+          (dateParam && timeParam) ||
+          prev.datetimeOptions?.time ||
+          getLocalISOTime(),
+      },
+      zodiacSystem: (zodiacParam as ZodiacSystem) || prev.zodiacSystem,
+      ayanamsa: (ayanamsaParam as Ayanamsa) || prev.ayanamsa,
+    }));
+  }, [searchParams]);
 
   useEffect(() => {
     if (type === "synastry") fetchSynastryChart();
