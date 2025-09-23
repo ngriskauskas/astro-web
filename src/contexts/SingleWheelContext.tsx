@@ -12,6 +12,10 @@ import { type SignAngle } from "../components/wheel/layers/Signs";
 import { useAuth } from "./AuthContext";
 import { type Aspect } from "../types/aspect";
 import type { Planet } from "../types/planet";
+import { getLocalISODate, getLocalISOTime } from "../utils/funcs";
+import type { ZodiacSystem } from "../types/zodiac-system";
+import type { Ayanamsa } from "../types/ayanamsa";
+import { useSearchParams } from "react-router-dom";
 
 export interface SingleWheelContextType {
   settings: ZodiacWheelOptions;
@@ -21,7 +25,7 @@ export interface SingleWheelContextType {
   signAngles: SignAngle[];
   keyAngles: KeyAngleAngle[];
   aspects: Aspect[];
-  type: "natal" | "time";
+  type: "natal" | "time" | "moment";
 }
 
 export const SingleWheelContext = createContext<
@@ -33,8 +37,9 @@ export const SingleWheelProvider = ({
   type,
 }: {
   children: ReactNode;
-  type: "natal" | "time";
+  type: "natal" | "time" | "moment";
 }) => {
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const [chart, setChart] = useState<SingleChart | undefined>();
   const { getNatalChart, getCurrentChart } = useCharts();
@@ -79,17 +84,24 @@ export const SingleWheelProvider = ({
   };
 
   const fetchCurrentChart = async () => {
-    const now = new Date();
-    const localISODate =
-      now.getFullYear() +
-      "-" +
-      String(now.getMonth() + 1).padStart(2, "0") +
-      "-" +
-      String(now.getDate()).padStart(2, "0");
     const data = await getCurrentChart({
       location: { lon: user!.longitude, lat: user!.latitude },
-      time: now.toTimeString().slice(0, 8),
-      date: localISODate,
+      time: getLocalISOTime(),
+      date: getLocalISODate(),
+      zodiac_system: settings.zodiacSystem,
+      house_system: settings.houseSystem,
+      ayanamsa:
+        settings.zodiacSystem === "sidereal" ? settings.ayanamsa : undefined,
+    });
+    setChart(data);
+  };
+
+  const fetchMomentChart = async () => {
+    if (!settings.datetimeOptions) return;
+    const data = await getCurrentChart({
+      location: { lon: user!.longitude, lat: user!.latitude },
+      time: settings.datetimeOptions?.time,
+      date: settings.datetimeOptions?.date,
       zodiac_system: settings.zodiacSystem,
       house_system: settings.houseSystem,
       ayanamsa:
@@ -99,8 +111,31 @@ export const SingleWheelProvider = ({
   };
 
   useEffect(() => {
+    if (type !== "moment") return;
+
+    const dateParam = searchParams.get("date");
+    const timeParam = "23:59:00";
+    const zodiacParam = searchParams.get("zodiac_system");
+    const ayanamsaParam = searchParams.get("ayanamsa");
+
+    setSettings((prev) => ({
+      ...prev,
+      datetimeOptions: {
+        date: dateParam || prev.datetimeOptions?.date || getLocalISODate(),
+        time:
+          (dateParam && timeParam) ||
+          prev.datetimeOptions?.time ||
+          getLocalISOTime(),
+      },
+      zodiacSystem: (zodiacParam as ZodiacSystem) || prev.zodiacSystem,
+      ayanamsa: (ayanamsaParam as Ayanamsa) || prev.ayanamsa,
+    }));
+  }, [searchParams]);
+
+  useEffect(() => {
     let interval: number;
     if (type === "natal") fetchNatalChart();
+    else if (type === "moment") fetchMomentChart();
     else if (type === "time") {
       fetchCurrentChart();
       interval = setInterval(() => {
@@ -116,6 +151,7 @@ export const SingleWheelProvider = ({
     settings.ayanamsa,
     settings.houseSystem,
     settings.zodiacSystem,
+    settings.datetimeOptions,
   ]);
 
   const round = (num: number): number => {

@@ -84,9 +84,9 @@ export const ZodiacWheelSettings = () => {
     str.charAt(0).toUpperCase() + str.slice(1);
 
   return (
-    <div className="space-y-6 p-6 bg-white rounded-xl shadow-md text-xs">
+    <div className="space-y-6 p-3 bg-white rounded-xl shadow-md text-xs border border-gray-400">
       {/* Profile selector */}
-      {type !== "time" && profiles && (
+      {type !== "time" && type !== "moment" && profiles && (
         <div>
           <div className="flex flex-col">
             <label className="font-medium text-gray-700 mb-1">Profile</label>

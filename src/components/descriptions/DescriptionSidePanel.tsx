@@ -5,9 +5,9 @@ import { SignPanel } from "./SignPanel";
 import { AspectPanel } from "./AspectPanel";
 import { HousePanel } from "./HousePanel";
 import { type PlanetName } from "../../types/planet";
-import { type Aspect } from "../../types/aspect";
+import { type Aspect, type AspectDisplay } from "../../types/aspect";
 import { AnglePanel } from "./AnglePanel";
-import type { CuspType } from "../../types/cusp";
+import type { CuspType, KeyType } from "../../types/cusp";
 
 export const DescriptionSidePanel = () => {
   const { active } = useDesc();
@@ -26,7 +26,7 @@ export const DescriptionSidePanel = () => {
       case "sign":
         return <SignPanel sign={active.value as ZodiacSign} />;
       case "aspect":
-        return <AspectPanel aspect={active.value as Aspect} />;
+        return <AspectPanel aspect={active.value as AspectDisplay} />;
       case "house":
         return (
           <HousePanel
@@ -35,7 +35,7 @@ export const DescriptionSidePanel = () => {
           />
         );
       case "angle":
-        return <AnglePanel angle={active.value as string} />;
+        return <AnglePanel angle={active.value as KeyType} />;
       default:
         return null;
     }
