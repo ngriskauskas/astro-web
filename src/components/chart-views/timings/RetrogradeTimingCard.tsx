@@ -1,9 +1,17 @@
 import type { RetrogradeTiming } from "../../../hooks/timings/useTimings";
 import { DateChip, PlanetChip, SectionSmall } from "../../descriptions/Helpers";
 import type { TimingEvent } from "../CurrentTimings";
+import { useState } from "react";
+import { useRetrogradeDesc } from "../../../hooks/useDescData";
 
 export const RetrogradeTimingCard = ({ event }: { event: TimingEvent }) => {
   const retrograde = event.data as RetrogradeTiming;
+  const [descOpen, setDescOpen] = useState(false);
+
+  const { loading, retrogradeDesc } = useRetrogradeDesc(
+    { planet: retrograde.planet },
+    descOpen,
+  );
 
   const eventLabel =
     event.event === "start" ? "enters retrograde" : "leaves retrograde";
@@ -30,8 +38,13 @@ export const RetrogradeTimingCard = ({ event }: { event: TimingEvent }) => {
         </div>
       </SectionSmall>
       <div className="mb-2"></div>
-      <SectionSmall title="Description" startOpen={false}>
-        some words
+      <SectionSmall
+        title="Description"
+        startOpen={false}
+        loading={loading}
+        onOpen={() => setDescOpen(true)}
+      >
+        {!loading && retrogradeDesc?.description}
       </SectionSmall>
     </div>
   );

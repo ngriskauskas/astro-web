@@ -1,12 +1,21 @@
-import type { IngressTiming } from "../../../hooks/timings/getTimings";
+import type { IngressTiming } from "../../../hooks/timings/useTimings";
 import {
   DateChip,
   PlanetChip,
   SectionSmall,
   SignChip,
 } from "../../descriptions/Helpers";
+import { useState } from "react";
+import { useIngressDesc } from "../../../hooks/useDescData";
 
 export const IngressTimingCard = ({ ingress }: { ingress: IngressTiming }) => {
+  const [descOpen, setDescOpen] = useState(false);
+
+  const { loading, ingressDesc } = useIngressDesc(
+    { planet: ingress.planet, sign: ingress.sign },
+    descOpen,
+  );
+
   return (
     <div className="rounded-xl border bg-white shadow-sm p-4">
       <div className="flex justify-between items-start mb-3">
@@ -19,8 +28,13 @@ export const IngressTimingCard = ({ ingress }: { ingress: IngressTiming }) => {
         </div>
         <DateChip date={ingress.date} format />
       </div>
-      <SectionSmall title="Description" startOpen={false}>
-        some words
+      <SectionSmall
+        title="Description"
+        startOpen={false}
+        loading={loading}
+        onOpen={() => setDescOpen(true)}
+      >
+        {!loading && ingressDesc?.description}
       </SectionSmall>
     </div>
   );

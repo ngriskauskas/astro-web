@@ -6,6 +6,7 @@ import { apiFetch } from "../utils/api";
 import type { SignAngle } from "../components/wheel/layers/Signs";
 import { useWheel } from "./useWheel";
 import type { AspectType } from "../types/aspect";
+import type { ZodiacSystem } from "../types/zodiac-system";
 
 type signDescriptions = Partial<Record<ZodiacSign, string>>;
 type planetDescriptions = Partial<Record<PlanetName, string>>;
@@ -21,59 +22,6 @@ interface PlanetDescParams {
   planet: Planet;
   sign: ZodiacSign;
   house: CuspType;
-}
-
-export interface HouseDesc {
-  signs: signDescriptions;
-  planets?: planetDescriptions;
-  mainPlanets?: planetDescriptions;
-  otherPlanets?: planetDescriptions;
-}
-
-interface HouseDescParams {
-  house: Cusp;
-  signs: SignAngle[];
-  planets?: Planet[];
-  mainPlanets?: Planet[];
-  otherPlanets?: Planet[];
-}
-
-export interface SignDesc {
-  houses?: houseDescriptions;
-  mainHouses?: houseDescriptions;
-  otherHouses?: houseDescriptions;
-  planets?: planetDescriptions;
-  mainPlanets?: planetDescriptions;
-  otherPlanets?: planetDescriptions;
-}
-
-interface SignDescParams {
-  sign: ZodiacSign;
-  houses?: Cusp[];
-  mainHouses?: Cusp[];
-  otherHouses?: Cusp[];
-  planets?: Planet[];
-  mainPlanets?: Planet[];
-  otherPlanets?: Planet[];
-}
-
-export interface AspectDesc {
-  description: string;
-}
-
-interface AspectDescParams {
-  aspect: AspectType;
-  planet1: PlanetName;
-  planet2: PlanetName;
-}
-
-export interface KeyAngleDesc {
-  sign: string;
-}
-
-interface KeyAngleDescParams {
-  sign: ZodiacSign;
-  angle: KeyType;
 }
 
 export const usePlanetDesc = (params: PlanetDescParams) => {
@@ -98,6 +46,21 @@ export const usePlanetDesc = (params: PlanetDescParams) => {
 
   return { loading, planetDesc };
 };
+
+export interface HouseDesc {
+  signs: signDescriptions;
+  planets?: planetDescriptions;
+  mainPlanets?: planetDescriptions;
+  otherPlanets?: planetDescriptions;
+}
+
+interface HouseDescParams {
+  house: Cusp;
+  signs: SignAngle[];
+  planets?: Planet[];
+  mainPlanets?: Planet[];
+  otherPlanets?: Planet[];
+}
 
 export const useHouseDesc = (params: HouseDescParams) => {
   const [loading, setLoading] = useState(true);
@@ -128,6 +91,25 @@ export const useHouseDesc = (params: HouseDescParams) => {
 
   return { loading, houseDesc };
 };
+
+export interface SignDesc {
+  houses?: houseDescriptions;
+  mainHouses?: houseDescriptions;
+  otherHouses?: houseDescriptions;
+  planets?: planetDescriptions;
+  mainPlanets?: planetDescriptions;
+  otherPlanets?: planetDescriptions;
+}
+
+interface SignDescParams {
+  sign: ZodiacSign;
+  houses?: Cusp[];
+  mainHouses?: Cusp[];
+  otherHouses?: Cusp[];
+  planets?: Planet[];
+  mainPlanets?: Planet[];
+  otherPlanets?: Planet[];
+}
 
 export const useSignDesc = (params: SignDescParams) => {
   const [loading, setLoading] = useState(true);
@@ -161,6 +143,16 @@ export const useSignDesc = (params: SignDescParams) => {
   return { loading, signDesc };
 };
 
+export interface AspectDesc {
+  description: string;
+}
+
+interface AspectDescParams {
+  aspect: AspectType;
+  planet1: PlanetName;
+  planet2: PlanetName;
+}
+
 export const useAspectDesc = (
   params: AspectDescParams,
   enabled: boolean = true,
@@ -188,6 +180,50 @@ export const useAspectDesc = (
   return { loading, aspectDesc };
 };
 
+export interface RetrogradeDesc {
+  description: string;
+}
+
+interface RetrogradeDescParams {
+  planet: PlanetName;
+}
+
+export const useRetrogradeDesc = (
+  params: RetrogradeDescParams,
+  enabled: boolean = true,
+) => {
+  const [loading, setLoading] = useState(true);
+  const [retrogradeDesc, setRetrogradeDesc] = useState<RetrogradeDesc>();
+
+  const { type } = useWheel();
+
+  useEffect(() => {
+    if (!enabled) return;
+    const fetchDesc = async () => {
+      setLoading(true);
+      const data = await apiFetch("/descriptions/retrograde", {
+        method: "POST",
+        body: JSON.stringify({ ...params, type }),
+      });
+      setRetrogradeDesc(data);
+      setLoading(false);
+    };
+
+    fetchDesc();
+  }, [params.planet, type, enabled]);
+
+  return { loading, retrogradeDesc };
+};
+
+export interface KeyAngleDesc {
+  sign: string;
+}
+
+interface KeyAngleDescParams {
+  sign: ZodiacSign;
+  angle: KeyType;
+}
+
 export const useKeyAngleDesc = (params: KeyAngleDescParams) => {
   const [loading, setLoading] = useState(true);
   const [keyAngleDesc, setKeyAngleDesc] = useState<KeyAngleDesc>();
@@ -209,4 +245,41 @@ export const useKeyAngleDesc = (params: KeyAngleDescParams) => {
   }, [params.angle, params.sign, type]);
 
   return { loading, keyAngleDesc };
+};
+
+export interface IngressDesc {
+  description: string;
+}
+
+interface IngressDescParams {
+  planet: PlanetName;
+  sign: ZodiacSign;
+}
+
+export const useIngressDesc = (
+  params: IngressDescParams,
+  enabled: boolean = true,
+) => {
+  const [loading, setLoading] = useState(true);
+  const [ingressDesc, setIngressDesc] = useState<IngressDesc>();
+
+  const { type } = useWheel();
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    const fetchDesc = async () => {
+      setLoading(true);
+      const data = await apiFetch("/descriptions/ingress", {
+        method: "POST",
+        body: JSON.stringify({ ...params, type }),
+      });
+      setIngressDesc(data);
+      setLoading(false);
+    };
+
+    fetchDesc();
+  }, [params.planet, params.sign, type, enabled]);
+
+  return { loading, ingressDesc };
 };
