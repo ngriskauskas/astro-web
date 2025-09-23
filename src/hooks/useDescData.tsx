@@ -161,13 +161,17 @@ export const useSignDesc = (params: SignDescParams) => {
   return { loading, signDesc };
 };
 
-export const useAspectDesc = (params: AspectDescParams) => {
+export const useAspectDesc = (
+  params: AspectDescParams,
+  enabled: boolean = true,
+) => {
   const [loading, setLoading] = useState(true);
   const [aspectDesc, setAspectDesc] = useState<AspectDesc>();
 
   const { type } = useWheel();
 
   useEffect(() => {
+    if (!enabled) return;
     const fetchDesc = async () => {
       setLoading(true);
       const data = await apiFetch("/descriptions/aspect", {
@@ -179,7 +183,7 @@ export const useAspectDesc = (params: AspectDescParams) => {
     };
 
     fetchDesc();
-  }, [params.aspect, type]);
+  }, [params.aspect, type, enabled]);
 
   return { loading, aspectDesc };
 };

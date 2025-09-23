@@ -1,4 +1,4 @@
-import type { AspectTiming } from "../../../hooks/timings/getTimings";
+import type { AspectTiming } from "../../../hooks/timings/useTimings";
 import { AspectChip, DateChip, SectionSmall } from "../../descriptions/Helpers";
 
 import { useState } from "react";
@@ -6,14 +6,25 @@ import { useState } from "react";
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import type { TimingEvent } from "../CurrentTimings";
 import { useWheel } from "../../../hooks/useWheel";
+import { useAspectDesc } from "../../../hooks/useDescData";
 
 export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
   const aspect = event.data as AspectTiming;
   const [expanded, setExpanded] = useState(false);
+  const [descOpen, setDescOpen] = useState(false);
 
   const ranges = aspect.exact_date_ranges || [];
   const hasMultipleRanges = ranges.length > 1;
   const displayedRanges = expanded ? ranges : ranges.slice(0, 1);
+
+  const { loading, aspectDesc } = useAspectDesc(
+    {
+      aspect: aspect.aspect_type,
+      planet1: aspect.planet1,
+      planet2: aspect.planet2,
+    },
+    descOpen,
+  );
 
   const eventLabel =
     event.event === "start"
@@ -30,6 +41,7 @@ export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
         : event.date;
 
   const { type } = useWheel();
+
   return (
     <div className="rounded-xl border bg-white shadow-sm p-4 space-y-2">
       <div className="flex justify-between items-center mb-3">
@@ -88,8 +100,13 @@ export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
           </div>
         )}
       </SectionSmall>
-      <SectionSmall title="Description" startOpen={false}>
-        some words
+      <SectionSmall
+        title="Description"
+        startOpen={false}
+        loading={loading}
+        onOpen={() => setDescOpen(true)}
+      >
+        {!loading && aspectDesc?.description}
       </SectionSmall>
     </div>
   );

@@ -1,4 +1,4 @@
-import type { RetrogradeTiming } from "../../../hooks/timings/getTimings";
+import type { RetrogradeTiming } from "../../../hooks/timings/useTimings";
 import { DateChip, PlanetChip, SectionSmall } from "../../descriptions/Helpers";
 import type { TimingEvent } from "../CurrentTimings";
 

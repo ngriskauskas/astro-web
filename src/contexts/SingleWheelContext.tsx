@@ -70,13 +70,6 @@ export const SingleWheelProvider = ({
       angleLabels: true,
       tickMarks: true,
     },
-    datetimeOptions:
-      type !== "moment"
-        ? undefined
-        : {
-            date: getLocalISODate(),
-            time: getLocalISOTime(),
-          },
   });
 
   const fetchNatalChart = async () => {
@@ -104,10 +97,11 @@ export const SingleWheelProvider = ({
   };
 
   const fetchMomentChart = async () => {
+    if (!settings.datetimeOptions) return;
     const data = await getCurrentChart({
       location: { lon: user!.longitude, lat: user!.latitude },
-      time: settings.datetimeOptions?.time || getLocalISOTime(),
-      date: settings.datetimeOptions?.date || getLocalISODate(),
+      time: settings.datetimeOptions?.time,
+      date: settings.datetimeOptions?.date,
       zodiac_system: settings.zodiacSystem,
       house_system: settings.houseSystem,
       ayanamsa:
@@ -115,7 +109,10 @@ export const SingleWheelProvider = ({
     });
     setChart(data);
   };
+
   useEffect(() => {
+    if (type !== "moment") return;
+
     const dateParam = searchParams.get("date");
     const timeParam = "23:59:00";
     const zodiacParam = searchParams.get("zodiac_system");
