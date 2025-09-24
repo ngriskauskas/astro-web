@@ -6,7 +6,6 @@ import { apiFetch } from "../utils/api";
 import type { SignAngle } from "../components/wheel/layers/Signs";
 import { useWheel } from "./useWheel";
 import type { AspectType } from "../types/aspect";
-import type { ZodiacSystem } from "../types/zodiac-system";
 
 type signDescriptions = Partial<Record<ZodiacSign, string>>;
 type planetDescriptions = Partial<Record<PlanetName, string>>;
@@ -35,7 +34,10 @@ export const usePlanetDesc = (params: PlanetDescParams) => {
       setLoading(true);
       const data = await apiFetch("/descriptions/planet", {
         method: "POST",
-        body: JSON.stringify({ ...params, type }),
+        body: JSON.stringify({
+          ...params,
+          type: type === "moment" ? "time" : type,
+        }),
       });
       setPlanetDesc(data);
       setLoading(false);

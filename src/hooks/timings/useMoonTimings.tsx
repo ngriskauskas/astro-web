@@ -18,32 +18,24 @@ export interface AspectTiming {
   exact_date_ranges: ExactDateRange[];
 }
 
-export interface RetrogradeTiming {
-  planet: PlanetName;
-  start_date: string;
-  end_date: string;
-}
-
 export interface IngressTiming {
-  planet: PlanetName;
   sign: ZodiacSign;
   date: string;
 }
 
 export interface CurrentTimingsType {
-  retrogrades: RetrogradeTiming[];
   ingresses: IngressTiming[];
-  aspects: AspectTiming[];
+  //aspects: AspectTiming[];
 }
 
 export interface TimingEvent {
   date: string;
   event: "start" | "end" | "exact";
   type: "aspect" | "ingress" | "retrograde";
-  data: AspectTiming | RetrogradeTiming | IngressTiming;
+  data: AspectTiming | IngressTiming;
 }
 
-export const useCurrentTimings = () => {
+export const useMoonTimings = () => {
   const {
     settings: { zodiacSystem, ayanamsa, profileId },
     type,
@@ -52,9 +44,7 @@ export const useCurrentTimings = () => {
   const { user } = useAuth();
 
   const [timings, setTimings] = useState<CurrentTimingsType>({
-    retrogrades: [],
     ingresses: [],
-    aspects: [],
   });
   const [loading, setLoading] = useState(false);
 
@@ -62,7 +52,7 @@ export const useCurrentTimings = () => {
     const fetchTimings = async () => {
       setLoading(true);
       try {
-        const res = await apiFetch("/timing/current", {
+        const res = await apiFetch("/timing/current-moon", {
           method: "POST",
           body: JSON.stringify({
             date: getLocalISODate(),
@@ -75,7 +65,7 @@ export const useCurrentTimings = () => {
         setTimings(res);
       } catch (err) {
         console.error("Failed to fetch timings", err);
-        setTimings({ retrogrades: [], ingresses: [], aspects: [] });
+        setTimings({ ingresses: [] });
       } finally {
         setLoading(false);
       }
@@ -83,7 +73,7 @@ export const useCurrentTimings = () => {
     const fetchTransitTimings = async () => {
       setLoading(true);
       try {
-        const res = await apiFetch("/timing/transit", {
+        const res = await apiFetch("/timing/current-moon", {
           method: "POST",
           body: JSON.stringify({
             date: getLocalISODate(),
@@ -95,7 +85,7 @@ export const useCurrentTimings = () => {
         setTimings(res);
       } catch (err) {
         console.error("Failed to fetch timings", err);
-        setTimings({ retrogrades: [], ingresses: [], aspects: [] });
+        setTimings({ ingresses: [] });
       } finally {
         setLoading(false);
       }
@@ -118,22 +108,7 @@ const isToday = (d: string | Date) => {
   );
 };
 
-export const convertToEvents = ({
-  aspects,
-  ingresses = [],
-  retrogrades = [],
-}: CurrentTimingsType) => {
-  const aspectEvents: TimingEvent[] = aspects.flatMap((a) => [
-    { date: a.start_date, event: "start", data: a, type: "aspect" },
-    { date: a.end_date, event: "end", data: a, type: "aspect" },
-    ...a.exact_date_ranges.map(([start]) => ({
-      date: start,
-      event: "exact",
-      data: a,
-      type: "aspect",
-    })),
-  ]) as TimingEvent[];
-
+export const convertToEvents = ({ ingresses = [] }: CurrentTimingsType) => {
   const ingressEvents: TimingEvent[] = ingresses.map((i) => ({
     date: i.date,
     event: "exact",
@@ -141,16 +116,7 @@ export const convertToEvents = ({
     type: "ingress",
   }));
 
-  const retrogradeEvents: TimingEvent[] = retrogrades.flatMap((r) => [
-    { date: r.start_date, event: "start", data: r, type: "retrograde" },
-    { date: r.end_date, event: "end", data: r, type: "retrograde" },
-  ]);
-
-  const allEvents: TimingEvent[] = [
-    ...aspectEvents,
-    ...ingressEvents,
-    ...retrogradeEvents,
-  ];
+  const allEvents: TimingEvent[] = [...ingressEvents];
 
   const today = new Date(getLocalISODate());
   const oneWeekAgo = new Date(today);
