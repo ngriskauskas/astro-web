@@ -16,6 +16,7 @@ export interface User {
   address: string;
   longitude: number;
   latitude: number;
+  timezone: string;
 }
 
 interface AuthContextType {

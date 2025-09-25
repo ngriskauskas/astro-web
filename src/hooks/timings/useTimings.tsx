@@ -5,6 +5,7 @@ import { getLocalISODate } from "../../utils/funcs";
 import type { PlanetName } from "../../types/planet";
 import type { AspectType } from "../../types/aspect";
 import type { ZodiacSign } from "../../types/zodiac";
+import { useAuth } from "../../contexts/AuthContext";
 
 type ExactDateRange = [string, string];
 
@@ -48,6 +49,8 @@ export const useCurrentTimings = () => {
     type,
   } = useWheel();
 
+  const { user } = useAuth();
+
   const [timings, setTimings] = useState<CurrentTimingsType>({
     retrogrades: [],
     ingresses: [],
@@ -65,6 +68,7 @@ export const useCurrentTimings = () => {
             date: getLocalISODate(),
             zodiac_system: zodiacSystem,
             ayanamsa: zodiacSystem === "tropical" ? null : ayanamsa,
+            timezone: user?.timezone,
           }),
         });
 
@@ -84,6 +88,7 @@ export const useCurrentTimings = () => {
           body: JSON.stringify({
             date: getLocalISODate(),
             birth_profile_id: profileId,
+            timezone: user?.timezone,
           }),
         });
 
@@ -95,9 +100,10 @@ export const useCurrentTimings = () => {
         setLoading(false);
       }
     };
+    if (!user) return;
     if (type === "time") fetchTimings();
     else if (type === "transit") fetchTransitTimings();
-  }, [zodiacSystem, ayanamsa, profileId]);
+  }, [zodiacSystem, ayanamsa, profileId, user]);
 
   return { timings, loading };
 };

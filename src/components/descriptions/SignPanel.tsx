@@ -11,8 +11,6 @@ import {
 } from "./Helpers";
 import { type ZodiacSign } from "../../types/zodiac";
 import { useDesc } from "../../contexts/DescContext";
-import { useWheel } from "../../hooks/useWheel";
-import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
 import { useSignData } from "../../hooks/chart/useChartData";
 import { useSignDesc } from "../../hooks/useDescData";
 import { useProfileNames } from "../../hooks/chart/getNames";

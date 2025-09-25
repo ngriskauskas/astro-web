@@ -5,9 +5,11 @@ import { SignPanel } from "./SignPanel";
 import { AspectPanel } from "./AspectPanel";
 import { HousePanel } from "./HousePanel";
 import { type PlanetName } from "../../types/planet";
-import { type Aspect, type AspectDisplay } from "../../types/aspect";
+import { type AspectDisplay } from "../../types/aspect";
 import { AnglePanel } from "./AnglePanel";
 import type { CuspType, KeyType } from "../../types/cusp";
+import { MoonPhasePanel } from "./MoonPhasePanel";
+import type { MoonPhaseTiming } from "../../hooks/timings/useMoonTimings";
 
 export const DescriptionSidePanel = () => {
   const { active } = useDesc();
@@ -36,6 +38,8 @@ export const DescriptionSidePanel = () => {
         );
       case "angle":
         return <AnglePanel angle={active.value as KeyType} />;
+      case "moonphase":
+        return <MoonPhasePanel phase={active.value as MoonPhaseTiming} />;
       default:
         return null;
     }

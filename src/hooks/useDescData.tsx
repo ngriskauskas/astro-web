@@ -6,7 +6,7 @@ import { apiFetch } from "../utils/api";
 import type { SignAngle } from "../components/wheel/layers/Signs";
 import { useWheel } from "./useWheel";
 import type { AspectType } from "../types/aspect";
-import type { ZodiacSystem } from "../types/zodiac-system";
+import type { MoonPhase } from "../types/moon";
 
 type signDescriptions = Partial<Record<ZodiacSign, string>>;
 type planetDescriptions = Partial<Record<PlanetName, string>>;
@@ -35,7 +35,10 @@ export const usePlanetDesc = (params: PlanetDescParams) => {
       setLoading(true);
       const data = await apiFetch("/descriptions/planet", {
         method: "POST",
-        body: JSON.stringify({ ...params, type }),
+        body: JSON.stringify({
+          ...params,
+          type: type === "moment" ? "time" : type,
+        }),
       });
       setPlanetDesc(data);
       setLoading(false);
@@ -282,4 +285,40 @@ export const useIngressDesc = (
   }, [params.planet, params.sign, type, enabled]);
 
   return { loading, ingressDesc };
+};
+
+export interface MoonPhaseDesc {
+  description: string;
+}
+
+interface MoonPhaseDescParams {
+  phase: MoonPhase;
+  sign: ZodiacSign;
+}
+
+export const useMoonPhaseDesc = (
+  params: MoonPhaseDescParams,
+  enabled: boolean = true,
+) => {
+  const [loading, setLoading] = useState(true);
+  const [moonPhaseDesc, setMoonPhaseDesc] = useState<MoonPhaseDesc>();
+
+  const { type } = useWheel();
+  useEffect(() => {
+    if (!enabled) return;
+
+    const fetchDesc = async () => {
+      setLoading(true);
+      const data = await apiFetch("/descriptions/moon-phase", {
+        method: "POST",
+        body: JSON.stringify({ ...params, type }),
+      });
+      setMoonPhaseDesc(data);
+      setLoading(false);
+    };
+
+    fetchDesc();
+  }, [params.phase, params.sign, type, enabled]);
+
+  return { loading, moonPhaseDesc };
 };
