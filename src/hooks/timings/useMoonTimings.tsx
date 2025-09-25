@@ -2,37 +2,25 @@ import { useState, useEffect } from "react";
 import { useWheel } from "../useWheel";
 import { apiFetch } from "../../utils/api";
 import { getLocalISODate } from "../../utils/funcs";
-import type { PlanetName } from "../../types/planet";
-import type { AspectType } from "../../types/aspect";
 import type { ZodiacSign } from "../../types/zodiac";
 import { useAuth } from "../../contexts/AuthContext";
-
-type ExactDateRange = [string, string];
-
-export interface AspectTiming {
-  planet1: PlanetName;
-  planet2: PlanetName;
-  start_date: string;
-  end_date: string;
-  aspect_type: AspectType;
-  exact_date_ranges: ExactDateRange[];
-}
+import type { MoonPhase, MoonPhaseDirection } from "../../types/moon";
 
 export interface IngressTiming {
   sign: ZodiacSign;
   date: string;
 }
 
-export interface CurrentTimingsType {
-  ingresses: IngressTiming[];
-  //aspects: AspectTiming[];
+export interface MoonPhaseTiming {
+  date: string;
+  sign: ZodiacSign;
+  direction: MoonPhaseDirection;
+  phase: MoonPhase;
 }
 
-export interface TimingEvent {
-  date: string;
-  event: "start" | "end" | "exact";
-  type: "aspect" | "ingress" | "retrograde";
-  data: AspectTiming | IngressTiming;
+export interface CurrentTimingsType {
+  ingresses: IngressTiming[];
+  phases: MoonPhaseTiming[];
 }
 
 export const useMoonTimings = () => {
@@ -45,6 +33,7 @@ export const useMoonTimings = () => {
 
   const [timings, setTimings] = useState<CurrentTimingsType>({
     ingresses: [],
+    phases: [],
   });
   const [loading, setLoading] = useState(false);
 
@@ -65,7 +54,7 @@ export const useMoonTimings = () => {
         setTimings(res);
       } catch (err) {
         console.error("Failed to fetch timings", err);
-        setTimings({ ingresses: [] });
+        setTimings({ ingresses: [], phases: [] });
       } finally {
         setLoading(false);
       }
@@ -85,7 +74,7 @@ export const useMoonTimings = () => {
         setTimings(res);
       } catch (err) {
         console.error("Failed to fetch timings", err);
-        setTimings({ ingresses: [] });
+        setTimings({ ingresses: [], phases: [] });
       } finally {
         setLoading(false);
       }
@@ -96,57 +85,4 @@ export const useMoonTimings = () => {
   }, [zodiacSystem, ayanamsa, profileId, user]);
 
   return { timings, loading };
-};
-
-const isToday = (d: string | Date) => {
-  const today = new Date(getLocalISODate());
-  const date = new Date(d);
-  return (
-    date.getFullYear() === today.getFullYear() &&
-    date.getMonth() === today.getMonth() &&
-    date.getDate() === today.getDate()
-  );
-};
-
-export const convertToEvents = ({ ingresses = [] }: CurrentTimingsType) => {
-  const ingressEvents: TimingEvent[] = ingresses.map((i) => ({
-    date: i.date,
-    event: "exact",
-    data: i,
-    type: "ingress",
-  }));
-
-  const allEvents: TimingEvent[] = [...ingressEvents];
-
-  const today = new Date(getLocalISODate());
-  const oneWeekAgo = new Date(today);
-  oneWeekAgo.setDate(today.getDate() - 7);
-
-  const oneWeekAhead = new Date(today);
-  oneWeekAhead.setDate(today.getDate() + 7);
-
-  const pastEvents = allEvents
-    .filter((e) => {
-      const d = new Date(e.date);
-      return d >= oneWeekAgo && d < today;
-    })
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-  const todayEvents = allEvents.filter((e) => isToday(e.date));
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-
-  const tomorrowEvents = allEvents.filter((e) => {
-    const d = new Date(e.date);
-    return d.toDateString() === tomorrow.toDateString();
-  });
-  const upcomingEvents = allEvents
-    .filter((e) => {
-      const d = new Date(e.date);
-      return d > tomorrow && d <= oneWeekAhead;
-    })
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-  return { todayEvents, tomorrowEvents, pastEvents, upcomingEvents };
 };

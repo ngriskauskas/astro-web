@@ -4,12 +4,19 @@ import { type Aspect, type AspectDisplay } from "../types/aspect";
 import { type PlanetName } from "../types/planet";
 import type { CuspType } from "../types/cusp";
 import type { OwnerType } from "./MultiWheelContext";
+import type { MoonPhaseTiming } from "../hooks/timings/useMoonTimings";
 
-type ActiveType = "planet" | "house" | "sign" | "aspect" | "angle";
+type ActiveType =
+  | "planet"
+  | "house"
+  | "sign"
+  | "aspect"
+  | "angle"
+  | "moonphase";
 
 interface Active {
   type: ActiveType;
-  value: PlanetName | ZodiacSign | CuspType | AspectDisplay;
+  value: PlanetName | ZodiacSign | CuspType | AspectDisplay | MoonPhaseTiming;
   owner?: OwnerType;
 }
 

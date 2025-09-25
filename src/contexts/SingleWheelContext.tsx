@@ -114,7 +114,7 @@ export const SingleWheelProvider = ({
     if (type !== "moment") return;
 
     const dateParam = searchParams.get("date");
-    const timeParam = "23:59:00";
+    const timeParam = searchParams.get("time") || "23:59:00";
     const zodiacParam = searchParams.get("zodiac_system");
     const ayanamsaParam = searchParams.get("ayanamsa");
 
