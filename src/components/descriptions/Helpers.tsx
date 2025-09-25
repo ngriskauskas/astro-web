@@ -16,7 +16,7 @@ import type { OwnerType } from "../../contexts/MultiWheelContext";
 import { Link } from "react-router-dom";
 import { useWheel } from "../../hooks/useWheel";
 
-const Spinner = () => (
+export const Spinner = () => (
   <div className="flex justify-center items-center py-3">
     <FiLoader className="w-5 h-5 text-gray-600 animate-spin" />
   </div>

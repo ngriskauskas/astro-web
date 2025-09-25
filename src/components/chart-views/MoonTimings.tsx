@@ -1,10 +1,19 @@
+import { useState } from "react";
 import { useDesc } from "../../contexts/DescContext";
 import {
   useMoonTimings,
+  type IngressTiming,
   type MoonPhaseTiming,
 } from "../../hooks/timings/useMoonTimings";
 import { MoonPhasesData } from "../../types/moon";
-import { DateChip, DateTimeChip, SignChip } from "../descriptions/Helpers";
+import {
+  DateChip,
+  DateTimeChip,
+  SignChip,
+  Spinner,
+} from "../descriptions/Helpers";
+import { useIngressDesc, usePlanetDesc } from "../../hooks/useDescData";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 
 export const MoonTimings = () => {
   const { loading, timings } = useMoonTimings();
@@ -63,28 +72,67 @@ export const MoonTimings = () => {
           <div>No upcoming Moon ingresses in this period.</div>
         ) : (
           <div className="space-y-3">
-            {upcomingIngresses.map((ingress, i) => {
-              const isCurrent = i === 0;
-              return (
-                <div
-                  key={i}
-                  className={`mr-15 ml-5 p-3 border rounded-md shadow-sm flex justify-between items-center transition transform ${
-                    isCurrent
-                      ? "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-400 ring-2 ring-blue-300 scale-105"
-                      : "bg-white border-gray-200 hover:shadow-md"
-                  }`}
-                >
-                  <DateChip date={ingress.date} />
-                  <span className="text-gray-700 font-medium">
-                    {isCurrent ? "Current" : "enters"}
-                  </span>
-                  <SignChip sign={ingress.sign} />
-                </div>
-              );
-            })}
+            {upcomingIngresses.map((ingress, i) => (
+              <MoonIngress key={i} ingress={ingress} isCurrent={i === 0} />
+            ))}
           </div>
         )}
       </div>
+    </div>
+  );
+};
+
+const MoonIngress = ({
+  ingress,
+  isCurrent,
+}: {
+  ingress: IngressTiming;
+  isCurrent: boolean;
+}) => {
+  const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  const { loading, ingressDesc } = useIngressDesc(
+    { planet: "moon", sign: ingress.sign },
+    expanded,
+  );
+
+  return (
+    <div
+      className={`mr-15 ml-5 p-3 border rounded-md shadow-sm flex flex-col transition transform ${
+        isCurrent
+          ? "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-400 ring-2 ring-blue-300 scale-105"
+          : "bg-white border-gray-200 hover:shadow-md"
+      }`}
+    >
+      <div
+        className="flex justify-between items-center cursor-pointer"
+        onClick={() => {
+          setOpen(!open);
+          setExpanded(true);
+        }}
+      >
+        <div className="flex items-center space-x-2">
+          <DateChip date={ingress.date} />
+          <span className="text-gray-700 font-medium">
+            {isCurrent ? "Current" : "enters"}
+          </span>
+          <SignChip sign={ingress.sign} />
+        </div>
+        <div>
+          {open ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+        </div>
+      </div>
+
+      {open && (
+        <div className="mt-2 text-gray-600 text-sm">
+          {loading ? (
+            <Spinner />
+          ) : (
+            ingressDesc?.description || "No description available."
+          )}
+        </div>
+      )}
     </div>
   );
 };
