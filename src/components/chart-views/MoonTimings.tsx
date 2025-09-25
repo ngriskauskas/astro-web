@@ -22,12 +22,22 @@ export const MoonTimings = () => {
   );
 
   const now = Date.now();
+  const currentIngressIndex = [...sortedIngresses]
+    .reverse()
+    .findIndex((ingress) => new Date(ingress.date).getTime() <= now);
+
+  const currentIndex =
+    currentIngressIndex === -1
+      ? 0
+      : sortedIngresses.length - 1 - currentIngressIndex;
+
+  const upcomingIngresses = sortedIngresses.slice(currentIndex);
   const currentPhaseIndex = sortedPhases.reduceRight((acc, phase, idx) => {
     return acc === -1 && new Date(phase.date).getTime() <= now ? idx : acc;
   }, -1);
 
   return (
-    <div className="p-4 space-y-8">
+    <div className="p-4 ml-4 space-y-8">
       <div>
         <h2 className="text-xl font-semibold mb-4 text-gray-800">
           Moon Phases
@@ -49,20 +59,29 @@ export const MoonTimings = () => {
         <h2 className="text-xl font-semibold mb-4 text-gray-800">
           Moon Ingresses
         </h2>
-        {sortedIngresses.length === 0 ? (
-          <div>No Moon ingresses in this period.</div>
+        {upcomingIngresses.length === 0 ? (
+          <div>No upcoming Moon ingresses in this period.</div>
         ) : (
           <div className="space-y-3">
-            {sortedIngresses.map((ingress, i) => (
-              <div
-                key={i}
-                className="p-3 border rounded-md shadow-sm flex justify-between items-center hover:bg-gray-50 transition"
-              >
-                <DateChip date={ingress.date} />
-                <span className="text-gray-700 font-medium">Moon enters</span>
-                <SignChip sign={ingress.sign} />
-              </div>
-            ))}
+            {upcomingIngresses.map((ingress, i) => {
+              const isCurrent = i === 0;
+              return (
+                <div
+                  key={i}
+                  className={`mr-15 ml-5 p-3 border rounded-md shadow-sm flex justify-between items-center transition transform ${
+                    isCurrent
+                      ? "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-400 ring-2 ring-blue-300 scale-105"
+                      : "bg-white border-gray-200 hover:shadow-md"
+                  }`}
+                >
+                  <DateChip date={ingress.date} />
+                  <span className="text-gray-700 font-medium">
+                    {isCurrent ? "Current" : "enters"}
+                  </span>
+                  <SignChip sign={ingress.sign} />
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

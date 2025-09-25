@@ -39,7 +39,6 @@ export const MoonPhasePanel = ({ phase }: { phase: MoonPhaseTiming }) => {
               <span className="text-gray-500">Date</span>
               <DateTimeChip datetime={phase.date} format />
             </div>
-            <span className="text-gray-500 mb-1">Sign</span>
             <DescSection
               key={phase.sign}
               desc={moonPhaseDesc?.description || ""}
