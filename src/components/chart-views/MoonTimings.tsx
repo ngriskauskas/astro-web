@@ -112,13 +112,11 @@ const MoonIngress = ({
           setExpanded(true);
         }}
       >
-        <div className="flex items-center space-x-2">
-          <DateChip date={ingress.date} />
-          <span className="text-gray-700 font-medium">
-            {isCurrent ? "Current" : "enters"}
-          </span>
-          <SignChip sign={ingress.sign} />
-        </div>
+        <DateChip date={ingress.date} />
+        <span className="text-gray-700 font-medium">
+          {isCurrent ? "Current" : "enters"}
+        </span>
+        <SignChip sign={ingress.sign} />
         <div>
           {open ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
         </div>
