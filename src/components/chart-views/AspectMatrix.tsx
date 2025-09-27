@@ -4,7 +4,6 @@ import { useWheel } from "../../hooks/useWheel";
 import { AspectData } from "../../types/aspect";
 import { PLANET_ORDER, PlanetsData, type Planet } from "../../types/planet";
 import { useDesc } from "../../contexts/DescContext";
-import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
 import { useWheelData } from "../../hooks/chart/useWheelData";
 
 export const AspectMatrix = () => {

@@ -106,6 +106,25 @@ export const getPlanetHouse = (
   throw new Error(`House not found for planet ${planet} (owner: ${owner})`);
 };
 
+export const getMainOfOtherPlanet = (
+  ctx: MultiWheelContextType,
+  planet: PlanetName,
+): { planetData: Planet; house: CuspType } => {
+  for (let house = 1; house <= 12; house++) {
+    const planetsInHouse = computePlanets(
+      ctx.otherPlanetAngles,
+      ctx.mainCuspAngles,
+      house as CuspType,
+    );
+    const planetData = planetsInHouse.find((p) => p.name === planet);
+    if (planetData) {
+      return { planetData, house: house as CuspType };
+    }
+  }
+
+  throw new Error(`House not found for planet ${planet} )`);
+};
+
 export const getHouse = (
   ctx: MultiWheelContextType,
   house: CuspType,

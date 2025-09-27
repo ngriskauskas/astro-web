@@ -1,12 +1,14 @@
-import type { AspectTiming } from "../../../hooks/timings/useTimings";
-import { AspectChip, DateChip, SectionSmall } from "../../descriptions/Helpers";
-
 import { useState } from "react";
-
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
-import type { TimingEvent } from "../CurrentTimings";
+import { useAspectDesc } from "../../../hooks/descriptions/useAspectDesc";
+import type {
+  TimingEvent,
+  AspectTiming,
+} from "../../../hooks/timings/useTimings";
 import { useWheel } from "../../../hooks/useWheel";
-import { useAspectDesc } from "../../../hooks/useDescData";
+import { AspectChip } from "../../utils/AspectChip";
+import { DateChip } from "../../utils/DateChip";
+import { SectionSmall } from "../../utils/Section";
 
 export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
   const aspect = event.data as AspectTiming;

@@ -1,21 +1,14 @@
-import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
 import { useDesc } from "../../contexts/DescContext";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
-import { useWheel } from "../../hooks/useWheel";
-import { HouseData, type CuspType } from "../../types/cusp";
-import { ZodiacData } from "../../types/zodiac";
-import {
-  BackButton,
-  CloseButton,
-  DescSection,
-  OverviewCard,
-  PlanetChip,
-  Section,
-  SignChip,
-} from "./Helpers";
-import { useHouseData } from "../../hooks/chart/useChartData";
-import { useHouseDesc } from "../../hooks/useDescData";
 import { useProfileNames } from "../../hooks/chart/getNames";
+import { useHouseData } from "../../hooks/chart/useChartData";
+import { useHouseDesc } from "../../hooks/descriptions/useHouseDesc";
+import { type CuspType, HouseData } from "../../types/cusp";
+import { ZodiacData } from "../../types/zodiac";
+import type { PlanetChip } from "../utils/PlanetChip";
+import type { Section, DescSection } from "../utils/Section";
+import { SignChip } from "../utils/SignChip";
+import { BackButton, CloseButton, OverviewCard } from "./Helpers";
 
 export const HousePanel = ({
   houseName,

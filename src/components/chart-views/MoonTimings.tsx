@@ -1,19 +1,16 @@
 import { useState } from "react";
+import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { useDesc } from "../../contexts/DescContext";
+import { useIngressDesc } from "../../hooks/descriptions/useIngressDesc";
 import {
   useMoonTimings,
   type IngressTiming,
   type MoonPhaseTiming,
 } from "../../hooks/timings/useMoonTimings";
 import { MoonPhasesData } from "../../types/moon";
-import {
-  DateChip,
-  DateTimeChip,
-  SignChip,
-  Spinner,
-} from "../descriptions/Helpers";
-import { useIngressDesc, usePlanetDesc } from "../../hooks/useDescData";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { DateChip, DateTimeChip } from "../utils/DateChip";
+import { SignChip } from "../utils/SignChip";
+import { Spinner } from "../utils/Spinner";
 
 export const MoonTimings = () => {
   const { loading, timings } = useMoonTimings();
@@ -99,11 +96,10 @@ const MoonIngress = ({
 
   return (
     <div
-      className={`mr-15 ml-5 p-3 border rounded-md shadow-sm flex flex-col transition transform ${
-        isCurrent
+      className={`mr-15 ml-5 p-3 border rounded-md shadow-sm flex flex-col transition transform ${isCurrent
           ? "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-400 ring-2 ring-blue-300 scale-105"
           : "bg-white border-gray-200 hover:shadow-md"
-      }`}
+        }`}
     >
       <div
         className="flex justify-between items-center cursor-pointer"
@@ -142,10 +138,9 @@ const renderMoonPhase = (phase: MoonPhaseTiming, isCurrent: boolean) => {
   return (
     <div
       className={`p-4 flex flex-col items-center justify-center rounded-full shadow-lg border transition-transform duration-200 transform hover:scale-110 cursor-pointer
-        ${
-          isCurrent
-            ? "bg-gradient-to-br from-purple-50 to-purple-100 border-purple-400 ring-4 ring-purple-300 "
-            : "bg-white border-gray-200 hover:shadow-xl"
+        ${isCurrent
+          ? "bg-gradient-to-br from-purple-50 to-purple-100 border-purple-400 ring-4 ring-purple-300 "
+          : "bg-white border-gray-200 hover:shadow-xl"
         }`}
       onClick={() => open({ type: "moonphase", value: phase })}
     >

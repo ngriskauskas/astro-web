@@ -1,9 +1,11 @@
 import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
-import { useAspectDesc } from "../../hooks/useDescData";
+import { useAspectDesc } from "../../hooks/descriptions/useAspectDesc";
 import { useWheel } from "../../hooks/useWheel";
-import { AspectData, type AspectDisplay } from "../../types/aspect";
+import { type AspectDisplay, AspectData } from "../../types/aspect";
 import { PlanetsData } from "../../types/planet";
-import { BackButton, CloseButton, PlanetChip, Section } from "./Helpers";
+import { PlanetChip } from "../utils/PlanetChip";
+import { Section } from "../utils/Section";
+import { BackButton, CloseButton } from "./Helpers";
 
 export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
   const aspectInfo = AspectData[aspect.type];
@@ -35,12 +37,16 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
       >
         <BackButton />
         <h2 className="text-xl font-semibold capitalize flex items-center gap-2">
-          <span className="text-xl">{PlanetsData[aspect.planet1].glyph}</span>
-          <span className="capitalize">{aspect.planet1}</span>
+          <span className="text-xl">
+            {PlanetsData[aspect.planet1.name].glyph}
+          </span>
+          <span className="capitalize">{aspect.planet1.name}</span>
           <span className="text-xl">{aspectInfo.glyph}</span>
-          <span className="text-xl">{PlanetsData[aspect.planet2].glyph}</span>
+          <span className="text-xl">
+            {PlanetsData[aspect.planet2.name].glyph}
+          </span>
 
-          <span className="capitalize">{aspect.planet2}</span>
+          <span className="capitalize">{aspect.planet2.name}</span>
         </h2>
         <CloseButton />
       </div>
@@ -69,7 +75,7 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
                     ? `${otherProfileName}'s`
                     : "Yours"}
                 </span>
-                <PlanetChip planet={aspect.planet1} />
+                <PlanetChip planet={aspect.planet1.name} />
               </div>
               <div>
                 <span className="text-gray-400 text-xs uppercase tracking-wide mb-1 text-center">
@@ -78,13 +84,13 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
                     : "Yours"}
                 </span>
 
-                <PlanetChip planet={aspect.planet2} />
+                <PlanetChip planet={aspect.planet2.name} />
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-6">
-              <PlanetChip planet={aspect.planet1} />
-              <PlanetChip planet={aspect.planet2} />
+              <PlanetChip planet={aspect.planet1.name} />
+              <PlanetChip planet={aspect.planet2.name} />
             </div>
           )}
           {aspectDesc && (

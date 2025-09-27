@@ -2,21 +2,13 @@ import { useState, type ReactNode } from "react";
 import {
   convertToEvents,
   useCurrentTimings,
-  type AspectTiming,
   type IngressTiming,
-  type RetrogradeTiming,
+  type TimingEvent,
 } from "../../hooks/timings/useTimings";
 import { AspectTimingCard } from "./timings/AspectTimingCard";
 import { IngressTimingCard } from "./timings/IngressTimingCard";
 import { RetrogradeTimingCard } from "./timings/RetrogradeTimingCard";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
-
-export interface TimingEvent {
-  date: string;
-  event: "start" | "end" | "exact";
-  type: "aspect" | "ingress" | "retrograde";
-  data: AspectTiming | RetrogradeTiming | IngressTiming;
-}
 
 export const CurrentTimings = () => {
   const { loading, timings } = useCurrentTimings();
@@ -70,7 +62,7 @@ export const CurrentTimings = () => {
   );
 };
 
-const EventCard = ({ event }: { event: TimingEvent }) => {
+export const EventCard = ({ event }: { event: TimingEvent }) => {
   return (
     <div className="h-auto self-start">
       {(() => {
@@ -88,7 +80,7 @@ const EventCard = ({ event }: { event: TimingEvent }) => {
     </div>
   );
 };
-const CollapsibleSection = ({
+export const CollapsibleSection = ({
   title,
   children,
   defaultOpen = true,
@@ -108,7 +100,7 @@ const CollapsibleSection = ({
         <span className="font-bold text-lg">{title}</span>
         {isOpen ? <FiChevronUp /> : <FiChevronDown />}
       </button>
-      {isOpen && <div className="p-3">{children}</div>}
+      {isOpen && <div className="p-1 py-2">{children}</div>}
     </section>
   );
 };

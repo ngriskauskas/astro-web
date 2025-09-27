@@ -6,7 +6,6 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   let token = localStorage.getItem("token");
 
   if (isTokenExpired(token)) {
-    console.log("EXPIRED");
     token = await refreshToken();
   }
 

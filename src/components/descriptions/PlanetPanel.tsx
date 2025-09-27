@@ -1,19 +1,14 @@
-import {
-  AspectChip,
-  BackButton,
-  CloseButton,
-  DescSection,
-  HouseChip,
-  Section,
-  SignChip,
-  SignGroup,
-} from "./Helpers";
-import { PlanetsData, type PlanetName } from "../../types/planet";
-import { usePlanetDesc } from "../../hooks/useDescData";
-import { usePlanetData } from "../../hooks/chart/useChartData";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
+import { usePlanetData } from "../../hooks/chart/useChartData";
+import { usePlanetDesc } from "../../hooks/descriptions/usePlanetDesc";
 import type { Aspect } from "../../types/aspect";
+import { type PlanetName, PlanetsData } from "../../types/planet";
 import { formatDegMin } from "../../utils/funcs";
+import { AspectChip } from "../utils/AspectChip";
+import { HouseChip } from "../utils/HouseChip";
+import { Section, DescSection } from "../utils/Section";
+import { SignGroup, SignChip } from "../utils/SignChip";
+import { BackButton, CloseButton } from "./Helpers";
 
 export const PlanetPanel = ({
   planetName,
@@ -87,8 +82,8 @@ export const PlanetPanel = ({
                     aspect={{
                       type: aspect.type,
                       orb: aspect.orb,
-                      planet1: aspect.planet1.name,
-                      planet2: aspect.planet2.name,
+                      planet1: aspect.planet1,
+                      planet2: aspect.planet2,
                       planet1Owner: aspect.planet1Owner,
                     }}
                   />
