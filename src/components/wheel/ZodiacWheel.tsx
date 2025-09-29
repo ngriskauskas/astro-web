@@ -26,7 +26,7 @@ export const ZodiacWheel = () => {
   const radius = size / 2;
 
   return (
-    <div className="flex gap-5 items-center">
+    <div className="flex gap-5 items-center mx-28">
       <div className="flex-[3] flex-shrink-0 flex justify-center">
         {aspects ? (
           <svg

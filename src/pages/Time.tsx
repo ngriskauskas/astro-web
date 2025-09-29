@@ -9,7 +9,7 @@ export const Time = () => {
     <SingleWheelProvider type="time">
       <DescProvider>
         <div className="flex mt-5">
-          <div className="w-[90%] max-w-5xl">
+          <div className="w-[90%] ">
             <div className="flex flex-row items-center gap-5">
               <div className="flex-[5]">
                 <ViewSelector page="time" />

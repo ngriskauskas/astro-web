@@ -28,8 +28,9 @@ export const AspectMatrix = () => {
             {planets.map((p) => (
               <th
                 key={p.name}
-                className={`px-4 py-2 text-xl border border-gray-300 cursor-pointer transition-colors ${hoveredPlanet === p.name ? "bg-yellow-100" : ""
-                  }`}
+                className={`px-4 py-2 text-xl border border-gray-300 cursor-pointer transition-colors ${
+                  hoveredPlanet === p.name ? "bg-yellow-100" : ""
+                }`}
                 onMouseEnter={() => setHoveredPlanet(p.name)}
                 onMouseLeave={() => setHoveredPlanet(null)}
               >
@@ -42,12 +43,14 @@ export const AspectMatrix = () => {
           {planets.map((rowPlanet, rowIndex) => (
             <tr
               key={rowPlanet.name}
-              className={`text-sm transition-colors ${hoveredPlanet === rowPlanet.name ? "bg-yellow-50" : ""
-                }`}
+              className={`text-sm transition-colors ${
+                hoveredPlanet === rowPlanet.name ? "bg-yellow-50" : ""
+              }`}
             >
               <td
-                className={`px-4 py-2 text-xl font-semibold border border-gray-300 bg-gray-50 cursor-pointer transition-colors ${hoveredPlanet === rowPlanet.name ? "bg-yellow-100" : ""
-                  }`}
+                className={`px-4 py-2 text-xl font-semibold border border-gray-300 bg-gray-50 cursor-pointer transition-colors ${
+                  hoveredPlanet === rowPlanet.name ? "bg-yellow-100" : ""
+                }`}
                 onMouseEnter={() => setHoveredPlanet(rowPlanet.name)}
                 onMouseLeave={() => setHoveredPlanet(null)}
               >
@@ -91,12 +94,14 @@ export const AspectMatrix = () => {
                 return (
                   <td
                     key={colPlanet.name}
-                    className={`px-4 py-2 text-lg font-bold border border-gray-300 transition-all ${aspect ? "cursor-pointer" : ""
-                      } ${hoveredPlanet === rowPlanet.name ||
-                        hoveredPlanet === colPlanet.name
+                    className={`px-4 py-2 text-lg font-bold border border-gray-300 transition-all ${
+                      aspect ? "cursor-pointer" : ""
+                    } ${
+                      hoveredPlanet === rowPlanet.name ||
+                      hoveredPlanet === colPlanet.name
                         ? "ring-2 ring-yellow-300"
                         : ""
-                      }`}
+                    }`}
                     style={{
                       backgroundColor: color ? `${color}20` : undefined,
                       color: color ?? undefined,

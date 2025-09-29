@@ -28,16 +28,24 @@ export const MoonTimings = () => {
   );
 
   const now = Date.now();
-  const currentIngressIndex = [...sortedIngresses]
-    .reverse()
-    .findIndex((ingress) => new Date(ingress.date).getTime() <= now);
-
-  const currentIndex =
-    currentIngressIndex === -1
-      ? 0
-      : sortedIngresses.length - 1 - currentIngressIndex;
+  const today = new Date();
+  const todayNum =
+    today.getFullYear() * 10000 +
+    (today.getMonth() + 1) * 100 +
+    today.getDate();
+  let currentIndex = 0;
+  for (let i = 0; i < sortedIngresses.length; i++) {
+    const [y, m, d] = sortedIngresses[i].date.split("-").map(Number);
+    const ingressNum = y * 10000 + m * 100 + d;
+    if (ingressNum <= todayNum) {
+      currentIndex = i;
+    } else {
+      break;
+    }
+  }
 
   const upcomingIngresses = sortedIngresses.slice(currentIndex);
+
   const currentPhaseIndex = sortedPhases.reduceRight((acc, phase, idx) => {
     return acc === -1 && new Date(phase.date).getTime() <= now ? idx : acc;
   }, -1);

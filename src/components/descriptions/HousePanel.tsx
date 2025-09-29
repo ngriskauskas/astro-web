@@ -5,8 +5,8 @@ import { useHouseData } from "../../hooks/chart/useChartData";
 import { useHouseDesc } from "../../hooks/descriptions/useHouseDesc";
 import { type CuspType, HouseData } from "../../types/cusp";
 import { ZodiacData } from "../../types/zodiac";
-import type { PlanetChip } from "../utils/PlanetChip";
-import type { Section, DescSection } from "../utils/Section";
+import { PlanetChip } from "../utils/PlanetChip";
+import { Section, DescSection } from "../utils/Section";
 import { SignChip } from "../utils/SignChip";
 import { BackButton, CloseButton, OverviewCard } from "./Helpers";
 

@@ -5,6 +5,7 @@ import { type AspectDisplay, AspectData } from "../../types/aspect";
 import { PlanetsData } from "../../types/planet";
 import { PlanetChip } from "../utils/PlanetChip";
 import { Section } from "../utils/Section";
+import { SignChip } from "../utils/SignChip";
 import { BackButton, CloseButton } from "./Helpers";
 
 export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
@@ -62,35 +63,34 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
         </Section>
         <Section title="Details" loading={loading}>
           {aspect.orb && (
-            <div className="mb-2">
+            <div className="mb-3">
               <span className="font-small">Orb: </span>
               {aspect.orb.toFixed(2)}°
             </div>
           )}
           {isMulti ? (
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <span className="text-gray-400 text-xs uppercase tracking-wide mb-1 text-center">
-                  {aspect.planet1Owner === "other"
-                    ? `${otherProfileName}'s`
-                    : "Yours"}
-                </span>
-                <PlanetChip planet={aspect.planet1.name} />
-              </div>
-              <div>
-                <span className="text-gray-400 text-xs uppercase tracking-wide mb-1 text-center">
-                  {aspect.planet1Owner === "main"
-                    ? `${otherProfileName}'s`
-                    : "Yours"}
-                </span>
-
-                <PlanetChip planet={aspect.planet2.name} />
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+              <span className="text-gray-400 text-xs uppercase tracking-wide text-center">
+                {aspect.planet1Owner === "other"
+                  ? `${otherProfileName}'s`
+                  : "Yours"}
+              </span>
+              <span className="text-gray-400 text-xs uppercase tracking-wide text-center">
+                {aspect.planet1Owner === "main"
+                  ? `${otherProfileName}'s`
+                  : "Yours"}
+              </span>
               <PlanetChip planet={aspect.planet1.name} />
               <PlanetChip planet={aspect.planet2.name} />
+              <SignChip sign={aspect.planet1.sign} />
+              <SignChip sign={aspect.planet2.sign} />
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+              <PlanetChip planet={aspect.planet1.name} />
+              <PlanetChip planet={aspect.planet2.name} />
+              <SignChip sign={aspect.planet1.sign} />
+              <SignChip sign={aspect.planet2.sign} />
             </div>
           )}
           {aspectDesc && (

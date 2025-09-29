@@ -47,6 +47,7 @@ export const PlanetTiming = ({ planet }: { planet: PlanetName }) => {
     house,
     planetAspects,
     transitPlanetDesc,
+    planetReturns,
   } = usePlanetTimings({ planet });
 
   if (loading) return <Spinner />;
@@ -84,7 +85,31 @@ export const PlanetTiming = ({ planet }: { planet: PlanetName }) => {
           </p>
         </SectionSmall>
       </div>
-      <CollapsibleSection title="Aspects" defaultOpen={true}>
+      <CollapsibleSection title="Returns" defaultOpen={true}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {planetReturns?.return && (
+            <EventCard
+              event={{
+                date: planetReturns.return.start_date,
+                event: "start",
+                type: "aspect",
+                data: planetReturns.return,
+              }}
+            />
+          )}
+          {planetReturns?.opposition && (
+            <EventCard
+              event={{
+                date: planetReturns.opposition.start_date,
+                event: "start",
+                type: "aspect",
+                data: planetReturns.opposition,
+              }}
+            />
+          )}
+        </div>
+      </CollapsibleSection>
+      <CollapsibleSection title="Aspects" defaultOpen={false}>
         {todayEvents.length > 0 && (
           <CollapsibleSection title="Today" defaultOpen={true}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

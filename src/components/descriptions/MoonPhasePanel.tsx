@@ -2,7 +2,7 @@ import { useMoonPhaseDesc } from "../../hooks/descriptions/useMoonPhaseDesc";
 import type { MoonPhaseTiming } from "../../hooks/timings/useMoonTimings";
 import { MoonPhasesData } from "../../types/moon";
 import { DateTimeChip } from "../utils/DateChip";
-import type { Section, DescSection } from "../utils/Section";
+import { Section, DescSection } from "../utils/Section";
 import { SignChip } from "../utils/SignChip";
 import { BackButton, CloseButton } from "./Helpers";
 

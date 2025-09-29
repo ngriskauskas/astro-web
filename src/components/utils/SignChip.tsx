@@ -42,3 +42,38 @@ export const SignGroup = ({
     </div>
   </div>
 );
+
+export const SignCircle = ({
+  sign,
+  size = 10,
+}: {
+  sign: ZodiacSign;
+  size?: number;
+}) => {
+  const signData = ZodiacData[sign];
+  const color = signData.color;
+
+  const sizeClass = `w-${size} h-${size}`;
+
+  return (
+    <div
+      title={sign}
+      className={`
+        ${sizeClass} 
+        flex items-center justify-center 
+        rounded-full border 
+      `}
+      style={{
+        borderColor: `${color}55`,
+        backgroundColor: `${color}33`,
+        borderWidth: 1,
+      }}
+    >
+      <img
+        src={signData.glyph}
+        alt={sign}
+        className="w-1/2 h-1/2 object-contain"
+      />
+    </div>
+  );
+};

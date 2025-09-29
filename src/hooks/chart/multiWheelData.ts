@@ -228,8 +228,10 @@ export const getSignInKeyAngle = (
 
 export const getFilteredAspects = (ctx: MultiWheelContextType): Aspect[] => {
   const aspectOptions = ctx.settings.aspectOptions;
-  return ctx.aspects.filter(
-    ({ type, orb }) =>
-      aspectOptions[type].show && aspectOptions[type].minOrb >= orb,
-  );
+  return ctx.aspects
+    .filter(
+      ({ type, orb }) =>
+        aspectOptions[type].show && aspectOptions[type].minOrb >= orb,
+    )
+    .map((aspect) => ({ ...aspect, planet1Owner: "main" }));
 };

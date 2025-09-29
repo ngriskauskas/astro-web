@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { AspectType } from "../../types/aspect";
-import type { PlanetBase, PlanetName } from "../../types/planet";
+import type { PlanetBase } from "../../types/planet";
 import { apiFetch } from "../../utils/api";
 import { useWheel } from "../useWheel";
 
@@ -36,7 +36,7 @@ export const useAspectDesc = (
     };
 
     fetchDesc();
-  }, [params.aspect, type, enabled]);
+  }, [params.aspect, params.planet1, params.planet2, type, enabled]);
 
   return { loading, aspectDesc };
 };

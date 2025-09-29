@@ -55,6 +55,7 @@ export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
               planet2: aspect.planet2,
               planet1Owner: type === "transit" ? "main" : undefined,
             }}
+            showSign
           />
           <span className="text-sm font-semibold tracking-wide text-gray-500">
             {eventLabel}

@@ -115,6 +115,7 @@ export const MultiWheelProvider = ({
   };
 
   useEffect(() => {
+    if (type !== "transit") return;
     const dateParam = searchParams.get("date");
     const timeParam = "23:59:00";
     const zodiacParam = searchParams.get("zodiac_system");
