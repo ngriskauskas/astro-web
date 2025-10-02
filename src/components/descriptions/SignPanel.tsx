@@ -3,8 +3,8 @@ import { useProfileNames } from "../../hooks/chart/getNames";
 import { useSignData } from "../../hooks/chart/useChartData";
 import { useSignDesc } from "../../hooks/descriptions/useSignDesc";
 import { type ZodiacSign, ZodiacData } from "../../types/zodiac";
-import type { HouseChip } from "../utils/HouseChip";
-import type { PlanetGroup, PlanetChip } from "../utils/PlanetChip";
+import { HouseChip } from "../utils/HouseChip";
+import { PlanetGroup, PlanetChip } from "../utils/PlanetChip";
 import { Section, DescSection } from "../utils/Section";
 import { BackButton, CloseButton, OverviewCard } from "./Helpers";
 

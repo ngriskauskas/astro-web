@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { ZodiacSign } from "../types/zodiac";
-import { type Aspect, type AspectDisplay } from "../types/aspect";
+import { type AspectDisplay } from "../types/aspect";
 import { type PlanetName } from "../types/planet";
-import type { CuspType } from "../types/cusp";
+import type { CuspType, KeyType } from "../types/cusp";
 import type { OwnerType } from "./MultiWheelContext";
 import type { MoonPhaseTiming } from "../hooks/timings/useMoonTimings";
 
@@ -16,7 +16,13 @@ type ActiveType =
 
 interface Active {
   type: ActiveType;
-  value: PlanetName | ZodiacSign | CuspType | AspectDisplay | MoonPhaseTiming;
+  value:
+  | PlanetName
+  | ZodiacSign
+  | CuspType
+  | AspectDisplay
+  | MoonPhaseTiming
+  | KeyType;
   owner?: OwnerType;
 }
 

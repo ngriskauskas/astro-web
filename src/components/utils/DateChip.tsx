@@ -17,10 +17,10 @@ export const DateChip = ({
   const urlAyanamsa = encodeURIComponent(ayanamsa || "");
   const displayDate = format
     ? new Date(`${date}T00:00`).toLocaleDateString(undefined, {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-      })
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    })
     : date;
 
   const toLink =
@@ -52,11 +52,11 @@ export const DateTimeChip = ({
   const [datePart, timePart] = datetime.split("T");
   const displayDateTime = format
     ? new Date(datetime).toLocaleString(undefined, {
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })
     : datetime;
 
   const urlDate = encodeURIComponent(datePart);
@@ -75,6 +75,47 @@ export const DateTimeChip = ({
       className="inline-flex items-center gap-1 px-2 py-1 bg-white border rounded shadow-sm text-xs font-medium hover:shadow-md hover:bg-gray-50"
     >
       <span className="font-medium text-gray-600">{displayDateTime}</span>
+    </Link>
+  );
+};
+
+export const TimeChip = ({
+  datetime,
+  format = true,
+}: {
+  datetime: string;
+  format?: boolean;
+}) => {
+  const {
+    settings: { zodiacSystem, ayanamsa },
+    type,
+  } = useWheel();
+
+  const [, timePart] = datetime.split("T");
+
+  const displayTime = format
+    ? new Date(datetime).toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+    : timePart;
+
+  const urlDate = encodeURIComponent(datetime.split("T")[0]);
+  const urlTime = encodeURIComponent(timePart);
+  const urlZodiac = encodeURIComponent(zodiacSystem);
+  const urlAyanamsa = encodeURIComponent(ayanamsa || "");
+
+  const toLink =
+    type === "time"
+      ? `/moment?date=${urlDate}&time=${urlTime}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`
+      : `/transit?date=${urlDate}&time=${urlTime}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`;
+
+  return (
+    <Link
+      to={toLink}
+      className="inline-flex items-center gap-1 px-2 py-1 bg-white border rounded shadow-sm text-xs font-medium hover:shadow-md hover:bg-gray-50"
+    >
+      <span className="font-medium text-gray-600">{displayTime}</span>
     </Link>
   );
 };

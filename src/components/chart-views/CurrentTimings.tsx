@@ -80,6 +80,7 @@ export const EventCard = ({ event }: { event: TimingEvent }) => {
     </div>
   );
 };
+
 export const CollapsibleSection = ({
   title,
   children,
