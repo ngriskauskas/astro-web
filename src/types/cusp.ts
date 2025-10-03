@@ -23,6 +23,11 @@ export interface KeyAngle {
   deg_min: [number, number];
 }
 
+export interface KeyAngleDisplay {
+  name: KeyType;
+  sign: ZodiacSign;
+}
+
 interface AngleInfo {
   name: string;
   color: string;

@@ -1,4 +1,5 @@
 import type { OwnerType } from "../contexts/MultiWheelContext";
+import type { KeyAngleDisplay } from "./cusp";
 import { type Planet, type PlanetBase } from "./planet";
 
 export interface Aspect {
@@ -13,8 +14,8 @@ export interface Aspect {
 export interface AspectDisplay {
   type: AspectType;
   orb?: number;
-  planet1: PlanetBase;
-  planet2: PlanetBase;
+  planet1: PlanetBase | KeyAngleDisplay;
+  planet2: PlanetBase | KeyAngleDisplay;
   planet1Owner?: OwnerType;
 }
 

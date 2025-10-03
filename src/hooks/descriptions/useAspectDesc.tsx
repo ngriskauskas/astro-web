@@ -3,6 +3,7 @@ import type { AspectType } from "../../types/aspect";
 import type { PlanetBase } from "../../types/planet";
 import { apiFetch } from "../../utils/api";
 import { useWheel } from "../useWheel";
+import type { KeyAngleDisplay } from "../../types/cusp";
 
 export interface AspectDesc {
   description: string;
@@ -10,8 +11,8 @@ export interface AspectDesc {
 
 interface AspectDescParams {
   aspect: AspectType;
-  planet1: PlanetBase;
-  planet2: PlanetBase;
+  planet1: PlanetBase | KeyAngleDisplay;
+  planet2: PlanetBase | KeyAngleDisplay;
 }
 
 export const useAspectDesc = (

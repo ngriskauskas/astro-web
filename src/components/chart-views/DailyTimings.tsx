@@ -4,8 +4,10 @@ import {
   type AspectTiming,
   type KeyAngleTiming,
 } from "../../hooks/timings/useDailyTimings";
+import { Timeline } from "../timeline/Timeline";
+import { AspectChip } from "../utils/AspectChip";
 import { TimeChip } from "../utils/DateChip";
-import { PlanetChip } from "../utils/PlanetChip";
+import { KeyAngleChip } from "../utils/KeyAngleChip";
 import { SignChip } from "../utils/SignChip";
 import { Spinner } from "../utils/Spinner";
 import { CollapsibleSection } from "./CurrentTimings";
@@ -51,7 +53,10 @@ export const DailyTimings = () => {
 
   return (
     <div className="space-y-8 ml-4 pb-4">
-      {/* Key Angles */}
+      <div className="mb-10">
+        <Timeline horizon="minutes" />
+      </div>
+
       {pastKeyAngles.length > 0 && (
         <CollapsibleSection title="Past Key Angles" defaultOpen={false}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -128,18 +133,15 @@ const KeyAngleCard = ({ keyAngle }: { keyAngle: KeyAngleTiming }) => {
       className="relative rounded-md shadow-sm transition-shadow duration-200 hover:shadow-md cursor-pointer"
     >
       <div className="relative z-10 rounded-md p-4 bg-white border-2 border-blue-200 hover:border-blue-400 transition-colors duration-200">
-        {/* Header: Angle + Sign */}
         <div className="flex justify-between items-center mb-2">
-          <span className="text-lg font-bold text-blue-700">
-            {keyAngle.angle_type}
+          <span className="text-lg font-bold">
+            <KeyAngleChip angle={keyAngle.angle_type} />
           </span>
-          {/* Keep SignChip clickable independently */}
           <div onClick={(e) => e.stopPropagation()}>
             <SignChip sign={keyAngle.sign} />
           </div>
         </div>
 
-        {/* Start / End Times */}
         <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
           <div
             className="bg-blue-50 rounded p-2"
@@ -161,19 +163,24 @@ const KeyAngleCard = ({ keyAngle }: { keyAngle: KeyAngleTiming }) => {
   );
 };
 
-//TODO  make aspects work with key angles
 const DailyAspectCard = ({ aspect }: { aspect: AspectTiming }) => {
   const { open } = useDesc();
 
+  const aspectDisplay = {
+    type: aspect.aspect_type,
+    planet1: { name: aspect.angle_type, sign: aspect.sign },
+    planet2: { name: aspect.planet, sign: aspect.sign },
+  };
+
   return (
     <div className="relative rounded-md shadow-sm transition-shadow duration-200 hover:shadow-md cursor-pointer">
-      <div className="relative z-10 rounded-md p-4 bg-white border-2 border-green-200 hover:border-green-400 transition-colors duration-200">
-        {/* Header: Planet + Angle Type */}
+      <div
+        className="relative z-10 rounded-md p-4 bg-white border-2 border-green-200 hover:border-green-400 transition-colors duration-200"
+        onClick={() => open({ type: "aspect", value: aspectDisplay })}
+      >
         <div className="flex justify-between items-center mb-2">
-          <span className="text-lg font-bold text-green-700">
-            {aspect.planet} - {aspect.angle_type}
-          </span>
-          {/* Keep SignChip clickable independently */}
+          <AspectChip aspect={aspectDisplay} />
+
           <div onClick={(e) => e.stopPropagation()}>
             <SignChip sign={aspect.sign} />
           </div>
