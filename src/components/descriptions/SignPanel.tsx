@@ -1,19 +1,12 @@
-import { ZodiacData } from "../../types/zodiac";
-import {
-  BackButton,
-  CloseButton,
-  DescSection,
-  HouseChip,
-  OverviewCard,
-  PlanetChip,
-  PlanetGroup,
-  Section,
-} from "./Helpers";
-import { type ZodiacSign } from "../../types/zodiac";
 import { useDesc } from "../../contexts/DescContext";
-import { useSignData } from "../../hooks/chart/useChartData";
-import { useSignDesc } from "../../hooks/useDescData";
 import { useProfileNames } from "../../hooks/chart/getNames";
+import { useSignData } from "../../hooks/chart/useChartData";
+import { useSignDesc } from "../../hooks/descriptions/useSignDesc";
+import { type ZodiacSign, ZodiacData } from "../../types/zodiac";
+import { HouseChip } from "../utils/HouseChip";
+import { PlanetGroup, PlanetChip } from "../utils/PlanetChip";
+import { Section, DescSection } from "../utils/Section";
+import { BackButton, CloseButton, OverviewCard } from "./Helpers";
 
 export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
   const { open } = useDesc();

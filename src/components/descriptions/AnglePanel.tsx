@@ -1,8 +1,10 @@
 import type { OwnerType } from "../../contexts/MultiWheelContext";
 import { useKeyAngleData } from "../../hooks/chart/useChartData";
-import { useKeyAngleDesc } from "../../hooks/useDescData";
+import { useKeyAngleDesc } from "../../hooks/descriptions/useKeyAngleDesc";
 import { AngleData, type KeyType } from "../../types/cusp";
-import { BackButton, CloseButton, Section, SignChip } from "./Helpers";
+import { Section } from "../utils/Section";
+import { SignChip } from "../utils/SignChip";
+import { BackButton, CloseButton } from "./Helpers";
 
 export const AnglePanel = ({
   angle,

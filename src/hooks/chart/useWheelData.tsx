@@ -11,6 +11,7 @@ export const useWheelData = (owner?: OwnerType) => {
 
   if (isMulti(ctx)) {
     return {
+      loading: ctx.mainPlanetAngles.length === 0,
       getPlanetsInSign: (sign: ZodiacSign) => multi.getPlanetsInSign(ctx, sign),
       getPlanetsInHouse: (house: CuspType) =>
         multi.getPlanetsInHouse(ctx, house, owner),
@@ -26,9 +27,12 @@ export const useWheelData = (owner?: OwnerType) => {
       getSignInKeyAngle: (keyAngle: KeyType) =>
         multi.getSignInKeyAngle(ctx, keyAngle, owner),
       getFilteredAspects: () => multi.getFilteredAspects(ctx),
+      getMainOfOtherPlanet: (planet: PlanetName) =>
+        multi.getMainOfOtherPlanet(ctx, planet),
     };
   } else {
     return {
+      loading: ctx.planetAngles.length === 0,
       getPlanetsInSign: (sign: ZodiacSign) =>
         single.getPlanetsInSign(ctx, sign),
       getPlanetsInHouse: (house: CuspType) =>

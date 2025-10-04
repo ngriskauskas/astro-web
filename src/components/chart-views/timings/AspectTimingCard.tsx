@@ -1,12 +1,14 @@
-import type { AspectTiming } from "../../../hooks/timings/useTimings";
-import { AspectChip, DateChip, SectionSmall } from "../../descriptions/Helpers";
-
 import { useState } from "react";
-
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
-import type { TimingEvent } from "../CurrentTimings";
+import { useAspectDesc } from "../../../hooks/descriptions/useAspectDesc";
+import type {
+  TimingEvent,
+  AspectTiming,
+} from "../../../hooks/timings/useTimings";
 import { useWheel } from "../../../hooks/useWheel";
-import { useAspectDesc } from "../../../hooks/useDescData";
+import { AspectChip } from "../../utils/AspectChip";
+import { DateChip, DateTimeChip } from "../../utils/DateChip";
+import { SectionSmall } from "../../utils/Section";
 
 export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
   const aspect = event.data as AspectTiming;
@@ -40,6 +42,9 @@ export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
         ? aspect.end_date
         : event.date;
 
+  const isMoonAspect =
+    aspect.planet1.name === "moon" || aspect.planet2.name === "moon";
+
   const { type } = useWheel();
 
   return (
@@ -53,19 +58,34 @@ export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
               planet2: aspect.planet2,
               planet1Owner: type === "transit" ? "main" : undefined,
             }}
+            showSign
           />
           <span className="text-sm font-semibold tracking-wide text-gray-500">
             {eventLabel}
           </span>
         </div>
-        <DateChip date={dateToShow} format />
+        {isMoonAspect ? (
+          <DateTimeChip datetime={dateToShow} format />
+        ) : (
+          <DateChip date={dateToShow} format />
+        )}
       </div>
       <SectionSmall title="Dates" startOpen={false}>
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <span className="font-semibold w-[80px]">Date Range:</span>
-          <DateChip date={aspect.start_date} />
-          <span>→</span>
-          <DateChip date={aspect.end_date} />
+          {isMoonAspect ? (
+            <>
+              <DateTimeChip datetime={aspect.start_date} format />
+              <span>→</span>
+              <DateTimeChip datetime={aspect.end_date} format />
+            </>
+          ) : (
+            <>
+              <DateChip date={aspect.start_date} />
+              <span>→</span>
+              <DateChip date={aspect.end_date} />
+            </>
+          )}
         </div>
         {ranges.length > 0 && (
           <div className="flex gap-2 mt-1 items-center">
@@ -75,7 +95,17 @@ export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
             <div className="flex flex-wrap gap-2 flex-1 text-xs text-gray-500">
               {displayedRanges.map(([start, end], i) =>
                 start === end ? (
-                  <DateChip key={i} date={start} />
+                  isMoonAspect ? (
+                    <DateTimeChip key={i} datetime={start} format />
+                  ) : (
+                    <DateChip key={i} date={start} />
+                  )
+                ) : isMoonAspect ? (
+                  <div key={i} className="flex items-center gap-2">
+                    <DateTimeChip datetime={start} format />
+                    <span>→</span>
+                    <DateTimeChip datetime={end} format />
+                  </div>
                 ) : (
                   <div key={i} className="flex items-center gap-2">
                     <DateChip date={start} />

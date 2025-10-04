@@ -1,8 +1,12 @@
-import type { RetrogradeTiming } from "../../../hooks/timings/useTimings";
-import { DateChip, PlanetChip, SectionSmall } from "../../descriptions/Helpers";
-import type { TimingEvent } from "../CurrentTimings";
 import { useState } from "react";
-import { useRetrogradeDesc } from "../../../hooks/useDescData";
+import { useRetrogradeDesc } from "../../../hooks/descriptions/useRetrogradeDesc";
+import type {
+  TimingEvent,
+  RetrogradeTiming,
+} from "../../../hooks/timings/useTimings";
+import { DateChip } from "../../utils/DateChip";
+import { PlanetChip } from "../../utils/PlanetChip";
+import { SectionSmall } from "../../utils/Section";
 
 export const RetrogradeTimingCard = ({ event }: { event: TimingEvent }) => {
   const retrograde = event.data as RetrogradeTiming;

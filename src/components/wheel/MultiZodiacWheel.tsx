@@ -3,7 +3,6 @@ import { Background } from "./layers/Background";
 import { Signs } from "./layers/Signs";
 import { Houses } from "./layers/Houses";
 import { Planets } from "./layers/Planets";
-import { ZodiacWheelSettings } from "./ZodiacWheelSettings";
 import { MultiAspects } from "./layers/MultiAspects";
 import { useWheel } from "../../hooks/useWheel";
 import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
@@ -34,7 +33,7 @@ export const MultiZodiacWheel = () => {
   const radius = size / 2;
 
   return (
-    <div className="flex gap-5 items-center">
+    <div className="flex gap-5 items-center mx-20 mr-28">
       <div className="flex-[3] flex-shrink-0 flex justify-center">
         {mainPlanetAngles ? (
           <svg

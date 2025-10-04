@@ -1,8 +1,10 @@
+import { useMoonPhaseDesc } from "../../hooks/descriptions/useMoonPhaseDesc";
 import type { MoonPhaseTiming } from "../../hooks/timings/useMoonTimings";
-import { BackButton, CloseButton, DescSection, Section } from "./Helpers";
-import { DateTimeChip, SignChip } from "../descriptions/Helpers";
 import { MoonPhasesData } from "../../types/moon";
-import { useMoonPhaseDesc } from "../../hooks/useDescData";
+import { DateTimeChip } from "../utils/DateChip";
+import { Section, DescSection } from "../utils/Section";
+import { SignChip } from "../utils/SignChip";
+import { BackButton, CloseButton } from "./Helpers";
 
 export const MoonPhasePanel = ({ phase }: { phase: MoonPhaseTiming }) => {
   const phaseData = MoonPhasesData[phase.phase];

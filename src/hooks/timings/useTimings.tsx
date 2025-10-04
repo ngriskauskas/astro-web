@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useWheel } from "../useWheel";
 import { apiFetch } from "../../utils/api";
 import { getLocalISODate } from "../../utils/funcs";
-import type { PlanetName } from "../../types/planet";
+import type { PlanetBase, PlanetName } from "../../types/planet";
 import type { AspectType } from "../../types/aspect";
 import type { ZodiacSign } from "../../types/zodiac";
 import { useAuth } from "../../contexts/AuthContext";
@@ -10,8 +10,8 @@ import { useAuth } from "../../contexts/AuthContext";
 type ExactDateRange = [string, string];
 
 export interface AspectTiming {
-  planet1: PlanetName;
-  planet2: PlanetName;
+  planet1: PlanetBase;
+  planet2: PlanetBase;
   start_date: string;
   end_date: string;
   aspect_type: AspectType;
@@ -119,7 +119,7 @@ const isToday = (d: string | Date) => {
 };
 
 export const convertToEvents = ({
-  aspects,
+  aspects = [],
   ingresses = [],
   retrogrades = [],
 }: CurrentTimingsType) => {

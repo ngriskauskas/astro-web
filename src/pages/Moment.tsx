@@ -1,4 +1,3 @@
-import { useSearchParams } from "react-router-dom";
 import { DescriptionSidePanel } from "../components/descriptions/DescriptionSidePanel";
 import { ViewSelector } from "../components/ViewSelector";
 import { ZodiacWheelSettings } from "../components/wheel/ZodiacWheelSettings";
@@ -6,23 +5,11 @@ import { DescProvider } from "../contexts/DescContext";
 import { SingleWheelProvider } from "../contexts/SingleWheelContext";
 
 export const Moment = () => {
-  const [searchParams] = useSearchParams();
-  const dateParam = searchParams.get("date");
-  const defaultTime = "23:59:00";
-  const zodiacSystemParam = searchParams.get("zodiac_system");
-  const ayanamsaParam = searchParams.get("ayanamsa");
-
   return (
-    <SingleWheelProvider
-      type="moment"
-      initialDate={dateParam || undefined}
-      initialTime={(dateParam && defaultTime) || undefined}
-      initialZodiacSystem={zodiacSystemParam || undefined}
-      initialAyanamsa={ayanamsaParam || undefined}
-    >
+    <SingleWheelProvider type="moment">
       <DescProvider>
         <div className="flex mt-5">
-          <div className="w-[88%] max-w-5xl">
+          <div className="w-[90%]">
             <div className="flex flex-row items-center gap-10">
               <div className="flex-[5]">
                 <ViewSelector page="moment" />

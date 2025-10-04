@@ -13,6 +13,8 @@ import { MultiAspectMatrix } from "./chart-views/MultiAspectMatrix";
 import { CurrentTimings } from "./chart-views/CurrentTimings";
 import { useEffect, useState } from "react";
 import { MoonTimings } from "./chart-views/MoonTimings";
+import { PlanetTimings } from "./chart-views/PlanetTimings";
+import { DailyTimings } from "./chart-views/DailyTimings";
 
 type PageType = "natal" | "time" | "transit" | "synastry" | "moment";
 
@@ -49,6 +51,10 @@ export const ViewSelector = ({ isMulti = false, page }: ViewSelectorProps) => {
         return <CurrentTimings />;
       case "moon-timings":
         return <MoonTimings />;
+      case "planet-timings":
+        return <PlanetTimings />;
+      case "daily-timings":
+        return <DailyTimings />;
       default:
         return <div>Unknown view</div>;
     }
@@ -75,7 +81,13 @@ export const ViewSelector = ({ isMulti = false, page }: ViewSelectorProps) => {
             <option value="timings">Timings</option>
           )}
           {(page === "time" || page === "transit") && (
+            <option value="daily-timings">Daily Timings</option>
+          )}
+          {page === "time" && (
             <option value="moon-timings">Moon Timings</option>
+          )}
+          {page === "transit" && (
+            <option value="planet-timings">Planet Timings</option>
           )}
         </select>
       </div>
@@ -90,6 +102,8 @@ export const ViewSelector = ({ isMulti = false, page }: ViewSelectorProps) => {
           <Route path="timings" element={renderView("timings")} />
           <Route path="aspect-matrix" element={renderView("aspect-matrix")} />
           <Route path="moon-timings" element={renderView("moon-timings")} />
+          <Route path="planet-timings" element={renderView("planet-timings")} />
+          <Route path="daily-timings" element={renderView("daily-timings")} />
         </Routes>
       </div>
     </div>

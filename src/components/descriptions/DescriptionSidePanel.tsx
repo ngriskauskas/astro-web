@@ -46,7 +46,7 @@ export const DescriptionSidePanel = () => {
   };
   return (
     <div
-      className="fixed top-0 right-0 h-full w-80 bg-white shadow-2xl border-l 
+      className="fixed top-0 right-0 h-full w-100 bg-white shadow-2xl border-l 
         border-gray-200 z-50 flex flex-col"
     >
       {renderPanel()}

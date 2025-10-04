@@ -2,7 +2,9 @@ import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { useWheelData } from "../../hooks/chart/useWheelData";
 import { useWheel } from "../../hooks/useWheel";
 import { formatDegMin } from "../../utils/funcs";
-import { HouseChip, PlanetChip, SignChip } from "../descriptions/Helpers";
+import { HouseChip } from "../utils/HouseChip";
+import { PlanetChip } from "../utils/PlanetChip";
+import { SignChip } from "../utils/SignChip";
 
 export const PlacementsTable = () => {
   const { planetAngles } = useWheel() as SingleWheelContextType;

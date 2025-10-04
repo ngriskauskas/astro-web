@@ -1,12 +1,10 @@
-import type { IngressTiming } from "../../../hooks/timings/useTimings";
-import {
-  DateChip,
-  PlanetChip,
-  SectionSmall,
-  SignChip,
-} from "../../descriptions/Helpers";
 import { useState } from "react";
-import { useIngressDesc } from "../../../hooks/useDescData";
+import { useIngressDesc } from "../../../hooks/descriptions/useIngressDesc";
+import type { IngressTiming } from "../../../hooks/timings/useTimings";
+import { DateChip } from "../../utils/DateChip";
+import { PlanetChip } from "../../utils/PlanetChip";
+import { SectionSmall } from "../../utils/Section";
+import { SignChip } from "../../utils/SignChip";
 
 export const IngressTimingCard = ({ ingress }: { ingress: IngressTiming }) => {
   const [descOpen, setDescOpen] = useState(false);

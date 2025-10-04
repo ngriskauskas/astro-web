@@ -23,6 +23,11 @@ export interface KeyAngle {
   deg_min: [number, number];
 }
 
+export interface KeyAngleDisplay {
+  name: KeyType;
+  sign: ZodiacSign;
+}
+
 interface AngleInfo {
   name: string;
   color: string;
@@ -50,7 +55,7 @@ export const AngleData: Record<KeyType, AngleInfo> = {
   },
   mc: {
     name: "Midheaven",
-    color: "#264653", // Capricorn-like dark earthy tone
+    color: "#386b75", // Capricorn-like dark earthy tone
     info: {
       description:
         "The highest point in the chart. Symbolizes career, public image, reputation, and aspirations.",

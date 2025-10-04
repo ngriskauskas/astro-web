@@ -42,6 +42,11 @@ export interface Planet {
   retrograde: boolean;
 }
 
+export interface PlanetBase {
+  name: PlanetName;
+  sign: ZodiacSign;
+}
+
 interface PlanetInfo {
   glyph: string;
   scale: number;
