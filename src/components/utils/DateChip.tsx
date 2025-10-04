@@ -82,9 +82,11 @@ export const DateTimeChip = ({
 export const TimeChip = ({
   datetime,
   format = true,
+  style = true,
 }: {
   datetime: string;
   format?: boolean;
+  style?: boolean;
 }) => {
   const {
     settings: { zodiacSystem, ayanamsa },
@@ -95,7 +97,7 @@ export const TimeChip = ({
 
   const displayTime = format
     ? new Date(datetime).toLocaleTimeString(undefined, {
-      hour: "2-digit",
+      hour: "numeric",
       minute: "2-digit",
     })
     : timePart;
@@ -113,9 +115,15 @@ export const TimeChip = ({
   return (
     <Link
       to={toLink}
-      className="inline-flex items-center gap-1 px-2 py-1 bg-white border rounded shadow-sm text-xs font-medium hover:shadow-md hover:bg-gray-50"
+      className={
+        style
+          ? "inline-flex items-center gap-1 px-2 py-1 bg-white border rounded shadow-sm text-xs font-medium hover:shadow-md hover:bg-gray-50"
+          : ""
+      }
     >
-      <span className="font-medium text-gray-600">{displayTime}</span>
+      <span className={style ? "font-medium text-gray-600" : ""}>
+        {displayTime}
+      </span>
     </Link>
   );
 };

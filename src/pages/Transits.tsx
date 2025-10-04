@@ -9,12 +9,12 @@ export const Transits = () => {
     <MultiWheelProvider type="transit">
       <DescProvider>
         <div className="flex mt-5">
-          <div className="w-[95%] ">
+          <div className="w-[90%] ">
             <div className="flex flex-row items-center gap-5">
-              <div className="flex-[4]">
+              <div className="flex-[5]">
                 <ViewSelector isMulti={true} page="transit" />
               </div>
-              <div className="flex-[1] max-h-[600px] overflow-y-auto my-5">
+              <div className="flex-[1.5] max-h-[600px] overflow-y-auto my-5">
                 <ZodiacWheelSettings />
               </div>
             </div>

@@ -1,6 +1,13 @@
 import { useDesc } from "../../contexts/DescContext";
 import { AngleData, type KeyType } from "../../types/cusp";
-export const KeyAngleChip = ({ angle }: { angle: KeyType }) => {
+
+export const KeyAngleChip = ({
+  angle,
+  small = false,
+}: {
+  angle: KeyType;
+  small?: boolean;
+}) => {
   const { open } = useDesc();
   const data = AngleData[angle];
 
@@ -20,7 +27,7 @@ export const KeyAngleChip = ({ angle }: { angle: KeyType }) => {
         <span className="text-base capitalize">{label}</span>
         <span className="relative -top-1 text-xs">{superscript}</span>
       </span>
-      <span className="ml-1 capitalize">{data.name}</span>
+      {!small && <span className="ml-1 capitalize">{data.name}</span>}
     </div>
   );
 };

@@ -24,17 +24,21 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
   });
 
   const {
-    settings: { otherProfileId },
+    settings: { otherProfileId, profileId },
     type,
   } = useWheel();
-  const { profiles } = useBirthProfiles();
 
-  const otherProfileName =
-    otherProfileId && profiles
-      ? profiles.find((x) => x.id === otherProfileId)?.name
-      : type === "transit"
-        ? "Transit"
-        : "Other";
+  const { profiles, mainProfile } = useBirthProfiles();
+
+  const getProfileName = (id: number | undefined) => {
+    if (!id || !profiles) return type === "transit" ? "transit" : "other";
+    if (mainProfile && id === mainProfile.id) return "Your";
+    return profiles.find((x) => x.id === id)?.name || "other";
+  };
+
+  const mainProfileName = getProfileName(profileId);
+  const otherProfileName = getProfileName(otherProfileId);
+
   const isMulti = type === "transit" || type === "synastry";
 
   const isPlanet = (p: PlanetBase | KeyAngleDisplay) => {
@@ -114,12 +118,12 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
               <span className="text-gray-400 text-xs uppercase tracking-wide text-center">
                 {aspect.planet1Owner === "other"
                   ? `${otherProfileName}'s`
-                  : "Yours"}
+                  : `${mainProfileName}'s`}
               </span>
               <span className="text-gray-400 text-xs uppercase tracking-wide text-center">
                 {aspect.planet1Owner === "main"
                   ? `${otherProfileName}'s`
-                  : "Yours"}
+                  : `${mainProfileName}'s`}
               </span>
               {isPlanet(aspect.planet1) ? (
                 <PlanetChip planet={aspect.planet1.name as PlanetName} />

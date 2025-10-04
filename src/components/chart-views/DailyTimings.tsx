@@ -5,10 +5,11 @@ import {
   type KeyAngleTiming,
 } from "../../hooks/timings/useDailyTimings";
 import { Timeline } from "../timeline/Timeline";
+import type { TimelineEvent } from "../timeline/types";
 import { AspectChip } from "../utils/AspectChip";
 import { TimeChip } from "../utils/DateChip";
 import { KeyAngleChip } from "../utils/KeyAngleChip";
-import { SignChip } from "../utils/SignChip";
+import { SignChip, SignCircle } from "../utils/SignChip";
 import { Spinner } from "../utils/Spinner";
 import { CollapsibleSection } from "./CurrentTimings";
 
@@ -38,34 +39,20 @@ export const DailyTimings = () => {
     loading,
   } = useDailyTimings();
 
-  const {
-    past: pastKeyAngles,
-    current: currentKeyAngles,
-    upcoming: upcomingKeyAngles,
-  } = splitByTime(key_angles);
-  const {
-    past: pastAspects,
-    current: currentAspects,
-    upcoming: upcomingAspects,
-  } = splitByTime(daily_aspects);
+  const { current: currentKeyAngles } = splitByTime(key_angles);
+  const { current: currentAspects } = splitByTime(daily_aspects);
+
+  const keyAngleEvents = keyAnglesToEvents(key_angles);
+  const dailyAspectEvents = dailyAspectsToEvents(daily_aspects);
 
   if (loading) return <Spinner />;
 
   return (
     <div className="space-y-8 ml-4 pb-4">
       <div className="mb-10">
-        <Timeline horizon="minutes" />
+        <Timeline events={[...keyAngleEvents, ...dailyAspectEvents]} />
       </div>
 
-      {pastKeyAngles.length > 0 && (
-        <CollapsibleSection title="Past Key Angles" defaultOpen={false}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {pastKeyAngles.map((k, i) => (
-              <KeyAngleCard key={i} keyAngle={k} />
-            ))}
-          </div>
-        </CollapsibleSection>
-      )}
       {currentKeyAngles.length > 0 && (
         <CollapsibleSection title="Current Key Angles" defaultOpen={true}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -75,26 +62,7 @@ export const DailyTimings = () => {
           </div>
         </CollapsibleSection>
       )}
-      {upcomingKeyAngles.length > 0 && (
-        <CollapsibleSection title="Upcoming Key Angles" defaultOpen={false}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {upcomingKeyAngles.map((k, i) => (
-              <KeyAngleCard key={i} keyAngle={k} />
-            ))}
-          </div>
-        </CollapsibleSection>
-      )}
 
-      {/* Aspects */}
-      {pastAspects.length > 0 && (
-        <CollapsibleSection title="Past Aspects" defaultOpen={false}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {pastAspects.map((a, i) => (
-              <DailyAspectCard key={i} aspect={a} />
-            ))}
-          </div>
-        </CollapsibleSection>
-      )}
       {currentAspects.length > 0 && (
         <CollapsibleSection title="Current Aspects" defaultOpen={true}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -103,19 +71,6 @@ export const DailyTimings = () => {
             ))}
           </div>
         </CollapsibleSection>
-      )}
-      {upcomingAspects.length > 0 && (
-        <CollapsibleSection title="Upcoming Aspects" defaultOpen={false}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {upcomingAspects.map((a, i) => (
-              <DailyAspectCard key={i} aspect={a} />
-            ))}
-          </div>
-        </CollapsibleSection>
-      )}
-
-      {key_angles.length === 0 && daily_aspects.length === 0 && (
-        <p className="text-gray-500">No daily timings available.</p>
       )}
     </div>
   );
@@ -163,6 +118,49 @@ const KeyAngleCard = ({ keyAngle }: { keyAngle: KeyAngleTiming }) => {
   );
 };
 
+const keyAnglesToEvents = (keyAngles: KeyAngleTiming[]): TimelineEvent[] => {
+  return keyAngles.map((ka) => {
+    const start = new Date(ka.start_time);
+    const end = new Date(ka.end_time);
+
+    return {
+      start,
+      end,
+      renderPreview: () => {
+        const startTime = new Date(ka.start_time)
+          .toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+          .replace(/ AM| PM/, "")
+          .replace(/^0/, "");
+
+        return (
+          <div
+            className="
+        flex items-center gap-1 px-1 py-0.5 rounded-md
+        border border-purple-300
+        bg-purple-50/30
+        shadow-sm
+        text-[10px]
+        pointer-events-none
+        transition-all duration-150
+        hover:shadow-md hover:border-purple-400
+      "
+          >
+            <span className="text-gray-700 font-mono text-xs">{startTime}</span>
+            <KeyAngleChip angle={ka.angle_type} small />
+            <span className="text-gray-500">→</span>
+            <SignCircle sign={ka.sign} />
+          </div>
+        );
+      },
+      renderDetail: () => <KeyAngleCard keyAngle={ka} />,
+    };
+  });
+};
+
 const DailyAspectCard = ({ aspect }: { aspect: AspectTiming }) => {
   const { open } = useDesc();
 
@@ -176,7 +174,12 @@ const DailyAspectCard = ({ aspect }: { aspect: AspectTiming }) => {
     <div className="relative rounded-md shadow-sm transition-shadow duration-200 hover:shadow-md cursor-pointer">
       <div
         className="relative z-10 rounded-md p-4 bg-white border-2 border-green-200 hover:border-green-400 transition-colors duration-200"
-        onClick={() => open({ type: "aspect", value: aspectDisplay })}
+        onClick={() =>
+          open({
+            type: "aspect",
+            value: { ...aspectDisplay, planet1Owner: "other" },
+          })
+        }
       >
         <div className="flex justify-between items-center mb-2">
           <AspectChip aspect={aspectDisplay} />
@@ -186,12 +189,7 @@ const DailyAspectCard = ({ aspect }: { aspect: AspectTiming }) => {
           </div>
         </div>
 
-        {/* Aspect Type + Start / End Times */}
-        <div className="grid grid-cols-3 gap-4 text-sm text-gray-700">
-          <div className="bg-green-50 rounded p-2 pointer-events-auto">
-            <p className="font-semibold text-green-800">Aspect</p>
-            <span>{aspect.aspect_type}</span>
-          </div>
+        <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
           <div
             className="bg-green-50 rounded p-2 pointer-events-auto"
             onClick={(e) => e.stopPropagation()}
@@ -210,4 +208,49 @@ const DailyAspectCard = ({ aspect }: { aspect: AspectTiming }) => {
       </div>
     </div>
   );
+};
+
+const dailyAspectsToEvents = (aspects: AspectTiming[]): TimelineEvent[] => {
+  return aspects.map((aspect, i) => {
+    const start = new Date(aspect.start_time);
+    const end = new Date(aspect.end_time);
+
+    const startTime = (() => {
+      const hours = start.getHours() % 12 || 12;
+      const minutes = start.getMinutes().toString().padStart(2, "0");
+      return `${hours}:${minutes}`;
+    })();
+
+    return {
+      start,
+      end,
+      renderPreview: () => (
+        <div
+          key={i}
+          className="
+      flex items-center gap-1 px-1 py-0.5 rounded-md
+      border border-green-300
+      bg-green-50/30
+      shadow-sm
+      text-[10px]
+      pointer-events-none
+      transition-all duration-150
+      hover:shadow-md hover:border-green-400
+    "
+        >
+          <span className="text-gray-700 font-mono text-xs">{startTime}</span>
+          <AspectChip
+            aspect={{
+              type: aspect.aspect_type,
+              planet1: { name: aspect.angle_type, sign: aspect.sign },
+              planet2: { name: aspect.planet, sign: aspect.sign },
+            }}
+          />
+          <span className="text-gray-500">→</span>
+          <SignCircle sign={aspect.sign} />
+        </div>
+      ),
+      renderDetail: () => <DailyAspectCard aspect={aspect} />,
+    };
+  });
 };

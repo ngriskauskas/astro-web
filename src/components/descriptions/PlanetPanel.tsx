@@ -25,6 +25,8 @@ export const PlanetPanel = ({
   });
   const planetInfo = PlanetsData[planetName];
 
+  console.log(planetDesc?.combined);
+
   return (
     <div className="flex flex-col h-full">
       <div
@@ -59,7 +61,6 @@ export const PlanetPanel = ({
                 desc={planetDesc?.retrograde ?? ""}
               />
             )}
-
             <DescSection title="Sign" desc={planetDesc?.sign ?? ""}>
               <SignChip sign={planet.sign} />
               <span className="text-gray-600 text-[13px] ml-1">
@@ -67,6 +68,14 @@ export const PlanetPanel = ({
               </span>
             </DescSection>
             <DescSection title="House" desc={planetDesc?.house ?? ""}>
+              <HouseChip house={house} owner={owner} />
+            </DescSection>
+            <DescSection
+              title="Combined"
+              desc={planetDesc?.combined ?? ""}
+              startOpen
+            >
+              <SignChip sign={planet.sign} />
               <HouseChip house={house} owner={owner} />
             </DescSection>
           </div>

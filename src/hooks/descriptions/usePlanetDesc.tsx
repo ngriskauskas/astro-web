@@ -9,6 +9,7 @@ export interface PlanetDesc {
   retrograde?: string;
   sign: string;
   house: string;
+  combined: string;
 }
 
 interface PlanetDescParams {

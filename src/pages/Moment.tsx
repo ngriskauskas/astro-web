@@ -9,7 +9,7 @@ export const Moment = () => {
     <SingleWheelProvider type="moment">
       <DescProvider>
         <div className="flex mt-5">
-          <div className="w-[95%]">
+          <div className="w-[90%]">
             <div className="flex flex-row items-center gap-10">
               <div className="flex-[5]">
                 <ViewSelector page="moment" />

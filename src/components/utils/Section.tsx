@@ -77,12 +77,14 @@ export const DescSection = ({
   title,
   children,
   desc,
+  startOpen = false,
 }: {
   title?: string;
   children?: React.ReactNode;
   desc: string;
+  startOpen?: boolean;
 }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(startOpen);
   return (
     <div>
       <div className="cursor-pointer" onClick={() => setIsOpen(!isOpen)}>

@@ -119,7 +119,7 @@ const isToday = (d: string | Date) => {
 };
 
 export const convertToEvents = ({
-  aspects,
+  aspects = [],
   ingresses = [],
   retrogrades = [],
 }: CurrentTimingsType) => {
