@@ -177,7 +177,13 @@ const DailyAspectCard = ({ aspect }: { aspect: AspectTiming }) => {
         onClick={() =>
           open({
             type: "aspect",
-            value: { ...aspectDisplay, planet1Owner: "other" },
+            value: {
+              planet1: { name: aspect.planet, sign: aspect.sign },
+              planet2: { name: aspect.angle_type, sign: aspect.sign },
+              type: aspect.aspect_type,
+              sign: aspect.sign,
+              planet1Owner: "main",
+            },
           })
         }
       >

@@ -90,7 +90,6 @@ export const useDailyTimings = () => {
     if (!user) return;
     if (type === "time") fetchDailyTimings();
     else if (type === "transit") fetchTransitTimings();
-    fetchDailyTimings();
   }, [zodiacSystem, ayanamsa, profileId, houseSystem, user]);
 
   return { timings, loading };

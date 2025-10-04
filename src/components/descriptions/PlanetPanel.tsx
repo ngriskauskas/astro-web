@@ -25,8 +25,6 @@ export const PlanetPanel = ({
   });
   const planetInfo = PlanetsData[planetName];
 
-  console.log(planetDesc?.combined);
-
   return (
     <div className="flex flex-col h-full">
       <div
