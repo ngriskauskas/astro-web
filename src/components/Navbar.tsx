@@ -36,9 +36,14 @@ export const Navbar = () => {
         </Link>
       </div>
       <div className="hidden md:flex space-x-6">
+        <Link to="/friends" className="text-gray-700 hover:text-gray-900">
+          Friends
+        </Link>
+
         <Link to="/profile" className="text-gray-700 hover:text-gray-900">
           Profile
         </Link>
+
         <button
           className="text-gray-700 hover:text-gray-900 cursor-pointer"
           onClick={handleLogout}
@@ -82,6 +87,10 @@ export const Navbar = () => {
             ${isOpen ? "translate-x-0" : "translate-x-full"}`}
         >
           <div className="flex flex-col space-y-4 p-4">
+            <Link to="/friends" className="text-gray-700 hover:text-gray-900">
+              Friends
+            </Link>
+
             <Link to="/profile" className="text-gray-700 hover:text-gray-900">
               Profile
             </Link>

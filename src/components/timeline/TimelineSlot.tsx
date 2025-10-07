@@ -1,29 +1,19 @@
+import { useDesc } from "../../contexts/DescContext";
 import { getLocalISODateTime } from "../../utils/funcs";
 import { TimeChip } from "../utils/DateChip";
-import type { DailyTimeSlot, TimelineEvent } from "./types";
+import type { DailyTimeSlot } from "./types";
 
-export const TimelineSlot = ({
-  slot,
-  opacity = 100,
-  onSelectEvent,
-}: {
-  slot: DailyTimeSlot;
-  opacity?: number;
-  onSelectEvent: (event: TimelineEvent) => void;
-}) => {
+export const TimelineSlot = ({ slot }: { slot: DailyTimeSlot }) => {
   const datetimeString = getLocalISODateTime(slot.date);
 
   return (
-    <div
-      className={`relative snap-start ${slot.isNow ? "is-now" : ""}`}
-      style={{ opacity }}
-    >
+    <div className={`relative snap-start ${slot.isNow ? "is-now" : ""}`}>
       {slot.isNow && (
         <div
           className="
             absolute top-0 bottom-0 left-0 right-0 -ml-1
             bg-blue-100/40 border-2 border-blue-400 rounded-md shadow-md
-            pointer-events-none "
+            "
         />
       )}
 
@@ -58,16 +48,7 @@ export const TimelineSlot = ({
 
         {slot.events && slot.events.length > 0 && (
           <div className="ml-4 flex gap-3 flex-wrap ">
-            {slot.events.map((event, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => onSelectEvent(event)}
-                className="focus:outline-none cursor-pointer"
-              >
-                {event.renderPreview()}
-              </button>
-            ))}
+            {slot.events.map((event) => event.renderPreview())}
           </div>
         )}
       </div>

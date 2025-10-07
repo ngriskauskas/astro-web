@@ -8,7 +8,7 @@ import type { ZodiacSign } from "../../types/zodiac";
 import { useAuth } from "../../contexts/AuthContext";
 import type { KeyType } from "../../types/cusp";
 
-export interface AspectTiming {
+export interface DailyAspectTiming {
   angle_type: KeyType;
   planet: PlanetName;
   start_time: string;
@@ -25,7 +25,7 @@ export interface KeyAngleTiming {
 }
 
 export interface DailyTimingsType {
-  daily_aspects: AspectTiming[];
+  daily_aspects: DailyAspectTiming[];
   key_angles: KeyAngleTiming[];
 }
 

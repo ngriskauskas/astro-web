@@ -14,5 +14,4 @@ export interface TimelineEvent {
   start: Date;
   end?: Date;
   renderPreview: () => ReactNode;
-  renderDetail: () => ReactNode;
 }

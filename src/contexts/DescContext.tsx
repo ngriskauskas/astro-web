@@ -5,16 +5,22 @@ import { type PlanetName } from "../types/planet";
 import type { CuspType, KeyType } from "../types/cusp";
 import type { OwnerType } from "./MultiWheelContext";
 import type { MoonPhaseTiming } from "../hooks/timings/useMoonTimings";
+import type {
+  DailyAspectTiming,
+  KeyAngleTiming,
+} from "../hooks/timings/useDailyTimings";
 
-type ActiveType =
+export type ActiveType =
   | "planet"
   | "house"
   | "sign"
   | "aspect"
   | "angle"
-  | "moonphase";
+  | "moonphase"
+  | "keyAngleTiming"
+  | "dailyAspectTiming";
 
-interface Active {
+export interface Active {
   type: ActiveType;
   value:
   | PlanetName
@@ -22,7 +28,9 @@ interface Active {
   | CuspType
   | AspectDisplay
   | MoonPhaseTiming
-  | KeyType;
+  | KeyType
+  | KeyAngleTiming
+  | DailyAspectTiming;
   owner?: OwnerType;
 }
 

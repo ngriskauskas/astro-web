@@ -10,6 +10,12 @@ import { AnglePanel } from "./AnglePanel";
 import type { CuspType, KeyType } from "../../types/cusp";
 import { MoonPhasePanel } from "./MoonPhasePanel";
 import type { MoonPhaseTiming } from "../../hooks/timings/useMoonTimings";
+import { KeyAngleTimingPanel } from "./KeyAngleTimingPanel";
+import type {
+  DailyAspectTiming,
+  KeyAngleTiming,
+} from "../../hooks/timings/useDailyTimings";
+import { DailyAspectTimingPanel } from "./DailyAspectTimingPanel";
 
 export const DescriptionSidePanel = () => {
   const { active } = useDesc();
@@ -40,6 +46,12 @@ export const DescriptionSidePanel = () => {
         return <AnglePanel angle={active.value as KeyType} />;
       case "moonphase":
         return <MoonPhasePanel phase={active.value as MoonPhaseTiming} />;
+      case "keyAngleTiming":
+        return <KeyAngleTimingPanel timing={active.value as KeyAngleTiming} />;
+      case "dailyAspectTiming":
+        return (
+          <DailyAspectTimingPanel timing={active.value as DailyAspectTiming} />
+        );
       default:
         return null;
     }

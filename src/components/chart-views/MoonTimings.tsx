@@ -27,7 +27,6 @@ export const MoonTimings = () => {
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
   );
 
-  const now = Date.now();
   const today = new Date();
   const todayNum =
     today.getFullYear() * 10000 +
@@ -46,8 +45,12 @@ export const MoonTimings = () => {
 
   const upcomingIngresses = sortedIngresses.slice(currentIndex);
 
+  today.setHours(0, 0, 0, 0);
+
   const currentPhaseIndex = sortedPhases.reduceRight((acc, phase, idx) => {
-    return acc === -1 && new Date(phase.date).getTime() <= now ? idx : acc;
+    const phaseDate = new Date(phase.date);
+    phaseDate.setHours(0, 0, 0, 0);
+    return acc === -1 && phaseDate <= today ? idx : acc;
   }, -1);
 
   return (

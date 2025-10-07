@@ -219,6 +219,8 @@ export const getSignInKeyAngle = (
 
   const angleObj = keyAnglesArray.find((ka) => ka.name === keyAngle)!;
 
+  console.log(angleObj, ctx.signAngles);
+
   const signAngle = ctx.signAngles.find((s) => {
     return angleObj.angle >= s.angle && angleObj.angle < (s.angle + 30) % 360;
   })!;

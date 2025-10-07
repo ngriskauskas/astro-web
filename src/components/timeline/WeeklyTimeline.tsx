@@ -2,46 +2,55 @@ import { useEffect, useRef } from "react";
 import { TimelineSlot } from "./TimelineSlot";
 import type { DailyTimeSlot, TimelineEvent } from "./types";
 
-const createDailyTimeSlots = (events: TimelineEvent[]): DailyTimeSlot[] => {
+const getWeekStart = (date: Date) => {
+  const d = new Date(date);
+  const day = d.getDay();
+  d.setDate(d.getDate() - day);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+const createWeeklyTimeSlots = (events: TimelineEvent[]): DailyTimeSlot[] => {
   const today = new Date();
-  const now = new Date();
-  today.setHours(0, 0, 0, 0);
+  const weekStart = getWeekStart(today);
 
-  return Array.from({ length: 24 * 4 }, (_, i) => {
-    const slotDate = new Date(today.getTime() + i * 15 * 60 * 1000);
-    const hours24 = slotDate.getHours();
-    const minutes = slotDate.getMinutes();
-    const ampm = hours24 < 12 ? "AM" : "PM";
-    const hour12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
-    const minuteStr = minutes.toString().padStart(2, "0");
-    const label = `${hour12}:${minuteStr} ${ampm}`;
-    const isHour = minutes === 0;
+  return Array.from({ length: 7 }, (_, i) => {
+    const slotDate = new Date(weekStart);
+    slotDate.setDate(weekStart.getDate() + i);
 
-    const isNow =
-      slotDate.getHours() === now.getHours() &&
-      slotDate.getMinutes() === Math.floor(now.getMinutes() / 15) * 15;
-
-    const slotEvents = events.filter((e) => {
-      const roundedMinutes = Math.floor(e.start.getMinutes() / 15) * 15;
-      return e.start.getHours() === hours24 && roundedMinutes === minutes;
+    const dayLabel = slotDate.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "short",
+      day: "numeric",
     });
+
+    const slotEvents = events.filter(
+      (e) =>
+        e.start.getFullYear() === slotDate.getFullYear() &&
+        e.start.getMonth() === slotDate.getMonth() &&
+        e.start.getDate() === slotDate.getDate(),
+    );
+
+    const isToday =
+      slotDate.getFullYear() === today.getFullYear() &&
+      slotDate.getMonth() === today.getMonth() &&
+      slotDate.getDate() === today.getDate();
 
     return {
       date: slotDate,
-      hours24,
-      minutes,
-      isHour,
-      label,
-      isNow,
+      label: dayLabel,
+      isNow: isToday,
       events: slotEvents,
+      hours24: 0,
+      minutes: 0,
+      isHour: true,
     };
   });
 };
 
-export const Timeline = ({ events }: { events: TimelineEvent[] }) => {
+export const WeeklyTimeline = ({ events }: { events: TimelineEvent[] }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const slots = createDailyTimeSlots(events);
+  const slots = createWeeklyTimeSlots(events);
 
   useEffect(() => {
     if (!containerRef.current) return;
