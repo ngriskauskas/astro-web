@@ -4,9 +4,11 @@ import { useWheel } from "../../hooks/useWheel";
 export const DateChip = ({
   date,
   format = false,
+  style = true,
 }: {
   date: string;
   format?: boolean;
+  style?: boolean;
 }) => {
   const {
     settings: { zodiacSystem, ayanamsa },
@@ -27,12 +29,19 @@ export const DateChip = ({
     type === "time"
       ? `/moment?date=${urlDate}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`
       : `/transit?date=${urlDate}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`;
+
   return (
     <Link
       to={toLink}
-      className="inline-flex items-center gap-1 px-2 py-1 bg-white border rounded shadow-sm text-xs font-medium hover:shadow-md hover:bg-gray-50"
+      className={
+        style
+          ? "inline-flex items-center gap-1 px-2 py-1 bg-white border rounded shadow-sm text-xs font-medium hover:shadow-md hover:bg-gray-50"
+          : ""
+      }
     >
-      <span className="font-medium text-gray-600">{displayDate}</span>
+      <span className={style ? "font-medium text-gray-600" : ""}>
+        {displayDate}
+      </span>
     </Link>
   );
 };

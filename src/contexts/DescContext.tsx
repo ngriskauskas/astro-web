@@ -9,6 +9,7 @@ import type {
   DailyAspectTiming,
   KeyAngleTiming,
 } from "../hooks/timings/useDailyTimings";
+import type { AspectTiming, TimingEvent } from "../hooks/timings/useTimings";
 
 export type ActiveType =
   | "planet"
@@ -18,7 +19,10 @@ export type ActiveType =
   | "angle"
   | "moonphase"
   | "keyAngleTiming"
-  | "dailyAspectTiming";
+  | "dailyAspectTiming"
+  | "aspectTiming"
+  | "ingressTiming"
+  | "retrogradeTiming";
 
 export interface Active {
   type: ActiveType;
@@ -30,7 +34,8 @@ export interface Active {
   | MoonPhaseTiming
   | KeyType
   | KeyAngleTiming
-  | DailyAspectTiming;
+  | DailyAspectTiming
+  | TimingEvent;
   owner?: OwnerType;
 }
 

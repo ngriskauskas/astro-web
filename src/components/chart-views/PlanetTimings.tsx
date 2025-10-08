@@ -6,7 +6,8 @@ import { HouseChip } from "../utils/HouseChip";
 import { SectionSmall } from "../utils/Section";
 import { SignChip } from "../utils/SignChip";
 import { Spinner } from "../utils/Spinner";
-import { CollapsibleSection, EventCard } from "./CurrentTimings";
+import { EventCard } from "./CurrentTimings";
+import { CollapsibleSection } from "../utils/CollapsibleSection";
 
 export const PlanetTimings = () => {
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetName>("sun");
@@ -52,7 +53,7 @@ export const PlanetTiming = ({ planet }: { planet: PlanetName }) => {
 
   if (loading) return <Spinner />;
 
-  const { todayEvents, tomorrowEvents, upcomingEvents } = convertToEvents({
+  const { } = convertToEvents({
     aspects: planetAspects,
     retrogrades: [],
     ingresses: [],
@@ -108,37 +109,6 @@ export const PlanetTiming = ({ planet }: { planet: PlanetName }) => {
             />
           )}
         </div>
-      </CollapsibleSection>
-      <CollapsibleSection title="Aspects" defaultOpen={false}>
-        {todayEvents.length > 0 && (
-          <CollapsibleSection title="Today" defaultOpen={true}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {todayEvents.map((event, i) => (
-                <EventCard key={i} event={event} />
-              ))}
-            </div>
-          </CollapsibleSection>
-        )}
-
-        {tomorrowEvents.length > 0 && (
-          <CollapsibleSection title="Tomorrow" defaultOpen={true}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {tomorrowEvents.map((event, i) => (
-                <EventCard key={i} event={event} />
-              ))}
-            </div>
-          </CollapsibleSection>
-        )}
-
-        {upcomingEvents.length > 0 && (
-          <CollapsibleSection title="Upcoming" defaultOpen={false}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {upcomingEvents.map((event, i) => (
-                <EventCard key={i} event={event} />
-              ))}
-            </div>
-          </CollapsibleSection>
-        )}
       </CollapsibleSection>
     </div>
   );

@@ -16,6 +16,10 @@ import type {
   KeyAngleTiming,
 } from "../../hooks/timings/useDailyTimings";
 import { DailyAspectTimingPanel } from "./DailyAspectTimingPanel";
+import { AspectTimingPanel } from "./AspectTimingPanel";
+import type { TimingEvent } from "../../hooks/timings/useTimings";
+import { IngressTimingPanel } from "./IngressPanel";
+import { RetrogradeTimingPanel } from "./RetrogradeTimingPanel";
 
 export const DescriptionSidePanel = () => {
   const { active } = useDesc();
@@ -51,6 +55,14 @@ export const DescriptionSidePanel = () => {
       case "dailyAspectTiming":
         return (
           <DailyAspectTimingPanel timing={active.value as DailyAspectTiming} />
+        );
+      case "aspectTiming":
+        return <AspectTimingPanel event={active.value as TimingEvent} />;
+      case "ingressTiming":
+        return <IngressTimingPanel ingress={active.value as TimingEvent} />;
+      case "retrogradeTiming":
+        return (
+          <RetrogradeTimingPanel retrograde={active.value as TimingEvent} />
         );
       default:
         return null;

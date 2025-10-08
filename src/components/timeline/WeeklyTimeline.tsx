@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { TimelineSlot } from "./TimelineSlot";
-import type { DailyTimeSlot, TimelineEvent } from "./types";
+import type { WeeklyTimeSlot, TimelineEvent } from "./types";
 
 const getWeekStart = (date: Date) => {
   const d = new Date(date);
@@ -10,7 +10,7 @@ const getWeekStart = (date: Date) => {
   return d;
 };
 
-const createWeeklyTimeSlots = (events: TimelineEvent[]): DailyTimeSlot[] => {
+const createWeeklyTimeSlots = (events: TimelineEvent[]): WeeklyTimeSlot[] => {
   const today = new Date();
   const weekStart = getWeekStart(today);
 
@@ -26,11 +26,10 @@ const createWeeklyTimeSlots = (events: TimelineEvent[]): DailyTimeSlot[] => {
 
     const slotEvents = events.filter(
       (e) =>
-        e.start.getFullYear() === slotDate.getFullYear() &&
-        e.start.getMonth() === slotDate.getMonth() &&
-        e.start.getDate() === slotDate.getDate(),
+        e.start.getUTCFullYear() === slotDate.getUTCFullYear() &&
+        e.start.getUTCMonth() === slotDate.getUTCMonth() &&
+        e.start.getUTCDate() === slotDate.getUTCDate(),
     );
-
     const isToday =
       slotDate.getFullYear() === today.getFullYear() &&
       slotDate.getMonth() === today.getMonth() &&
@@ -41,9 +40,6 @@ const createWeeklyTimeSlots = (events: TimelineEvent[]): DailyTimeSlot[] => {
       label: dayLabel,
       isNow: isToday,
       events: slotEvents,
-      hours24: 0,
-      minutes: 0,
-      isHour: true,
     };
   });
 };
@@ -67,7 +63,7 @@ export const WeeklyTimeline = ({ events }: { events: TimelineEvent[] }) => {
 
   return (
     <div>
-      <div className="relative h-[615px]">
+      <div className="relative h-[700px]">
         <div className="absolute inset-0 pointer-events-none">
           <div className="h-16 bg-gradient-to-b from-white to-transparent" />
           <div className="absolute bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
@@ -76,9 +72,9 @@ export const WeeklyTimeline = ({ events }: { events: TimelineEvent[] }) => {
           ref={containerRef}
           className="h-full overflow-y-scroll hide-scrollbar snap-y snap-mandatory relative scroll-smooth p-1"
         >
-          {slots.map((slot, idx) => {
-            return <TimelineSlot key={idx} slot={slot} />;
-          })}
+          {slots.map((slot, idx) => (
+            <TimelineSlot key={idx} slot={slot} />
+          ))}
         </div>
       </div>
     </div>

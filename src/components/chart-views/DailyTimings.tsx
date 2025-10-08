@@ -1,4 +1,3 @@
-import { useDesc } from "../../contexts/DescContext";
 import {
   useDailyTimings,
   type DailyAspectTiming,
@@ -9,7 +8,6 @@ import { KeyAnglePreview } from "../descriptions/KeyAngleTimingPanel";
 import { Timeline } from "../timeline/Timeline";
 import type { TimelineEvent } from "../timeline/types";
 import { Spinner } from "../utils/Spinner";
-import { CollapsibleSection } from "./CurrentTimings";
 
 const splitByTime = <T extends { start_time: string; end_time: string }>(
   items: T[],

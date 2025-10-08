@@ -80,7 +80,7 @@ export const ViewSelector = ({ isMulti = false, page }: ViewSelectorProps) => {
           {(page === "time" || page === "transit") && (
             <option value="timings">Timings</option>
           )}
-          {(page === "time") && (
+          {(page === "time" || page == "transit") && (
             <option value="daily-timings">Daily Timings</option>
           )}
           {page === "time" && (
