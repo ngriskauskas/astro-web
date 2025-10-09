@@ -88,6 +88,8 @@ export const useCurrentTimings = () => {
             date: getLocalISODate(),
             birth_profile_id: profileId,
             timezone: user?.timezone,
+            zodiac_system: zodiacSystem,
+            ayanamsa: zodiacSystem === "tropical" ? null : ayanamsa,
           }),
         });
 
