@@ -17,10 +17,10 @@ export const PlanetPanel = ({
   planetName: PlanetName;
   owner?: OwnerType;
 }) => {
-  const { aspects, planet, house } = usePlanetData(planetName, owner);
+  const { aspects, planet } = usePlanetData(planetName, owner);
   const { loading, planetDesc } = usePlanetDesc({
     planet,
-    house,
+    house: planet.house,
     sign: planet.sign,
   });
   const planetInfo = PlanetsData[planetName];
@@ -66,7 +66,7 @@ export const PlanetPanel = ({
               </span>
             </DescSection>
             <DescSection title="House" desc={planetDesc?.house ?? ""}>
-              <HouseChip house={house} owner={owner} />
+              <HouseChip house={planet.house} owner={owner} />
             </DescSection>
             <DescSection
               title="Combined"
@@ -74,7 +74,7 @@ export const PlanetPanel = ({
               startOpen
             >
               <SignChip sign={planet.sign} />
-              <HouseChip house={house} owner={owner} />
+              <HouseChip house={planet.house} owner={owner} />
             </DescSection>
           </div>
         </Section>

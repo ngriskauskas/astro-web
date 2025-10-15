@@ -1,5 +1,4 @@
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
-import { useWheelData } from "../../hooks/chart/useWheelData";
 import { useWheel } from "../../hooks/useWheel";
 import { formatDegMin } from "../../utils/funcs";
 import { HouseChip } from "../utils/HouseChip";
@@ -22,9 +21,6 @@ export const PlacementsTable = () => {
         </thead>
         <tbody>
           {planetAngles.map((planet, index) => {
-            const { getPlanetHouse } = useWheelData();
-            const house = getPlanetHouse(planet.name);
-
             return (
               <tr
                 key={planet.name}
@@ -42,7 +38,7 @@ export const PlacementsTable = () => {
                 </td>
                 <td className="px-3 py-2 align-middle whitespace-nowrap">
                   <div className="max-w-[80px]">
-                    <HouseChip house={house} />
+                    <HouseChip house={planet.house} />
                   </div>
                 </td>
                 <td className="px-3 py-2 align-middle text-xs font-mono">

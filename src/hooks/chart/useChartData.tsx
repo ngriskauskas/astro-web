@@ -10,13 +10,12 @@ const isMultiResult = (result: any[] | [any[], any[]]) =>
   Array.isArray(result) && Array.isArray(result[0]);
 
 export const usePlanetData = (planetName: PlanetName, owner?: OwnerType) => {
-  const { getPlanetAspects, getPlanet, getPlanetHouse } = useWheelData(owner);
+  const { getPlanetAspects, getPlanet } = useWheelData(owner);
 
   return useMemo(() => {
     return {
       aspects: getPlanetAspects(planetName),
       planet: getPlanet(planetName),
-      house: getPlanetHouse(planetName),
     };
   }, [planetName, owner]);
 };

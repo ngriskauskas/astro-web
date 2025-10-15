@@ -53,7 +53,7 @@ export const PlanetTiming = ({ planet }: { planet: PlanetName }) => {
 
   if (loading) return <Spinner />;
 
-  const { } = convertToEvents({
+  const {} = convertToEvents({
     aspects: planetAspects,
     retrogrades: [],
     ingresses: [],

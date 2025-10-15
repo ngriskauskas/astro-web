@@ -1,3 +1,4 @@
+import type { CuspType } from "./cusp";
 import { type ZodiacSign } from "./zodiac";
 
 export type PlanetName =
@@ -40,6 +41,7 @@ export interface Planet {
   deg_in_sign: number;
   deg_min: [number, number];
   retrograde: boolean;
+  house: CuspType;
 }
 
 export interface PlanetBase {

@@ -18,17 +18,7 @@ export const getPlanetsInHouse = (
   ctx: SingleWheelContextType,
   houseNum: CuspType,
 ): Planet[] => {
-  const { angle: start, endAngle: end } = ctx.cuspAngles.find(
-    (x) => x.name === houseNum,
-  )!;
-
-  return ctx.planetAngles.filter((planet) => {
-    if (start < end) {
-      return planet.angle >= start && planet.angle < end;
-    } else {
-      return planet.angle >= start || planet.angle < end;
-    }
-  });
+  return ctx.planetAngles.filter((planet) => planet.house === houseNum);
 };
 
 export const getPlanetAspects = (
@@ -47,19 +37,6 @@ export const getPlanetAspects = (
 
 export const getPlanet = (ctx: SingleWheelContextType, planet: PlanetName) => {
   return ctx.planetAngles.find((x) => x.name === planet)!;
-};
-
-export const getPlanetHouse = (
-  ctx: SingleWheelContextType,
-  planet: PlanetName,
-): CuspType => {
-  for (let house = 1; house <= 12; house++) {
-    const planetsInHouse = getPlanetsInHouse(ctx, house as CuspType);
-    if (planetsInHouse.some((p) => p.name === planet)) {
-      return house as CuspType;
-    }
-  }
-  throw new Error(`House not found for planet ${planet}`);
 };
 
 export const getHouse = (ctx: SingleWheelContextType, house: number) => {

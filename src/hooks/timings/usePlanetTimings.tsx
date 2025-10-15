@@ -102,7 +102,7 @@ export const usePlanetAspectTimings = (
     null,
   );
   const {
-    settings: { profileId },
+    settings: { profileId, zodiacSystem, ayanamsa },
   } = useWheel();
 
   const { user } = useAuth();
@@ -121,6 +121,8 @@ export const usePlanetAspectTimings = (
             date: getLocalISODate(),
             birth_profile_id: profileId,
             timezone: user?.timezone,
+            zodiac_system: zodiacSystem,
+            ayanamsa: zodiacSystem === "tropical" ? undefined : ayanamsa,
           }),
         });
 
