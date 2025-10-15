@@ -10,9 +10,14 @@ export interface DailyTimeSlot {
   events: TimelineEvent[];
 }
 
+export interface WeeklyTimeSlot {
+  date: Date;
+  label: string;
+  isNow: boolean;
+  events: TimelineEvent[];
+}
+
 export interface TimelineEvent {
   start: Date;
-  end?: Date;
   renderPreview: () => ReactNode;
-  renderDetail: () => ReactNode;
 }

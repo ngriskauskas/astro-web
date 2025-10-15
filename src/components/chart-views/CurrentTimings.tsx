@@ -1,4 +1,3 @@
-import { useState, type ReactNode } from "react";
 import {
   convertToEvents,
   useCurrentTimings,
@@ -8,56 +7,33 @@ import {
 import { AspectTimingCard } from "./timings/AspectTimingCard";
 import { IngressTimingCard } from "./timings/IngressTimingCard";
 import { RetrogradeTimingCard } from "./timings/RetrogradeTimingCard";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { WeeklyTimeline } from "../timeline/WeeklyTimeline";
+import type { TimelineEvent } from "../timeline/types";
+import { AspectPreview } from "../descriptions/AspectTimingPanel";
+import { IngressPreview } from "../descriptions/IngressPanel";
+import { RetrogradePreview } from "../descriptions/RetrogradeTimingPanel";
 
 export const CurrentTimings = () => {
   const { loading, timings } = useCurrentTimings();
 
   if (loading) return <div>Loading...</div>;
 
-  const { todayEvents, upcomingEvents, pastEvents, tomorrowEvents } =
+  const { aspectEvents, ingressEvents, retrogradeEvents } =
     convertToEvents(timings);
+
+  const aspectTimelineEvents = aspectsToEvents(aspectEvents);
+  const ingressTimelineEvents = ingressesToEvents(ingressEvents);
+  const retrogradeTimelineEvents = retrogradesToEvents(retrogradeEvents);
+
+  const allTimelineEvents: TimelineEvent[] = [
+    ...aspectTimelineEvents,
+    ...ingressTimelineEvents,
+    ...retrogradeTimelineEvents,
+  ];
 
   return (
     <div className="space-y-8 ml-4 pb-4">
-      {todayEvents.length > 0 && (
-        <CollapsibleSection title="Today" defaultOpen={true}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {todayEvents.map((event, i) => (
-              <EventCard event={event} key={i} />
-            ))}
-          </div>
-        </CollapsibleSection>
-      )}
-      {tomorrowEvents.length > 0 && (
-        <CollapsibleSection title="Tomorrow" defaultOpen={true}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {tomorrowEvents.map((event, i) => (
-              <EventCard event={event} key={i} />
-            ))}
-          </div>
-        </CollapsibleSection>
-      )}
-
-      {upcomingEvents.length > 0 && (
-        <CollapsibleSection title="Upcoming" defaultOpen={false}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {upcomingEvents.map((event, i) => (
-              <EventCard event={event} key={i} />
-            ))}
-          </div>
-        </CollapsibleSection>
-      )}
-
-      {pastEvents.length > 0 && (
-        <CollapsibleSection title="Past" defaultOpen={false}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {pastEvents.map((event, i) => (
-              <EventCard event={event} key={i} />
-            ))}
-          </div>
-        </CollapsibleSection>
-      )}
+      <WeeklyTimeline events={allTimelineEvents} />
     </div>
   );
 };
@@ -81,27 +57,20 @@ export const EventCard = ({ event }: { event: TimingEvent }) => {
   );
 };
 
-export const CollapsibleSection = ({
-  title,
-  children,
-  defaultOpen = true,
-}: {
-  title: string;
-  children: ReactNode;
-  defaultOpen?: boolean;
-}) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+const aspectsToEvents = (aspects: TimingEvent[]): TimelineEvent[] =>
+  aspects.map((a) => ({
+    start: new Date(a.date),
+    renderPreview: () => <AspectPreview aspect={a} />,
+  }));
 
-  return (
-    <section className="mb-4 rounded-lg">
-      <button
-        className="flex justify-between items-center w-full text-left py-2 px-3  hover:bg-gray-200 rounded-t-lg cursor-pointer"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span className="font-bold text-lg">{title}</span>
-        {isOpen ? <FiChevronUp /> : <FiChevronDown />}
-      </button>
-      {isOpen && <div className="p-1 py-2">{children}</div>}
-    </section>
-  );
-};
+const ingressesToEvents = (ingresses: TimingEvent[]): TimelineEvent[] =>
+  ingresses.map((i) => ({
+    start: new Date(i.date),
+    renderPreview: () => <IngressPreview ingress={i} />,
+  }));
+
+const retrogradesToEvents = (retrogrades: TimingEvent[]): TimelineEvent[] =>
+  retrogrades.map((r) => ({
+    start: new Date(r.date),
+    renderPreview: () => <RetrogradePreview retrograde={r} />,
+  }));

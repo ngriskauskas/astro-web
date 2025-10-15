@@ -12,9 +12,11 @@ import type { KeyAngleDisplay } from "../../types/cusp";
 export const AspectChip = ({
   aspect,
   showSign = false,
+  showPlanetName = true,
 }: {
   aspect: AspectDisplay;
   showSign?: boolean;
+  showPlanetName?: boolean;
 }) => {
   const { open } = useDesc();
   const { color, glyph: aspectGylph } = AspectData[aspect.type];
@@ -39,16 +41,20 @@ export const AspectChip = ({
           <span className="text-base">
             {PlanetsData[aspect.planet1.name as PlanetName].glyph}
           </span>
-          <span className="capitalize text-xs">{aspect.planet1.name}</span>
+          {showPlanetName && (
+            <span className="capitalize text-xs">{aspect.planet1.name}</span>
+          )}
         </div>
       ) : (
         <span className="inline-block font-mono tracking-tight">
           <span className="text-base capitalize">
             {aspect.planet1.name.charAt(0)}
           </span>
-          <span className="relative -top-1 text-xs">
-            {aspect.planet1.name.slice(1)}
-          </span>
+          {showPlanetName && (
+            <span className="relative -top-1 text-xs">
+              {aspect.planet1.name.slice(1)}
+            </span>
+          )}
         </span>
       )}
 
@@ -59,16 +65,20 @@ export const AspectChip = ({
           <span className="text-base">
             {PlanetsData[aspect.planet2.name as PlanetName].glyph}
           </span>
-          <span className="capitalize">{aspect.planet2.name}</span>
+          {showPlanetName && (
+            <span className="capitalize">{aspect.planet2.name}</span>
+          )}
         </div>
       ) : (
         <span className="inline-block font-mono font-semibold tracking-tight">
           <span className="text-base capitalize">
             {aspect.planet2.name.charAt(0)}
           </span>
-          <span className="relative -top-1 text-xs">
-            {aspect.planet2.name.slice(1)}
-          </span>
+          {showPlanetName && (
+            <span className="relative -top-1 text-xs">
+              {aspect.planet2.name.slice(1)}
+            </span>
+          )}
         </span>
       )}
 

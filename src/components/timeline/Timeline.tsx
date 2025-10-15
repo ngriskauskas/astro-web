@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { TimelineSlot } from "./TimelineSlot";
 import type { DailyTimeSlot, TimelineEvent } from "./types";
 
@@ -38,12 +38,8 @@ const createDailyTimeSlots = (events: TimelineEvent[]): DailyTimeSlot[] => {
   });
 };
 
-const SLOT_HEIGHT = 60;
-
 export const Timeline = ({ events }: { events: TimelineEvent[] }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [scrollTop, setScrollTop] = useState(0);
-  const [activeEvent, setActiveEvent] = useState<TimelineEvent | null>(null);
 
   const slots = createDailyTimeSlots(events);
 
@@ -60,21 +56,6 @@ export const Timeline = ({ events }: { events: TimelineEvent[] }) => {
     }
   }, []);
 
-  const handleScroll = () => {
-    if (!containerRef.current) return;
-    setScrollTop(containerRef.current.scrollTop);
-  };
-
-  const calcOpacity = (idx: number) => {
-    const containerHeight = containerRef.current?.offsetHeight || 0;
-    const slotTop = idx * SLOT_HEIGHT;
-    const slotCenter = slotTop + SLOT_HEIGHT / 2;
-    const centerY = scrollTop + containerHeight / 2;
-    const distance = Math.abs(centerY - slotCenter);
-    const normalized = Math.min(distance / (containerHeight / 2), 1);
-    return 0.6 + (1 - normalized) ** 2 * 0.5;
-  };
-
   return (
     <div>
       <div className="relative h-[615px]">
@@ -84,29 +65,13 @@ export const Timeline = ({ events }: { events: TimelineEvent[] }) => {
         </div>
         <div
           ref={containerRef}
-          onScroll={handleScroll}
           className="h-full overflow-y-scroll hide-scrollbar snap-y snap-mandatory relative scroll-smooth p-1"
         >
           {slots.map((slot, idx) => {
-            return (
-              <TimelineSlot
-                key={idx}
-                slot={slot}
-                onSelectEvent={setActiveEvent}
-              />
-            );
+            return <TimelineSlot key={idx} slot={slot} />;
           })}
         </div>
       </div>
-      {activeEvent && (
-        <div className="w-80 mt-5 relative">
-          <h4 className="text-sm font-semibold text-gray-700 mb-2">
-            Event Details
-          </h4>
-
-          {activeEvent.renderDetail()}
-        </div>
-      )}
     </div>
   );
 };

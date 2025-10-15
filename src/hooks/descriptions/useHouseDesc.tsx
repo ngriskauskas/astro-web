@@ -36,7 +36,10 @@ export const useHouseDesc = (params: HouseDescParams) => {
       setLoading(true);
       const data = await apiFetch("/descriptions/house", {
         method: "POST",
-        body: JSON.stringify({ ...params, type }),
+        body: JSON.stringify({
+          ...params,
+          type: type === "moment" ? "time" : type,
+        }),
       });
       setHouseDesc(data);
       setLoading(false);

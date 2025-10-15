@@ -30,9 +30,8 @@ export const Profile = () => {
     try {
       await updateUser(userInfo);
       toast.success("Profile Updated");
-    } catch (err) {
-      console.log(err);
-      toast.error("Something went wrong");
+    } catch (err: any) {
+      if (err.message) toast.error(err.message);
     }
   };
 

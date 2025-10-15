@@ -37,7 +37,15 @@ export const useAspectDesc = (
     };
 
     fetchDesc();
-  }, [params.aspect, params.planet1, params.planet2, type, enabled]);
+  }, [
+    params.aspect,
+    params.planet1.name,
+    params.planet2.name,
+    params.planet1.sign,
+    params.planet2.sign,
+    type,
+    enabled,
+  ]);
 
   return { loading, aspectDesc };
 };

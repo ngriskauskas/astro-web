@@ -26,6 +26,8 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
       const errorKey = Object.keys(data.errors)[0];
       const errorMessage = data.errors[errorKey];
       throw Error(`${errorKey}: ${errorMessage}`);
+    } else if (data?.error) {
+      throw Error(data.error || "Unknown error");
     } else throw Error(data.message);
   }
 

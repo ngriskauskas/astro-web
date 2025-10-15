@@ -18,8 +18,6 @@ export const useWheelData = (owner?: OwnerType) => {
       getPlanetAspects: (planet: PlanetName) =>
         multi.getPlanetAspects(ctx, planet, owner),
       getPlanet: (planet: PlanetName) => multi.getPlanet(ctx, planet, owner),
-      getPlanetHouse: (planet: PlanetName) =>
-        multi.getPlanetHouse(ctx, planet, owner),
       getHouse: (house: CuspType) => multi.getHouse(ctx, house, owner),
       getSignsInHouse: (house: CuspType) =>
         multi.getSignsInHouse(ctx, house, owner),
@@ -40,8 +38,6 @@ export const useWheelData = (owner?: OwnerType) => {
       getPlanetAspects: (planet: PlanetName) =>
         single.getPlanetAspects(ctx, planet),
       getPlanet: (planet: PlanetName) => single.getPlanet(ctx, planet),
-      getPlanetHouse: (planet: PlanetName) =>
-        single.getPlanetHouse(ctx, planet),
       getHouse: (house: CuspType) => single.getHouse(ctx, house),
       getSignsInHouse: (house: CuspType) => single.getSignsInHouse(ctx, house),
       getHousesInSign: (sign: ZodiacSign) => single.getHousesInSign(ctx, sign),

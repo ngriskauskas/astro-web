@@ -71,7 +71,6 @@ export const useCurrentTimings = () => {
             timezone: user?.timezone,
           }),
         });
-
         setTimings(res);
       } catch (err) {
         console.error("Failed to fetch timings", err);
@@ -89,6 +88,8 @@ export const useCurrentTimings = () => {
             date: getLocalISODate(),
             birth_profile_id: profileId,
             timezone: user?.timezone,
+            zodiac_system: zodiacSystem,
+            ayanamsa: zodiacSystem === "tropical" ? null : ayanamsa,
           }),
         });
 
@@ -106,16 +107,6 @@ export const useCurrentTimings = () => {
   }, [zodiacSystem, ayanamsa, profileId, user]);
 
   return { timings, loading };
-};
-
-const isToday = (d: string | Date) => {
-  const today = new Date(getLocalISODate());
-  const date = new Date(d);
-  return (
-    date.getFullYear() === today.getFullYear() &&
-    date.getMonth() === today.getMonth() &&
-    date.getDate() === today.getDate()
-  );
 };
 
 export const convertToEvents = ({
@@ -146,41 +137,20 @@ export const convertToEvents = ({
     { date: r.end_date, event: "end", data: r, type: "retrograde" },
   ]);
 
-  const allEvents: TimingEvent[] = [
-    ...aspectEvents,
-    ...ingressEvents,
-    ...retrogradeEvents,
-  ];
+  const now = new Date();
 
-  const today = new Date(getLocalISODate());
-  const oneWeekAgo = new Date(today);
-  oneWeekAgo.setDate(today.getDate() - 7);
+  const ongoingAspects = aspects.filter(
+    (a) => new Date(a.start_date) <= now && new Date(a.end_date) >= now,
+  );
 
-  const oneWeekAhead = new Date(today);
-  oneWeekAhead.setDate(today.getDate() + 7);
-
-  const pastEvents = allEvents
-    .filter((e) => {
-      const d = new Date(e.date);
-      return d >= oneWeekAgo && d < today;
-    })
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-  const todayEvents = allEvents.filter((e) => isToday(e.date));
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-
-  const tomorrowEvents = allEvents.filter((e) => {
-    const d = new Date(e.date);
-    return d.toDateString() === tomorrow.toDateString();
-  });
-  const upcomingEvents = allEvents
-    .filter((e) => {
-      const d = new Date(e.date);
-      return d > tomorrow && d <= oneWeekAhead;
-    })
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-  return { todayEvents, tomorrowEvents, pastEvents, upcomingEvents };
+  const ongoingRetrogrades = retrogrades.filter(
+    (r) => new Date(r.start_date) <= now && new Date(r.end_date) >= now,
+  );
+  return {
+    ongoingAspects,
+    ongoingRetrogrades,
+    aspectEvents,
+    ingressEvents,
+    retrogradeEvents,
+  };
 };
