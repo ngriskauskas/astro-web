@@ -11,29 +11,26 @@ interface RetrogradeDescParams {
   planet: PlanetName;
 }
 
-export const useRetrogradeDesc = (
-  params: RetrogradeDescParams,
-  enabled: boolean = true,
-) => {
-  const [loading, setLoading] = useState(true);
-  const [retrogradeDesc, setRetrogradeDesc] = useState<RetrogradeDesc>();
+export const useRetrogradeDesc = (params: RetrogradeDescParams, enabled: boolean = true) => {
+  const [loading, setLoading] = useState(false);
+  const [retrogradeDesc, setRetrogradeDesc] = useState<RetrogradeDesc>({ description: "temp" });
 
   const { type } = useWheel();
 
-  useEffect(() => {
-    if (!enabled) return;
-    const fetchDesc = async () => {
-      setLoading(true);
-      const data = await apiFetch("/descriptions/retrograde", {
-        method: "POST",
-        body: JSON.stringify({ ...params, type }),
-      });
-      setRetrogradeDesc(data);
-      setLoading(false);
-    };
+  // useEffect(() => {
+  //   if (!enabled) return;
+  //   const fetchDesc = async () => {
+  //     setLoading(true);
+  //     const data = await apiFetch("/descriptions/retrograde", {
+  //       method: "POST",
+  //       body: JSON.stringify({ ...params, type }),
+  //     });
+  //     setRetrogradeDesc(data);
+  //     setLoading(false);
+  //   };
 
-    fetchDesc();
-  }, [params.planet, type, enabled]);
+  //   fetchDesc();
+  // }, [params.planet, type, enabled]);
 
   return { loading, retrogradeDesc };
 };

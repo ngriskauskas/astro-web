@@ -42,7 +42,7 @@ export const PlacementsTable = () => {
                   </div>
                 </td>
                 <td className="px-3 py-2 align-middle text-xs font-mono">
-                  {formatDegMin(planet.deg_min)}
+                  {formatDegMin(planet.position.degMin)}
                 </td>
               </tr>
             );

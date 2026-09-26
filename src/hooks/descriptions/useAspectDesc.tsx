@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { AspectType } from "../../types/aspect";
+import type { AspectPointType, AspectType } from "../../types/aspect";
 import type { PlanetBase } from "../../types/planet";
 import { apiFetch } from "../../utils/api";
 import { useWheel } from "../useWheel";
@@ -11,41 +11,44 @@ export interface AspectDesc {
 
 interface AspectDescParams {
   aspect: AspectType;
-  planet1: PlanetBase | KeyAngleDisplay;
-  planet2: PlanetBase | KeyAngleDisplay;
+  point1: {
+    type: AspectPointType;
+    value: PlanetBase | KeyAngleDisplay;
+  };
+  point2: {
+    type: AspectPointType;
+    value: PlanetBase | KeyAngleDisplay;
+  };
 }
 
-export const useAspectDesc = (
-  params: AspectDescParams,
-  enabled: boolean = true,
-) => {
-  const [loading, setLoading] = useState(true);
-  const [aspectDesc, setAspectDesc] = useState<AspectDesc>();
+export const useAspectDesc = (params: AspectDescParams, enabled: boolean = true) => {
+  const [loading, setLoading] = useState(false);
+  const [aspectDesc, setAspectDesc] = useState<AspectDesc>({ description: "temp" });
 
   const { type } = useWheel();
 
-  useEffect(() => {
-    if (!enabled) return;
-    const fetchDesc = async () => {
-      setLoading(true);
-      const data = await apiFetch("/descriptions/aspect", {
-        method: "POST",
-        body: JSON.stringify({ ...params, type }),
-      });
-      setAspectDesc(data);
-      setLoading(false);
-    };
+  // useEffect(() => {
+  //   if (!enabled) return;
+  //   const fetchDesc = async () => {
+  //     setLoading(true);
+  //     const data = await apiFetch("/descriptions/aspect", {
+  //       method: "POST",
+  //       body: JSON.stringify({ ...params, type }),
+  //     });
+  //     setAspectDesc(data);
+  //     setLoading(false);
+  //   };
 
-    fetchDesc();
-  }, [
-    params.aspect,
-    params.planet1.name,
-    params.planet2.name,
-    params.planet1.sign,
-    params.planet2.sign,
-    type,
-    enabled,
-  ]);
+  //   fetchDesc();
+  // }, [
+  //   params.aspect,
+  //   params.point1.value.name,
+  //   params.point2.value.name,
+  //   params.point1.value.sign,
+  //   params.point2.value.sign,
+  //   type,
+  //   enabled,
+  // ]);
 
   return { loading, aspectDesc };
 };

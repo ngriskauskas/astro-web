@@ -1,26 +1,23 @@
 import { ElementData, type ElementInfo } from "./element";
 import { ModalityData, type ModalityInfo } from "./modality";
 import { PolarityData, type PolarityInfo } from "./polarity";
+import type { Position } from "./position";
 import { type ZodiacSign } from "./zodiac";
 
 export type CuspType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export interface Cusp {
   name: CuspType;
-  position: number;
+  position: Position;
   sign: ZodiacSign;
-  deg_in_sign: number;
-  deg_min: [number, number];
 }
 
-export type KeyType = "asc" | "mc" | "ic" | "dc";
+export type KeyType = "ASC" | "MC" | "IC" | "DC";
 
 export interface KeyAngle {
   name: KeyType;
-  position: number;
+  position: Position;
   sign: ZodiacSign;
-  deg_in_sign: number;
-  deg_min: [number, number];
 }
 
 export interface KeyAngleDisplay {
@@ -37,7 +34,7 @@ interface AngleInfo {
 }
 
 export const AngleData: Record<KeyType, AngleInfo> = {
-  asc: {
+  ASC: {
     name: "Ascendant",
     color: "#E63946", // Aries-like red
     info: {
@@ -45,7 +42,7 @@ export const AngleData: Record<KeyType, AngleInfo> = {
         "The rising sign. Represents outward personality, first impressions, and the way you initiate life experiences.",
     },
   },
-  dc: {
+  DC: {
     name: "Descendant",
     color: "#2A9D8F", // Libra-like green/teal
     info: {
@@ -53,7 +50,7 @@ export const AngleData: Record<KeyType, AngleInfo> = {
         "Opposite the Ascendant. Governs partnerships, one-on-one relationships, and qualities sought in others.",
     },
   },
-  mc: {
+  MC: {
     name: "Midheaven",
     color: "#386b75", // Capricorn-like dark earthy tone
     info: {
@@ -61,7 +58,7 @@ export const AngleData: Record<KeyType, AngleInfo> = {
         "The highest point in the chart. Symbolizes career, public image, reputation, and aspirations.",
     },
   },
-  ic: {
+  IC: {
     name: "Imum Coeli",
     color: "#457B9D", // Cancer-like deep blue
     info: {
@@ -93,7 +90,7 @@ export const HouseData: Record<CuspType, HouseInfo> = {
       element: ElementData["fire"],
       modality: ModalityData["cardinal"],
       polarity: PolarityData["masculine"],
-      sign: "aries",
+      sign: "ARIES",
     },
   },
   2: {
@@ -105,7 +102,7 @@ export const HouseData: Record<CuspType, HouseInfo> = {
       element: ElementData["earth"],
       modality: ModalityData["fixed"],
       polarity: PolarityData["feminine"],
-      sign: "taurus",
+      sign: "TAURUS",
     },
   },
   3: {
@@ -117,7 +114,7 @@ export const HouseData: Record<CuspType, HouseInfo> = {
       element: ElementData["air"],
       modality: ModalityData["mutable"],
       polarity: PolarityData["masculine"],
-      sign: "gemini",
+      sign: "GEMINI",
     },
   },
   4: {
@@ -129,7 +126,7 @@ export const HouseData: Record<CuspType, HouseInfo> = {
       element: ElementData["water"],
       modality: ModalityData["cardinal"],
       polarity: PolarityData["feminine"],
-      sign: "cancer",
+      sign: "CANCER",
     },
   },
   5: {
@@ -141,7 +138,7 @@ export const HouseData: Record<CuspType, HouseInfo> = {
       element: ElementData["fire"],
       modality: ModalityData["fixed"],
       polarity: PolarityData["masculine"],
-      sign: "leo",
+      sign: "LEO",
     },
   },
   6: {
@@ -153,7 +150,7 @@ export const HouseData: Record<CuspType, HouseInfo> = {
       element: ElementData["earth"],
       modality: ModalityData["mutable"],
       polarity: PolarityData["feminine"],
-      sign: "virgo",
+      sign: "VIRGO",
     },
   },
   7: {
@@ -165,7 +162,7 @@ export const HouseData: Record<CuspType, HouseInfo> = {
       element: ElementData["air"],
       modality: ModalityData["cardinal"],
       polarity: PolarityData["masculine"],
-      sign: "libra",
+      sign: "LIBRA",
     },
   },
   8: {
@@ -177,7 +174,7 @@ export const HouseData: Record<CuspType, HouseInfo> = {
       element: ElementData["water"],
       modality: ModalityData["fixed"],
       polarity: PolarityData["feminine"],
-      sign: "scorpio",
+      sign: "SCORPIO",
     },
   },
   9: {
@@ -189,7 +186,7 @@ export const HouseData: Record<CuspType, HouseInfo> = {
       element: ElementData["fire"],
       modality: ModalityData["mutable"],
       polarity: PolarityData["masculine"],
-      sign: "sagittarius",
+      sign: "SAGITTARIUS",
     },
   },
   10: {
@@ -201,7 +198,7 @@ export const HouseData: Record<CuspType, HouseInfo> = {
       element: ElementData["earth"],
       modality: ModalityData["cardinal"],
       polarity: PolarityData["feminine"],
-      sign: "capricorn",
+      sign: "CAPRICORN",
     },
   },
   11: {
@@ -213,7 +210,7 @@ export const HouseData: Record<CuspType, HouseInfo> = {
       element: ElementData["air"],
       modality: ModalityData["fixed"],
       polarity: PolarityData["masculine"],
-      sign: "aquarius",
+      sign: "AQUARIUS",
     },
   },
   12: {
@@ -225,7 +222,7 @@ export const HouseData: Record<CuspType, HouseInfo> = {
       element: ElementData["water"],
       modality: ModalityData["mutable"],
       polarity: PolarityData["feminine"],
-      sign: "pisces",
+      sign: "PISCES",
     },
   },
 };

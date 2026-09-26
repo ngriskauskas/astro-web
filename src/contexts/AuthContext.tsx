@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { apiFetch } from "../utils/api";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -13,9 +7,12 @@ export interface User {
   id: string;
   email: string;
   username: string;
-  address: string;
-  longitude: number;
-  latitude: number;
+  location: {
+    timezone: string;
+    address: string;
+    longitude: number;
+    latitude: number;
+  };
   timezone: string;
 }
 
@@ -30,9 +27,7 @@ interface AuthContextType {
   updateUser: (user: Partial<User>) => Promise<void>;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined,
-);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
@@ -50,7 +45,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!token) return;
-
     fetchUser();
   }, [token]);
 
@@ -60,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await apiFetch("/me", {
         method: "GET",
       });
-      const user = data.user as User;
+      const user = data as User;
       setUser(user);
     } catch (err) {
       localStorage.removeItem("token");
@@ -72,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (email: string, password: string) => {
-    const res = await fetch(`${API_URL}/login`, {
+    const res = await fetch(`${API_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -114,7 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const register = async (email: string, password: string) => {
-    const res = await fetch(`${API_URL}/register`, {
+    const res = await fetch(`${API_URL}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -134,11 +128,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const updateUser = async (updatedUser: Partial<User>) => {
     const data = await apiFetch("/me", {
-      method: "PATCH",
+      method: "PUT",
       body: JSON.stringify(updatedUser),
     });
 
-    setUser(data.user);
+    setUser(data);
   };
 
   return (

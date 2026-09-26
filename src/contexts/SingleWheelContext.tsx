@@ -1,21 +1,18 @@
 import { createContext, useEffect, useState, type ReactNode } from "react";
-import { type SingleChart, useCharts } from "./ChartContext";
+import { useCharts } from "./ChartContext";
 import { ZodiacSigns, type ZodiacSign } from "../types/zodiac";
 import { type ZodiacWheelOptions } from "../components/wheel/ZodiacWheelSettings";
 import { useBirthProfiles } from "./BirthProfilesContext";
 import { type PlanetAngle } from "../components/wheel/layers/Planets";
-import {
-  type CuspAngle,
-  type KeyAngleAngle,
-} from "../components/wheel/layers/Houses";
+import { type CuspAngle, type KeyAngleAngle } from "../components/wheel/layers/Houses";
 import { type SignAngle } from "../components/wheel/layers/Signs";
-import { useAuth } from "./AuthContext";
 import { type Aspect } from "../types/aspect";
 import type { Planet } from "../types/planet";
-import { getLocalISODate, getLocalISOTime } from "../utils/funcs";
+import { getLocalISODate, getLocalISODateTime, getLocalISOTime } from "../utils/funcs";
 import type { ZodiacSystem } from "../types/zodiac-system";
 import type { Ayanamsa } from "../types/ayanamsa";
 import { useSearchParams } from "react-router-dom";
+import type { SingleChart } from "../types/chart";
 
 export interface SingleWheelContextType {
   settings: ZodiacWheelOptions;
@@ -28,9 +25,7 @@ export interface SingleWheelContextType {
   type: "natal" | "time" | "moment";
 }
 
-export const SingleWheelContext = createContext<
-  SingleWheelContextType | undefined
->(undefined);
+export const SingleWheelContext = createContext<SingleWheelContextType | undefined>(undefined);
 
 export const SingleWheelProvider = ({
   children,
@@ -40,7 +35,6 @@ export const SingleWheelProvider = ({
   type: "natal" | "time" | "moment";
 }) => {
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
   const [chart, setChart] = useState<SingleChart | undefined>();
   const { getNatalChart, getCurrentChart } = useCharts();
   const { mainProfile } = useBirthProfiles();
@@ -52,60 +46,26 @@ export const SingleWheelProvider = ({
 
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
     profileId: mainProfile?.id,
-    zodiacSystem: "tropical",
-    houseSystem: "placidus",
-    ayanamsa: "lahiri",
-    aspectOptions: {
-      conjunction: { show: true, minOrb: 6 },
-      opposition: { show: true, minOrb: 6 },
-      square: { show: true, minOrb: 6 },
-      trine: { show: true, minOrb: 6 },
-      sextile: { show: true, minOrb: 6 },
-    },
-    objectOptions: {
-      showChiron: true,
-      showLilith: true,
-    },
-    displayOptions: {
-      angleLabels: true,
-      tickMarks: true,
-    },
   });
 
   const fetchNatalChart = async () => {
     const data = await getNatalChart({
-      birth_profile_id: settings.profileId!,
-      zodiac_system: settings.zodiacSystem,
-      house_system: settings.houseSystem,
-      ayanamsa:
-        settings.zodiacSystem === "sidereal" ? settings.ayanamsa : undefined,
+      birthProfileId: settings.profileId!,
     });
     setChart(data);
   };
 
   const fetchCurrentChart = async () => {
     const data = await getCurrentChart({
-      location: { lon: user!.longitude, lat: user!.latitude },
-      time: getLocalISOTime(),
-      date: getLocalISODate(),
-      zodiac_system: settings.zodiacSystem,
-      house_system: settings.houseSystem,
-      ayanamsa:
-        settings.zodiacSystem === "sidereal" ? settings.ayanamsa : undefined,
+      datetime: getLocalISODateTime(),
     });
     setChart(data);
   };
 
   const fetchMomentChart = async () => {
-    if (!settings.datetimeOptions) return;
+    if (!settings.datetimeOptions?.date || !settings.datetimeOptions?.time) return;
     const data = await getCurrentChart({
-      location: { lon: user!.longitude, lat: user!.latitude },
-      time: settings.datetimeOptions?.time,
-      date: settings.datetimeOptions?.date,
-      zodiac_system: settings.zodiacSystem,
-      house_system: settings.houseSystem,
-      ayanamsa:
-        settings.zodiacSystem === "sidereal" ? settings.ayanamsa : undefined,
+      datetime: `${settings.datetimeOptions.date}T${settings.datetimeOptions.time}`,
     });
     setChart(data);
   };
@@ -115,20 +75,13 @@ export const SingleWheelProvider = ({
 
     const dateParam = searchParams.get("date");
     const timeParam = searchParams.get("time") || "23:59:00";
-    const zodiacParam = searchParams.get("zodiac_system");
-    const ayanamsaParam = searchParams.get("ayanamsa");
 
     setSettings((prev) => ({
       ...prev,
       datetimeOptions: {
         date: dateParam || prev.datetimeOptions?.date || getLocalISODate(),
-        time:
-          (dateParam && timeParam) ||
-          prev.datetimeOptions?.time ||
-          getLocalISOTime(),
+        time: (dateParam && timeParam) || prev.datetimeOptions?.time || getLocalISOTime(),
       },
-      zodiacSystem: (zodiacParam as ZodiacSystem) || prev.zodiacSystem,
-      ayanamsa: (ayanamsaParam as Ayanamsa) || prev.ayanamsa,
     }));
   }, [searchParams]);
 
@@ -146,24 +99,18 @@ export const SingleWheelProvider = ({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [
-    settings.profileId,
-    settings.ayanamsa,
-    settings.houseSystem,
-    settings.zodiacSystem,
-    settings.datetimeOptions,
-  ]);
+  }, [settings.profileId, settings.datetimeOptions]);
 
   const round = (num: number): number => {
     return Math.round(num * 100) / 100;
   };
 
   const calcCuspAngles = (chart: SingleChart) => {
-    const ascPos = chart.cusps[1].position;
+    const ascPos = chart.houses[1].position.position;
 
-    const cusps = Object.entries(chart.cusps).map(([_key, cusp]) => ({
+    const cusps = Object.entries(chart.houses).map(([_key, cusp]) => ({
       ...cusp,
-      angle: round((cusp.position - ascPos + 360) % 360),
+      angle: round((cusp.position.position - ascPos + 360) % 360),
     }));
 
     return cusps.map((cusp) => {
@@ -178,23 +125,20 @@ export const SingleWheelProvider = ({
   };
 
   const calcKeyAngles = (chart: SingleChart) => {
-    const ascPos = chart.cusps[1].position;
+    const ascPos = chart.houses[1].position.position;
 
-    return Object.entries(chart.keys).map(([_key, cusp]) => ({
+    return Object.entries(chart.keyAngles).map(([_key, cusp]) => ({
       ...cusp,
-      angle: round((cusp.position - ascPos + 360) % 360),
+      angle: round((cusp.position.position - ascPos + 360) % 360),
     }));
   };
 
-  const calcInitialPlanetAngles = (
-    ascPos: number,
-    planets: Record<string, Planet>,
-  ) =>
+  const calcInitialPlanetAngles = (ascPos: number, planets: Record<string, Planet>) =>
     Object.entries(planets)
       .map(([_key, planet]) => ({
         ...planet,
-        angle: round((planet.position - ascPos + 360) % 360),
-        glyphAngle: round((planet.position - ascPos + 360) % 360),
+        angle: round((planet.position.position - ascPos + 360) % 360),
+        glyphAngle: round((planet.position.position - ascPos + 360) % 360),
       }))
       .sort((a, b) => a.angle - b.angle);
 
@@ -224,7 +168,7 @@ export const SingleWheelProvider = ({
   };
 
   const calcPlanetAngles = (chart: SingleChart) => {
-    const ascPos = chart.cusps[1].position;
+    const ascPos = chart.houses[1].position.position;
 
     const rawPlanetAngles = calcInitialPlanetAngles(ascPos, chart.planets);
 
@@ -232,11 +176,11 @@ export const SingleWheelProvider = ({
   };
 
   const calcSignAngles = (chart: SingleChart) => {
-    const ascSign = chart.cusps[1].sign;
+    const ascSign = chart.houses[1].sign;
 
     const ascIndex = ZodiacSigns.indexOf(ascSign);
 
-    const startAngleFirstSign = -chart.cusps[1].deg_in_sign;
+    const startAngleFirstSign = -chart.houses[1].position.degInSign;
     return ZodiacSigns.map((s, i) => {
       const offset = (i - ascIndex + 12) % 12;
       const angle = round((startAngleFirstSign + offset * 30 + 360) % 360);
@@ -251,7 +195,12 @@ export const SingleWheelProvider = ({
     setCuspAngles(calcCuspAngles(chart));
     setSignAngles(calcSignAngles(chart));
     setKeyAngles(calcKeyAngles(chart));
-    setAspects(chart.aspects);
+    //TODO for now just use planet aspects
+    setAspects(
+      chart.aspects.filter(
+        ({ point1, point2 }) => point1.type === "Planet" && point2.type === "Planet",
+      ),
+    );
   }, [chart]);
 
   return (

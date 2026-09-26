@@ -27,7 +27,9 @@ export const Navbar = () => {
         <Link to="/moment" className="text-gray-700 hover:text-gray-900">
           Moment
         </Link>
-
+        <Link to="/daily" className="text-gray-700 hover:text-gray-900">
+          Daily
+        </Link>
         <Link to="/transit" className="text-gray-700 hover:text-gray-900">
           Transits
         </Link>
@@ -44,10 +46,7 @@ export const Navbar = () => {
           Profile
         </Link>
 
-        <button
-          className="text-gray-700 hover:text-gray-900 cursor-pointer"
-          onClick={handleLogout}
-        >
+        <button className="text-gray-700 hover:text-gray-900 cursor-pointer" onClick={handleLogout}>
           Logout
         </button>
       </div>
@@ -72,15 +71,10 @@ export const Navbar = () => {
       </button>
       <div
         className={`fixed inset-0 z-40 transition-opacity duration-300 ${
-          isOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
+          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       >
-        <div
-          className="absolute inset-0 bg-black/20"
-          onClick={() => setIsOpen(false)}
-        />
+        <div className="absolute inset-0 bg-black/20" onClick={() => setIsOpen(false)} />
 
         <div
           className={`absolute top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out

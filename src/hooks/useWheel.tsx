@@ -1,21 +1,13 @@
 import { useContext } from "react";
-import {
-  SingleWheelContext,
-  type SingleWheelContextType,
-} from "../contexts/SingleWheelContext";
-import {
-  MultiWheelContext,
-  type MultiWheelContextType,
-} from "../contexts/MultiWheelContext";
+import { SingleWheelContext, type SingleWheelContextType } from "../contexts/SingleWheelContext";
+import { MultiWheelContext, type MultiWheelContextType } from "../contexts/MultiWheelContext";
 
 export const useWheel = () => {
   const single = useContext(SingleWheelContext);
   const multi = useContext(MultiWheelContext);
 
   if (!single && !multi) {
-    throw new Error(
-      "useWheel must be used inside a SingleWheelProvider or MultiWheel provider",
-    );
+    throw new Error("useWheel must be used inside a SingleWheelProvider or MultiWheel provider");
   }
 
   return (single ?? multi)!;

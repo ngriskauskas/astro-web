@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  useBirthProfiles,
-  type BirthProfile,
-} from "../contexts/BirthProfilesContext";
+import { useBirthProfiles, type BirthProfile } from "../../contexts/BirthProfilesContext";
 import { BirthInfoForm } from "./BirthInfoForm";
 
 export const CustomProfileList = () => {
@@ -12,7 +9,7 @@ export const CustomProfileList = () => {
   const [newOpen, setNewOpen] = useState(false);
 
   useEffect(() => {
-    setCustomProfiles(profiles.filter((x) => !x.main));
+    setCustomProfiles(profiles.filter((x) => !x.isMain));
   }, [profiles]);
 
   const toggle = (id: number) => {

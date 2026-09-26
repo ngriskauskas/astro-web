@@ -1,11 +1,11 @@
 export const AYANAMSAS = [
-  "faganBradely",
-  "lahiri",
-  "deLuce",
-  "raman",
-  "ushaSashi",
-  "krishnamurit",
-  "djwhwalKhul",
-  "yukteshwar",
+  "FAGANBRADLEY",
+  "LAHIRI",
+  "DELUCE",
+  "RAMAN",
+  "USHASASHI",
+  "KRISHNAMURTI",
+  "DJWHWALKHUL",
+  "YUKTESHWAR",
 ] as const;
 export type Ayanamsa = (typeof AYANAMSAS)[number];

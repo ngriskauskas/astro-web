@@ -1,14 +1,10 @@
 import { createContext, useEffect, useState, type ReactNode } from "react";
-import { type MultiChart, useCharts } from "./ChartContext";
+import { useCharts } from "./ChartContext";
 import { type ZodiacWheelOptions } from "../components/wheel/ZodiacWheelSettings";
 import { useBirthProfiles } from "./BirthProfilesContext";
 import { type PlanetAngle } from "../components/wheel/layers/Planets";
-import {
-  type CuspAngle,
-  type KeyAngleAngle,
-} from "../components/wheel/layers/Houses";
+import { type CuspAngle, type KeyAngleAngle } from "../components/wheel/layers/Houses";
 import { type SignAngle } from "../components/wheel/layers/Signs";
-import { useAuth } from "./AuthContext";
 import { ZodiacSigns, type ZodiacSign } from "../types/zodiac";
 import { type Aspect } from "../types/aspect";
 import type { Planet } from "../types/planet";
@@ -16,6 +12,7 @@ import { getLocalISODate, getLocalISOTime } from "../utils/funcs";
 import type { ZodiacSystem } from "../types/zodiac-system";
 import type { Ayanamsa } from "../types/ayanamsa";
 import { useSearchParams } from "react-router-dom";
+import type { MultiChart } from "../types/chart";
 
 export type OwnerType = "main" | "other";
 
@@ -33,9 +30,7 @@ export interface MultiWheelContextType {
   type: "synastry" | "transit";
 }
 
-export const MultiWheelContext = createContext<
-  MultiWheelContextType | undefined
->(undefined);
+export const MultiWheelContext = createContext<MultiWheelContextType | undefined>(undefined);
 
 export const MultiWheelProvider = ({
   children,
@@ -45,7 +40,6 @@ export const MultiWheelProvider = ({
   type: "synastry" | "transit";
 }) => {
   const [searchParams] = useSearchParams();
-  const { user } = useAuth();
   const [chart, setChart] = useState<MultiChart | undefined>();
   const { getSynastryChart, getTransitChart } = useCharts();
   const { mainProfile, profiles } = useBirthProfiles();
@@ -60,16 +54,16 @@ export const MultiWheelProvider = ({
 
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
     profileId: mainProfile?.id,
-    otherProfileId: type === "synastry" ? profiles[0].id : undefined,
+    otherProfileId: type === "synastry" ? profiles[1].id : undefined,
     zodiacSystem: "tropical",
     houseSystem: "placidus",
     ayanamsa: "lahiri",
     aspectOptions: {
-      conjunction: { show: true, minOrb: 3 },
-      opposition: { show: true, minOrb: 3 },
-      square: { show: true, minOrb: 3 },
-      trine: { show: true, minOrb: 3 },
-      sextile: { show: true, minOrb: 3 },
+      CONJUNCTION: { show: true, minOrb: 3 },
+      OPPOSITION: { show: true, minOrb: 3 },
+      SQUARE: { show: true, minOrb: 3 },
+      TRINE: { show: true, minOrb: 3 },
+      SEXTILE: { show: true, minOrb: 3 },
     },
     objectOptions: {
       showChiron: true,
@@ -83,33 +77,23 @@ export const MultiWheelProvider = ({
       type === "synastry"
         ? undefined
         : {
-          date: getLocalISODate(),
-          time: getLocalISOTime(),
-        },
+            date: getLocalISODate(),
+            time: getLocalISOTime(),
+          },
   });
 
   const fetchSynastryChart = async () => {
     const data = await getSynastryChart({
-      main_birth_profile_id: settings.profileId!,
-      other_birth_profile_id: settings.otherProfileId!,
-      zodiac_system: settings.zodiacSystem,
-      house_system: settings.houseSystem,
-      ayanamsa:
-        settings.zodiacSystem === "sidereal" ? settings.ayanamsa : undefined,
+      mainBirthProfileId: settings.profileId!,
+      otherBirthProfileId: settings.otherProfileId!,
     });
     setChart(data);
   };
 
   const fetchCurrentChart = async () => {
     const data = await getTransitChart({
-      birth_profile_id: settings.profileId!,
-      location: { lon: user!.longitude, lat: user!.latitude },
-      time: settings.datetimeOptions!.time,
-      date: settings.datetimeOptions!.date,
-      zodiac_system: settings.zodiacSystem,
-      house_system: settings.houseSystem,
-      ayanamsa:
-        settings.zodiacSystem === "sidereal" ? settings.ayanamsa : undefined,
+      birthProfileId: settings.profileId!,
+      datetime: `${settings.datetimeOptions!.date}T${settings.datetimeOptions!.time}`,
     });
     setChart(data);
   };
@@ -125,10 +109,7 @@ export const MultiWheelProvider = ({
       ...prev,
       datetimeOptions: {
         date: dateParam || prev.datetimeOptions?.date || getLocalISODate(),
-        time:
-          (dateParam && timeParam) ||
-          prev.datetimeOptions?.time ||
-          getLocalISOTime(),
+        time: (dateParam && timeParam) || prev.datetimeOptions?.time || getLocalISOTime(),
       },
       zodiacSystem: (zodiacParam as ZodiacSystem) || prev.zodiacSystem,
       ayanamsa: (ayanamsaParam as Ayanamsa) || prev.ayanamsa,
@@ -152,18 +133,16 @@ export const MultiWheelProvider = ({
   };
 
   const calcCuspAngles = (chart: MultiChart) => {
-    const ascPos = chart.main.cusps[1].position;
+    const ascPos = chart.main.houses[1].position.position;
 
-    const mainCusps = Object.entries(chart.main.cusps).map(([_key, cusp]) => ({
+    const mainCusps = Object.entries(chart.main.houses).map(([_key, cusp]) => ({
       ...cusp,
-      angle: round((cusp.position - ascPos + 360) % 360),
+      angle: round((cusp.position.position - ascPos + 360) % 360),
     }));
-    const otherCusps = Object.entries(chart.other.cusps).map(
-      ([_key, cusp]) => ({
-        ...cusp,
-        angle: round((cusp.position - ascPos + 360) % 360),
-      }),
-    );
+    const otherCusps = Object.entries(chart.other.houses).map(([_key, cusp]) => ({
+      ...cusp,
+      angle: round((cusp.position.position - ascPos + 360) % 360),
+    }));
 
     const main = mainCusps.map((cusp) => {
       const nextid = cusp.name === 12 ? 1 : cusp.name + 1;
@@ -188,29 +167,26 @@ export const MultiWheelProvider = ({
   };
 
   const calcKeyAngles = (chart: MultiChart) => {
-    const ascPos = chart.main.cusps[1].position;
+    const ascPos = chart.main.houses[1].position.position;
 
-    const main = Object.entries(chart.main.keys).map(([_key, cusp]) => ({
+    const main = Object.entries(chart.main.keyAngles).map(([_key, cusp]) => ({
       ...cusp,
-      angle: round((cusp.position - ascPos + 360) % 360),
+      angle: round((cusp.position.position - ascPos + 360) % 360),
     }));
-    const other = Object.entries(chart.other.keys).map(([_key, cusp]) => ({
+    const other = Object.entries(chart.other.keyAngles).map(([_key, cusp]) => ({
       ...cusp,
-      angle: round((cusp.position - ascPos + 360) % 360),
+      angle: round((cusp.position.position - ascPos + 360) % 360),
     }));
 
     return { main, other };
   };
 
-  const calcInitialPlanetAngles = (
-    ascPos: number,
-    planets: Record<string, Planet>,
-  ) =>
+  const calcInitialPlanetAngles = (ascPos: number, planets: Record<string, Planet>) =>
     Object.entries(planets)
       .map(([_key, planet]) => ({
         ...planet,
-        angle: round((planet.position - ascPos + 360) % 360),
-        glyphAngle: round((planet.position - ascPos + 360) % 360),
+        angle: round((planet.position.position - ascPos + 360) % 360),
+        glyphAngle: round((planet.position.position - ascPos + 360) % 360),
       }))
       .sort((a, b) => a.angle - b.angle);
 
@@ -240,17 +216,11 @@ export const MultiWheelProvider = ({
   };
 
   const calcPlanetAngles = (chart: MultiChart) => {
-    const ascPos = chart.main.cusps[1].position;
+    const ascPos = chart.main.houses[1].position.position;
 
-    const rawMainPlanetAngles = calcInitialPlanetAngles(
-      ascPos,
-      chart.main.planets,
-    );
+    const rawMainPlanetAngles = calcInitialPlanetAngles(ascPos, chart.main.planets);
 
-    const rawOtherPlanetAngles = calcInitialPlanetAngles(
-      ascPos,
-      chart.other.planets,
-    );
+    const rawOtherPlanetAngles = calcInitialPlanetAngles(ascPos, chart.other.planets);
 
     const main = adjustGlyphAngles(rawMainPlanetAngles);
     const other = adjustGlyphAngles(rawOtherPlanetAngles);
@@ -259,11 +229,11 @@ export const MultiWheelProvider = ({
   };
 
   const calcSignAngles = (chart: MultiChart) => {
-    const ascSign = chart.main.cusps[1].sign;
+    const ascSign = chart.main.houses[1].sign;
 
     const ascIndex = ZodiacSigns.indexOf(ascSign);
 
-    const startAngleFirstSign = -chart.main.cusps[1].deg_in_sign;
+    const startAngleFirstSign = -chart.main.houses[1].position.degInSign;
     return ZodiacSigns.map((s, i) => {
       const offset = (i - ascIndex + 12) % 12;
       const angle = round((startAngleFirstSign + offset * 30 + 360) % 360);
@@ -287,7 +257,11 @@ export const MultiWheelProvider = ({
     setOtherKeyAngles(otherKAngles);
 
     setSignAngles(calcSignAngles(chart));
-    setAspects(chart.aspects);
+    setAspects(
+      chart.aspects.filter(
+        ({ point1, point2 }) => point1.type === "Planet" && point2.type === "Planet",
+      ),
+    );
   }, [chart]);
 
   return (

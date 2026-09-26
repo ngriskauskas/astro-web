@@ -3,16 +3,12 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
 
-export const ProtectedUserLocation = ({
-  children,
-}: {
-  children: ReactNode;
-}) => {
+export const ProtectedUserLocation = ({ children }: { children: ReactNode }) => {
   const { user, loading } = useAuth();
   const hasToasted = useRef(false);
 
   useEffect(() => {
-    if (!user?.address && !hasToasted.current) {
+    if (!user?.location.address && !hasToasted.current) {
       toast.error("Please enter your location first");
       hasToasted.current = true;
     }
@@ -22,7 +18,7 @@ export const ProtectedUserLocation = ({
     return <>Loading...</>;
   }
 
-  if (!user?.address) {
+  if (!user?.location.address) {
     return <Navigate to="/profile" replace />;
   }
 

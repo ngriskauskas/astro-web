@@ -1,65 +1,23 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { apiFetch } from "../utils/api";
-import type { Planet, PlanetName } from "../types/planet";
-import type { Cusp, CuspType, KeyAngle } from "../types/cusp";
-import type { Aspect } from "../types/aspect";
-import type { HouseSystem } from "../types/house-system";
-import type { ZodiacSystem } from "../types/zodiac-system";
-import type { Ayanamsa } from "../types/ayanamsa";
+import type { SingleChart, MultiChart } from "../types/chart";
 
-export interface MultiChart {
-  main: {
-    planets: Record<PlanetName, Planet>;
-    cusps: Record<CuspType, Cusp>;
-    keys: Record<KeyType, KeyAngle>;
-  };
-  other: {
-    planets: Record<PlanetName, Planet>;
-    cusps: Record<CuspType, Cusp>;
-    keys: Record<KeyType, KeyAngle>;
-  };
-  aspects: Aspect[];
+export interface NatalChartOptions {
+  birthProfileId: number;
 }
 
-export interface SingleChart {
-  planets: Record<PlanetName, Planet>;
-  cusps: Record<CuspType, Cusp>;
-  keys: Record<KeyType, KeyAngle>;
-  aspects: Aspect[];
+export interface CurrentChartOptions {
+  datetime: string;
 }
 
-interface ChartOptions {
-  house_system: HouseSystem;
-  zodiac_system: ZodiacSystem;
-  ayanamsa?: Ayanamsa;
+export interface SynastryChartOptions {
+  mainBirthProfileId: number;
+  otherBirthProfileId: number;
 }
 
-export interface NatalChartOptions extends ChartOptions {
-  birth_profile_id: number;
-}
-
-export interface CurrentChartOptions extends ChartOptions {
-  date: string;
-  time: string;
-  location: {
-    lat: number;
-    lon: number;
-  };
-}
-
-export interface SynastryChartOptions extends ChartOptions {
-  main_birth_profile_id: number;
-  other_birth_profile_id: number;
-}
-
-export interface TransitChartOptions extends ChartOptions {
-  birth_profile_id: number;
-  date: string;
-  time: string;
-  location: {
-    lat: number;
-    lon: number;
-  };
+export interface TransitChartOptions {
+  birthProfileId: number;
+  datetime: string;
 }
 
 interface ChartContextType {

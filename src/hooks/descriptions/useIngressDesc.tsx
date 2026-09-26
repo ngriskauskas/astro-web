@@ -13,30 +13,27 @@ interface IngressDescParams {
   sign: ZodiacSign;
 }
 
-export const useIngressDesc = (
-  params: IngressDescParams,
-  enabled: boolean = true,
-) => {
-  const [loading, setLoading] = useState(true);
-  const [ingressDesc, setIngressDesc] = useState<IngressDesc>();
+export const useIngressDesc = (params: IngressDescParams, enabled: boolean = true) => {
+  const [loading, setLoading] = useState(false);
+  const [ingressDesc, setIngressDesc] = useState<IngressDesc>({ description: "temp" });
 
   const { type } = useWheel();
 
-  useEffect(() => {
-    if (!enabled) return;
+  // useEffect(() => {
+  //   if (!enabled) return;
 
-    const fetchDesc = async () => {
-      setLoading(true);
-      const data = await apiFetch("/descriptions/ingress", {
-        method: "POST",
-        body: JSON.stringify({ ...params, type }),
-      });
-      setIngressDesc(data);
-      setLoading(false);
-    };
+  //   const fetchDesc = async () => {
+  //     setLoading(true);
+  //     const data = await apiFetch("/descriptions/ingress", {
+  //       method: "POST",
+  //       body: JSON.stringify({ ...params, type }),
+  //     });
+  //     setIngressDesc(data);
+  //     setLoading(false);
+  //   };
 
-    fetchDesc();
-  }, [params.planet, params.sign, type, enabled]);
+  //   fetchDesc();
+  // }, [params.planet, params.sign, type, enabled]);
 
   return { loading, ingressDesc };
 };

@@ -33,10 +33,7 @@ export const LoginEmail = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm"
-      >
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
         <h1 className="text-2xl font-bold mb-4">Login</h1>
 
         {error && <p className="text-red-500 mb-2">{error}</p>}

@@ -20,8 +20,8 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ProtectedCharts } from "./components/ProtectedCharts.tsx";
 import { ProtectedUserLocation } from "./components/ProtectedUserLocation.tsx";
 import { Moment } from "./pages/Moment.tsx";
-import { Friends } from "./pages/Friends.tsx";
-import { FriendsProvider } from "./contexts/FriendsContext.tsx";
+import { ChartSettingsProvider } from "./contexts/ChartSettingsContext.tsx";
+import { Daily } from "./pages/Daily.tsx";
 
 const clientid = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 createRoot(document.getElementById("root")!).render(
@@ -34,19 +34,21 @@ createRoot(document.getElementById("root")!).render(
               path="/"
               element={
                 <ProtectedRoute>
-                  <FriendsProvider>
-                    <BirthProfilesProvider>
+                  {/* <FriendsProvider> */}
+                  <BirthProfilesProvider>
+                    <ChartSettingsProvider>
                       <ChartProvider>
                         <App />
                       </ChartProvider>
-                    </BirthProfilesProvider>
-                  </FriendsProvider>
+                    </ChartSettingsProvider>
+                  </BirthProfilesProvider>
+                  {/* </FriendsProvider> */}
                 </ProtectedRoute>
               }
             >
               <Route index element={<Home />} />
               <Route path="profile" element={<Profile />} />
-              <Route path="friends" element={<Friends />} />
+              {/* <Route path="friends" element={<Friends />} /> */}
 
               <Route element={<ProtectedCharts />}>
                 <Route
@@ -54,6 +56,14 @@ createRoot(document.getElementById("root")!).render(
                   element={
                     <ProtectedUserLocation>
                       <Time />
+                    </ProtectedUserLocation>
+                  }
+                />
+                <Route
+                  path="daily/*"
+                  element={
+                    <ProtectedUserLocation>
+                      <Daily />
                     </ProtectedUserLocation>
                   }
                 />

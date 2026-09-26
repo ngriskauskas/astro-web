@@ -6,6 +6,7 @@ import type { PlanetBase, PlanetName } from "../../types/planet";
 import type { AspectType } from "../../types/aspect";
 import type { ZodiacSign } from "../../types/zodiac";
 import { useAuth } from "../../contexts/AuthContext";
+import { useChartSettings } from "../../contexts/ChartSettingsContext";
 
 type ExactDateRange = [string, string];
 
@@ -45,9 +46,13 @@ export interface TimingEvent {
 
 export const useCurrentTimings = () => {
   const {
-    settings: { zodiacSystem, ayanamsa, profileId },
     type,
+    settings: { profileId },
   } = useWheel();
+
+  const {
+    settings: { zodiacType, ayanamsa },
+  } = useChartSettings();
 
   const { user } = useAuth();
 
@@ -66,8 +71,8 @@ export const useCurrentTimings = () => {
           method: "POST",
           body: JSON.stringify({
             date: getLocalISODate(),
-            zodiac_system: zodiacSystem,
-            ayanamsa: zodiacSystem === "tropical" ? null : ayanamsa,
+            zodiac_system: zodiacType,
+            ayanamsa: zodiacType === "TROPICAL" ? null : ayanamsa,
             timezone: user?.timezone,
           }),
         });
@@ -88,8 +93,8 @@ export const useCurrentTimings = () => {
             date: getLocalISODate(),
             birth_profile_id: profileId,
             timezone: user?.timezone,
-            zodiac_system: zodiacSystem,
-            ayanamsa: zodiacSystem === "tropical" ? null : ayanamsa,
+            zodiac_system: zodiacType,
+            ayanamsa: zodiacType === "TROPICAL" ? null : ayanamsa,
           }),
         });
 
@@ -104,7 +109,7 @@ export const useCurrentTimings = () => {
     if (!user) return;
     if (type === "time") fetchTimings();
     else if (type === "transit") fetchTransitTimings();
-  }, [zodiacSystem, ayanamsa, profileId, user]);
+  }, [zodiacType, ayanamsa, profileId, user]);
 
   return { timings, loading };
 };

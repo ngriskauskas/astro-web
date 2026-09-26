@@ -6,31 +6,21 @@ import type { CuspType, KeyType } from "../../types/cusp";
 import type { Planet, PlanetName } from "../../types/planet";
 import type { ZodiacSign } from "../../types/zodiac";
 
-export const getPlanetsInSign = (
-  ctx: SingleWheelContextType,
-  sign: ZodiacSign,
-) => {
+export const getPlanetsInSign = (ctx: SingleWheelContextType, sign: ZodiacSign) => {
   const planets = ctx.planetAngles.filter((x) => x.sign === sign);
   return (planets as Planet[]) ?? [];
 };
 
-export const getPlanetsInHouse = (
-  ctx: SingleWheelContextType,
-  houseNum: CuspType,
-): Planet[] => {
+export const getPlanetsInHouse = (ctx: SingleWheelContextType, houseNum: CuspType): Planet[] => {
   return ctx.planetAngles.filter((planet) => planet.house === houseNum);
 };
 
-export const getPlanetAspects = (
-  ctx: SingleWheelContextType,
-  planet: PlanetName,
-) => {
+export const getPlanetAspects = (ctx: SingleWheelContextType, planet: PlanetName) => {
   return ctx.aspects
-    .filter((x) => x.planet1.name === planet || x.planet2.name === planet)
-    .filter(({ type, orb }) => orb <= ctx.settings.aspectOptions[type].minOrb)
+    .filter((x) => x.point1.value.name === planet || x.point2.value.name === planet)
     .map((x) => {
-      if (x.planet1.name === planet) return x;
-      return { ...x, planet1: x.planet2, planet2: x.planet1 };
+      if (x.point1.value.name === planet) return x;
+      return { ...x, point1: x.point2, point2: x.point1 };
     })
     .sort((a, b) => a.orb - b.orb);
 };
@@ -62,15 +52,12 @@ const inHouse = (deg: number, { angle, endAngle }: CuspAngle) => {
   }
 };
 
-export const getSignsInHouse = (
-  ctx: SingleWheelContextType,
-  houseNum: CuspType,
-) => {
+export const getSignsInHouse = (ctx: SingleWheelContextType, houseNum: CuspType) => {
   const house = getHouse(ctx, houseNum);
 
-  if (ctx.settings.houseSystem === "whole_sign") {
-    return ctx.signAngles.filter((x) => x.angle === house.angle);
-  }
+  // if (ctx.settings.houseSystem === "whole_sign") {
+  //   return ctx.signAngles.filter((x) => x.angle === house.angle);
+  // }
 
   return ctx.signAngles.filter((x) => {
     const signStart = x.angle;
@@ -84,38 +71,27 @@ export const getSignsInHouse = (
   });
 };
 
-export const getHousesInSign = (
-  ctx: SingleWheelContextType,
-  sign: ZodiacSign,
-) => {
+export const getHousesInSign = (ctx: SingleWheelContextType, sign: ZodiacSign) => {
   const signAngle = ctx.signAngles.find((s) => s.sign === sign)!;
 
-  if (ctx.settings.houseSystem === "whole_sign") {
-    return ctx.cuspAngles.filter(({ angle }) => angle === signAngle.angle);
-  }
+  // if (ctx.settings.houseSystem === "whole_sign") {
+  //   return ctx.cuspAngles.filter(({ angle }) => angle === signAngle.angle);
+  // }
 
   return ctx.cuspAngles.filter((house) => {
     return (
       inSign(house.angle, signAngle) ||
       inSign(house.endAngle, signAngle) ||
-      (inHouse(signAngle.angle, house) &&
-        inHouse((signAngle.angle + 30) % 360, house))
+      (inHouse(signAngle.angle, house) && inHouse((signAngle.angle + 30) % 360, house))
     );
   });
 };
 
-export const getSignInKeyAngle = (
-  ctx: SingleWheelContextType,
-  keyAngle: KeyType,
-): ZodiacSign => {
+export const getSignInKeyAngle = (ctx: SingleWheelContextType, keyAngle: KeyType): ZodiacSign => {
   const angleObj = ctx.keyAngles.find((ka) => ka.name === keyAngle)!;
   return angleObj.sign;
 };
 
 export const getFilteredAspects = (ctx: SingleWheelContextType): Aspect[] => {
-  const aspectOptions = ctx.settings.aspectOptions;
-  return ctx.aspects.filter(
-    ({ type, orb }) =>
-      aspectOptions[type].show && aspectOptions[type].minOrb >= orb,
-  );
+  return ctx.aspects;
 };

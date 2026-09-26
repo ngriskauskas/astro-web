@@ -26,34 +26,112 @@ interface SignDescParams {
 }
 
 export const useSignDesc = (params: SignDescParams) => {
-  const [loading, setLoading] = useState(true);
-  const [signDesc, setSignDesc] = useState<SignDesc>();
+  const [loading, setLoading] = useState(false);
+  const [signDesc, setSignDesc] = useState<SignDesc>({
+    planets: {
+      SUN: "temp",
+      MOON: "temp",
+      MARS: "temp",
+      VENUS: "temp",
+      SATURN: "temp",
+      JUPITER: "temp",
+      MERCURY: "temp",
+      URANUS: "temp",
+      NEPTUNE: "temp",
+      PLUTO: "temp",
+    },
+    mainPlanets: {
+      SUN: "temp",
+      MOON: "temp",
+      MARS: "temp",
+      VENUS: "temp",
+      SATURN: "temp",
+      JUPITER: "temp",
+      MERCURY: "temp",
+      URANUS: "temp",
+      NEPTUNE: "temp",
+      PLUTO: "temp",
+    },
+    otherPlanets: {
+      SUN: "temp",
+      MOON: "temp",
+      MARS: "temp",
+      VENUS: "temp",
+      SATURN: "temp",
+      JUPITER: "temp",
+      MERCURY: "temp",
+      URANUS: "temp",
+      NEPTUNE: "temp",
+      PLUTO: "temp",
+    },
+    houses: {
+      1: "temp",
+      2: "temp",
+      3: "temp",
+      4: "temp",
+      5: "temp",
+      6: "temp",
+      7: "temp",
+      8: "temp",
+      9: "temp",
+      10: "temp",
+      11: "temp",
+      12: "temp",
+    },
+    mainHouses: {
+      1: "temp",
+      2: "temp",
+      3: "temp",
+      4: "temp",
+      5: "temp",
+      6: "temp",
+      7: "temp",
+      8: "temp",
+      9: "temp",
+      10: "temp",
+      11: "temp",
+      12: "temp",
+    },
+    otherHouses: {
+      1: "temp",
+      2: "temp",
+      3: "temp",
+      4: "temp",
+      5: "temp",
+      6: "temp",
+      7: "temp",
+      8: "temp",
+      9: "temp",
+      10: "temp",
+      11: "temp",
+      12: "temp",
+    },
+  });
 
   const { type } = useWheel();
 
-  useEffect(() => {
-    const fetchDesc = async () => {
-      setLoading(true);
-      const data = await apiFetch("/descriptions/sign", {
-        method: "POST",
-        body: JSON.stringify({ ...params, type }),
-      });
-      setSignDesc(data);
-      setLoading(false);
-    };
+  // useEffect(() => {
+  //   const fetchDesc = async () => {
+  //     setLoading(true);
+  //     const data = await apiFetch("/descriptions/sign", {
+  //       method: "POST",
+  //       body: JSON.stringify({ ...params, type }),
+  //     });
+  //     setSignDesc(data);
+  //     setLoading(false);
+  //   };
 
-    fetchDesc();
-  }, [
-    params.sign,
-    params.otherPlanets,
-    params.mainPlanets,
-    params.planets,
-    params.houses,
-    params.mainHouses,
-    params.otherHouses,
-    type,
-  ]);
+  //   fetchDesc();
+  // }, [
+  //   params.sign,
+  //   params.otherPlanets,
+  //   params.mainPlanets,
+  //   params.planets,
+  //   params.houses,
+  //   params.mainHouses,
+  //   params.otherHouses,
+  //   type,
+  // ]);
 
   return { loading, signDesc };
 };
-

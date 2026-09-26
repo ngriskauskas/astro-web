@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { BirthPlacePicker } from "./BirthPlacePicker";
-import { useBirthProfiles } from "../contexts/BirthProfilesContext";
+import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
 import toast from "react-hot-toast";
 
 export const BirthInfoForm = ({
@@ -19,26 +19,25 @@ export const BirthInfoForm = ({
   const [birthDate, setBirthDate] = useState("");
   const [birthTime, setBirthTime] = useState("");
   const [unknownTime, setUnknownTime] = useState(false);
-  const [birthPlace, setBirthPlace] = useState("");
+  const [location, setLocation] = useState("");
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
   const [isMain, setIsMain] = useState(isMainProfile);
   const [name, setName] = useState("");
-  const { createProfile, updateProfile, deleteProfile, profiles } =
-    useBirthProfiles();
+  const { createProfile, updateProfile, deleteProfile, profiles } = useBirthProfiles();
 
   useEffect(() => {
     if (!profiles || !profileId) return;
 
     const profile = profiles.find((x) => x.id === profileId);
 
-    setBirthPlace(profile?.birth_place || "");
-    setBirthDate(profile?.birth_date || "");
-    setBirthTime(profile?.birth_time || "");
-    setUnknownTime(profile?.birth_time_unknown || false);
+    setLocation(profile?.location || "");
+    setBirthDate(profile?.birthDate || "");
+    setBirthTime(profile?.birthTime || "");
+    setUnknownTime(profile?.birthTimeUnknown || false);
     setLongitude(profile?.longitude || 0);
     setLatitude(profile?.latitude || 0);
-    setIsMain(profile?.main || false);
+    setIsMain(profile?.isMain || false);
     setName(profile?.name || "");
   }, [profiles, profileId]);
 
@@ -48,11 +47,11 @@ export const BirthInfoForm = ({
     const updatedProfile = {
       latitude,
       longitude: longitude,
-      birth_time_unknown: unknownTime,
-      birth_time: birthTime,
-      birth_date: birthDate,
-      birth_place: birthPlace,
-      main: isMain,
+      birthTimeUnknown: unknownTime,
+      birthTime: birthTime,
+      birthDate: birthDate,
+      location: location,
+      isMain: isMain,
       name: isMain ? "My Profile" : name,
     };
     try {
@@ -89,9 +88,7 @@ export const BirthInfoForm = ({
     <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
       {!isMain && (
         <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700">
-            Name
-          </label>
+          <label className="block mb-1 text-sm font-medium text-gray-700">Name</label>
           <input
             type="text"
             value={name}
@@ -103,9 +100,7 @@ export const BirthInfoForm = ({
       )}
 
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">
-          Birth Date
-        </label>
+        <label className="block mb-1 text-sm font-medium text-gray-700">Birth Date</label>
         <input
           type="date"
           value={birthDate}
@@ -116,9 +111,7 @@ export const BirthInfoForm = ({
       </div>
 
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">
-          Birth Time
-        </label>
+        <label className="block mb-1 text-sm font-medium text-gray-700">Birth Time</label>
         <div className="flex items-center gap-4">
           <input
             type="time"
@@ -143,13 +136,11 @@ export const BirthInfoForm = ({
       </div>
 
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">
-          Birth Place
-        </label>
+        <label className="block mb-1 text-sm font-medium text-gray-700">Birth Place</label>
         <BirthPlacePicker
-          initialAddress={birthPlace}
+          initialAddress={location}
           onSelect={({ address, latitude, longitude }) => {
-            setBirthPlace(address);
+            setLocation(address);
             setLatitude(latitude);
             setLongitude(longitude);
           }}

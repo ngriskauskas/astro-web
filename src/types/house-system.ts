@@ -1,9 +1,9 @@
 export const HOUSE_SYSTEMS = [
-  "whole_sign",
-  "placidus",
-  "koch",
-  "equal",
-  "campanus",
-  "regio",
+  "WHOLE_SIGN",
+  "PLACIDUS",
+  "KOCH",
+  "EQUAL",
+  "CAMPANUS",
+  "REGIO",
 ] as const;
 export type HouseSystem = (typeof HOUSE_SYSTEMS)[number];

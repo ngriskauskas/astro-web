@@ -3,12 +3,7 @@ import { useAspectDesc } from "../../hooks/descriptions/useAspectDesc";
 import { useWheel } from "../../hooks/useWheel";
 import { type AspectDisplay, AspectData } from "../../types/aspect";
 import type { KeyAngleDisplay, KeyType } from "../../types/cusp";
-import {
-  PLANET_ORDER,
-  PlanetsData,
-  type PlanetBase,
-  type PlanetName,
-} from "../../types/planet";
+import { PLANET_ORDER, PlanetsData, type PlanetBase, type PlanetName } from "../../types/planet";
 import { KeyAngleChip } from "../utils/KeyAngleChip";
 import { PlanetChip } from "../utils/PlanetChip";
 import { Section } from "../utils/Section";
@@ -19,8 +14,8 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
   const aspectInfo = AspectData[aspect.type];
   const { loading, aspectDesc } = useAspectDesc({
     aspect: aspect.type,
-    planet1: aspect.planet1,
-    planet2: aspect.planet2,
+    point1: aspect.point1,
+    point2: aspect.point2,
   });
 
   const {
@@ -41,10 +36,6 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
 
   const isMulti = type === "transit" || type === "synastry";
 
-  const isPlanet = (p: PlanetBase | KeyAngleDisplay) => {
-    return PLANET_ORDER.includes(p.name as any);
-  };
-
   return (
     <div className="flex flex-col h-full">
       <div
@@ -53,43 +44,35 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
       >
         <BackButton />
         <h2 className="text-xl font-semibold capitalize flex items-center gap-2">
-          {isPlanet(aspect.planet1) ? (
+          {aspect.point1.type === "Planet" ? (
             <div>
               <span className="text-xl mr-1">
-                {PlanetsData[aspect.planet1.name as PlanetName].glyph}
+                {PlanetsData[aspect.point1.value.name as PlanetName].glyph}
               </span>
-              <span className="capitalize">{aspect.planet1.name}</span>
+              <span className="capitalize">{aspect.point1.value.name}</span>
             </div>
           ) : (
             <div>
               <span className="inline-block font-mono tracking-tight">
-                <span className="capitalize">
-                  {aspect.planet1.name.charAt(0)}
-                </span>
-                <span className="relative -top-1 text-xs">
-                  {aspect.planet1.name.slice(1)}
-                </span>
+                <span className="capitalize">{aspect.point1.value.name.charAt(0)}</span>
+                <span className="relative -top-1 text-xs">{aspect.point1.value.name.slice(1)}</span>
               </span>
             </div>
           )}
 
           <span className="text-xl">{aspectInfo.glyph}</span>
-          {isPlanet(aspect.planet2) ? (
+          {aspect.point2.type === "Planet" ? (
             <div>
               <span className="text-xl mr-1">
-                {PlanetsData[aspect.planet2.name as PlanetName].glyph}
+                {PlanetsData[aspect.point2.value.name as PlanetName].glyph}
               </span>
-              <span className="capitalize">{aspect.planet2.name}</span>
+              <span className="capitalize">{aspect.point2.value.name}</span>
             </div>
           ) : (
             <div>
               <span className="inline-block font-mono font-semibold tracking-tight">
-                <span className="text-base capitalize">
-                  {aspect.planet2.name.charAt(0)}
-                </span>
-                <span className="relative -top-1 text-xs">
-                  {aspect.planet2.name.slice(1)}
-                </span>
+                <span className="text-base capitalize">{aspect.point2.value.name.charAt(0)}</span>
+                <span className="relative -top-1 text-xs">{aspect.point2.value.name.slice(1)}</span>
               </span>
             </div>
           )}
@@ -116,48 +99,42 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
           {isMulti ? (
             <div className="grid grid-cols-2 gap-x-6 gap-y-2">
               <span className="text-gray-400 text-xs uppercase tracking-wide text-center">
-                {aspect.planet1Owner === "other"
-                  ? `${otherProfileName}'s`
-                  : `${mainProfileName}'s`}
+                {aspect.point1Owner === "other" ? `${otherProfileName}'s` : `${mainProfileName}'s`}
               </span>
               <span className="text-gray-400 text-xs uppercase tracking-wide text-center">
-                {aspect.planet1Owner === "main"
-                  ? `${otherProfileName}'s`
-                  : `${mainProfileName}'s`}
+                {aspect.point1Owner === "main" ? `${otherProfileName}'s` : `${mainProfileName}'s`}
               </span>
-              {isPlanet(aspect.planet1) ? (
-                <PlanetChip planet={aspect.planet1.name as PlanetName} />
+              {aspect.point1.type === "Planet" ? (
+                <PlanetChip planet={aspect.point1.value.name as PlanetName} />
               ) : (
-                <KeyAngleChip angle={aspect.planet1.name as KeyType} />
+                <KeyAngleChip angle={aspect.point1.value.name as KeyType} />
               )}
-              {isPlanet(aspect.planet2) ? (
-                <PlanetChip planet={aspect.planet2.name as PlanetName} />
+              {aspect.point2.type === "Planet" ? (
+                <PlanetChip planet={aspect.point2.value.name as PlanetName} />
               ) : (
-                <KeyAngleChip angle={aspect.planet2.name as KeyType} />
+                <KeyAngleChip angle={aspect.point2.value.name as KeyType} />
               )}
-              <SignChip sign={aspect.planet1.sign} />
-              <SignChip sign={aspect.planet2.sign} />
+              <SignChip sign={aspect.point1.value.sign} />
+              <SignChip sign={aspect.point2.value.sign} />
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-              {isPlanet(aspect.planet1) ? (
-                <PlanetChip planet={aspect.planet1.name as PlanetName} />
+              {aspect.point1.type === "Planet" ? (
+                <PlanetChip planet={aspect.point1.value.name as PlanetName} />
               ) : (
-                <KeyAngleChip angle={aspect.planet1.name as KeyType} />
+                <KeyAngleChip angle={aspect.point1.value.name as KeyType} />
               )}
-              {isPlanet(aspect.planet2) ? (
-                <PlanetChip planet={aspect.planet2.name as PlanetName} />
+              {aspect.point2.type === "Planet" ? (
+                <PlanetChip planet={aspect.point2.value.name as PlanetName} />
               ) : (
-                <KeyAngleChip angle={aspect.planet2.name as KeyType} />
+                <KeyAngleChip angle={aspect.point2.value.name as KeyType} />
               )}
-              <SignChip sign={aspect.planet1.sign} />
-              <SignChip sign={aspect.planet2.sign} />
+              <SignChip sign={aspect.point1.value.sign} />
+              <SignChip sign={aspect.point2.value.sign} />
             </div>
           )}
           {aspectDesc && (
-            <div className="text-xs text-gray-600 mt-2 pl-2">
-              {aspectDesc.description}
-            </div>
+            <div className="text-xs text-gray-600 mt-2 pl-2">{aspectDesc.description}</div>
           )}
         </Section>
       </div>

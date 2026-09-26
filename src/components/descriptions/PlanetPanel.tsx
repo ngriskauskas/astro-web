@@ -44,35 +44,25 @@ export const PlanetPanel = ({
           <div className="mt-3 space-y-2">
             <SignGroup title="Rulerships" signs={planetInfo.info.rulerships} />
             <SignGroup title="Exalted in" signs={planetInfo.info.exaltedIn} />
-            <SignGroup
-              title="Detriment in"
-              signs={planetInfo.info.detrimentIn}
-            />
+            <SignGroup title="Detriment in" signs={planetInfo.info.detrimentIn} />
             <SignGroup title="Fall in" signs={planetInfo.info.fallIn} />
           </div>
         </Section>
         <Section title="Details" loading={loading}>
           <div className="flex flex-col gap-3">
             {planet.retrograde && (
-              <DescSection
-                title="Retrograde ℞"
-                desc={planetDesc?.retrograde ?? ""}
-              />
+              <DescSection title="Retrograde ℞" desc={planetDesc?.retrograde ?? ""} />
             )}
             <DescSection title="Sign" desc={planetDesc?.sign ?? ""}>
               <SignChip sign={planet.sign} />
               <span className="text-gray-600 text-[13px] ml-1">
-                {formatDegMin(planet.deg_min)}
+                {formatDegMin(planet.position.degMin)}
               </span>
             </DescSection>
             <DescSection title="House" desc={planetDesc?.house ?? ""}>
               <HouseChip house={planet.house} owner={owner} />
             </DescSection>
-            <DescSection
-              title="Combined"
-              desc={planetDesc?.combined ?? ""}
-              startOpen
-            >
+            <DescSection title="Combined" desc={planetDesc?.combined ?? ""} startOpen>
               <SignChip sign={planet.sign} />
               <HouseChip house={planet.house} owner={owner} />
             </DescSection>
@@ -89,9 +79,9 @@ export const PlanetPanel = ({
                     aspect={{
                       type: aspect.type,
                       orb: aspect.orb,
-                      planet1: aspect.planet1,
-                      planet2: aspect.planet2,
-                      planet1Owner: aspect.planet1Owner,
+                      point1: aspect.point1,
+                      point2: aspect.point2,
+                      //planet1Owner: aspect.point1.owner,
                     }}
                   />
                 </div>

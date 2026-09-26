@@ -29,32 +29,32 @@ import { type PlanetName } from "./planet";
 import type { CuspType } from "./cusp";
 
 export const ZodiacSigns = [
-  "aries",
-  "taurus",
-  "gemini",
-  "cancer",
-  "leo",
-  "virgo",
-  "libra",
-  "scorpio",
-  "sagittarius",
-  "capricorn",
-  "aquarius",
-  "pisces",
+  "ARIES",
+  "TAURUS",
+  "GEMINI",
+  "CANCER",
+  "LEO",
+  "VIRGO",
+  "LIBRA",
+  "SCORPIO",
+  "SAGITTARIUS",
+  "CAPRICORN",
+  "AQUARIUS",
+  "PISCES",
 ];
 export type ZodiacSign =
-  | "aries"
-  | "taurus"
-  | "gemini"
-  | "cancer"
-  | "leo"
-  | "virgo"
-  | "libra"
-  | "scorpio"
-  | "sagittarius"
-  | "capricorn"
-  | "aquarius"
-  | "pisces";
+  | "ARIES"
+  | "TAURUS"
+  | "GEMINI"
+  | "CANCER"
+  | "LEO"
+  | "VIRGO"
+  | "LIBRA"
+  | "SCORPIO"
+  | "SAGITTARIUS"
+  | "CAPRICORN"
+  | "AQUARIUS"
+  | "PISCES";
 
 interface ZodiacInfo {
   glyph: string;
@@ -74,7 +74,7 @@ interface ZodiacInfo {
 }
 
 export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
-  aries: {
+  ARIES: {
     glyph: AriesSvg,
     color: ElementData["fire"].color,
     drawing: AriesDrawing,
@@ -85,13 +85,13 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       modality: ModalityData["cardinal"],
       polarity: PolarityData["masculine"],
       house: 1,
-      rulers: ["mars"],
-      exalted: ["sun"],
-      detriment: ["venus"],
-      fall: ["saturn"],
+      rulers: ["MARS"],
+      exalted: ["SUN"],
+      detriment: ["VENUS"],
+      fall: ["SATURN"],
     },
   },
-  taurus: {
+  TAURUS: {
     glyph: TaurusSvg,
     color: ElementData["earth"].color,
     drawing: TaurusDrawing,
@@ -102,13 +102,13 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       modality: ModalityData["fixed"],
       polarity: PolarityData["feminine"],
       house: 2,
-      rulers: ["venus"],
-      exalted: ["moon"],
-      detriment: ["mars"],
-      fall: ["uranus"],
+      rulers: ["VENUS"],
+      exalted: ["MOON"],
+      detriment: ["MARS"],
+      fall: ["URANUS"],
     },
   },
-  gemini: {
+  GEMINI: {
     glyph: GeminiSvg,
     color: ElementData["air"].color,
     drawing: GeminiDrawing,
@@ -119,13 +119,13 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       modality: ModalityData["mutable"],
       polarity: PolarityData["masculine"],
       house: 3,
-      rulers: ["mercury"],
+      rulers: ["MERCURY"],
       exalted: [],
-      detriment: ["jupiter"],
+      detriment: ["JUPITER"],
       fall: [],
     },
   },
-  cancer: {
+  CANCER: {
     glyph: CancerSvg,
     color: ElementData["water"].color,
     drawing: CancerDrawing,
@@ -136,13 +136,13 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       modality: ModalityData["cardinal"],
       polarity: PolarityData["feminine"],
       house: 4,
-      rulers: ["moon"],
-      exalted: ["jupiter"],
-      detriment: ["saturn"],
-      fall: ["mars"],
+      rulers: ["MOON"],
+      exalted: ["JUPITER"],
+      detriment: ["SATURN"],
+      fall: ["MARS"],
     },
   },
-  leo: {
+  LEO: {
     glyph: LeoSvg,
     color: ElementData["fire"].color,
     drawing: LeoDrawing,
@@ -153,13 +153,13 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       modality: ModalityData["fixed"],
       polarity: PolarityData["masculine"],
       house: 5,
-      rulers: ["sun"],
-      exalted: ["neptune", "sun"],
-      detriment: ["saturn"],
-      fall: ["uranus"],
+      rulers: ["SUN"],
+      exalted: ["NEPTUNE", "SUN"],
+      detriment: ["SATURN"],
+      fall: ["URANUS"],
     },
   },
-  virgo: {
+  VIRGO: {
     glyph: VirgoSvg,
     color: ElementData["earth"].color,
     drawing: VirgoDrawing,
@@ -170,13 +170,13 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       modality: ModalityData["mutable"],
       polarity: PolarityData["feminine"],
       house: 6,
-      rulers: ["mercury"],
-      exalted: ["mercury"],
-      detriment: ["jupiter"],
+      rulers: ["MERCURY"],
+      exalted: ["MERCURY"],
+      detriment: ["JUPITER"],
       fall: [],
     },
   },
-  libra: {
+  LIBRA: {
     glyph: LibraSvg,
     color: ElementData["air"].color,
     drawing: LibraDrawing,
@@ -187,13 +187,13 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       modality: ModalityData["cardinal"],
       polarity: PolarityData["masculine"],
       house: 7,
-      rulers: ["venus"],
-      exalted: ["saturn"],
-      detriment: ["mars"],
-      fall: ["sun"],
+      rulers: ["VENUS"],
+      exalted: ["SATURN"],
+      detriment: ["MARS"],
+      fall: ["SUN"],
     },
   },
-  scorpio: {
+  SCORPIO: {
     glyph: ScorpioSvg,
     color: ElementData["water"].color,
     drawing: ScorpioDrawing,
@@ -204,13 +204,13 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       modality: ModalityData["fixed"],
       polarity: PolarityData["feminine"],
       house: 8,
-      rulers: ["mars", "pluto"],
-      exalted: ["uranus", "neptune"],
-      detriment: ["venus"],
-      fall: ["moon"],
+      rulers: ["MARS", "PLUTO"],
+      exalted: ["URANUS", "NEPTUNE"],
+      detriment: ["VENUS"],
+      fall: ["MOON"],
     },
   },
-  sagittarius: {
+  SAGITTARIUS: {
     glyph: SagittariusSvg,
     color: ElementData["fire"].color,
     drawing: SagittariusDrawing,
@@ -221,13 +221,13 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       modality: ModalityData["mutable"],
       polarity: PolarityData["masculine"],
       house: 9,
-      rulers: ["jupiter"],
-      exalted: ["moon"],
-      detriment: ["mercury"],
-      fall: ["venus"],
+      rulers: ["JUPITER"],
+      exalted: ["MOON"],
+      detriment: ["MERCURY"],
+      fall: ["VENUS"],
     },
   },
-  capricorn: {
+  CAPRICORN: {
     glyph: CapricornSvg,
     color: ElementData["earth"].color,
     drawing: CapricornDrawing,
@@ -238,13 +238,13 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       modality: ModalityData["cardinal"],
       polarity: PolarityData["feminine"],
       house: 10,
-      rulers: ["saturn"],
-      exalted: ["mars"],
-      detriment: ["moon"],
-      fall: ["jupiter"],
+      rulers: ["SATURN"],
+      exalted: ["MARS"],
+      detriment: ["MOON"],
+      fall: ["JUPITER"],
     },
   },
-  aquarius: {
+  AQUARIUS: {
     glyph: AquariusSvg,
     color: ElementData["air"].color,
     drawing: AquariusDrawing,
@@ -255,13 +255,13 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       modality: ModalityData["fixed"],
       polarity: PolarityData["masculine"],
       house: 11,
-      rulers: ["saturn", "uranus"],
+      rulers: ["SATURN", "URANUS"],
       exalted: [],
-      detriment: ["sun"],
-      fall: ["mercury"],
+      detriment: ["SUN"],
+      fall: ["MERCURY"],
     },
   },
-  pisces: {
+  PISCES: {
     glyph: PiscesSvg,
     color: ElementData["water"].color,
     drawing: PiscesDrawing,
@@ -272,10 +272,10 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       modality: ModalityData["mutable"],
       polarity: PolarityData["feminine"],
       house: 12,
-      rulers: ["jupiter", "neptune"],
-      exalted: ["venus"],
-      detriment: ["mercury"],
-      fall: ["mars"],
+      rulers: ["JUPITER", "NEPTUNE"],
+      exalted: ["VENUS"],
+      detriment: ["MERCURY"],
+      fall: ["MARS"],
     },
   },
 };

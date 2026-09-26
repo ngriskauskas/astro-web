@@ -14,29 +14,27 @@ interface TransitPlanetDescParams {
   house: CuspType;
 }
 
-export const useTransitPlanetDesc = (
-  params: TransitPlanetDescParams,
-  enabled: boolean = true,
-) => {
-  const [loading, setLoading] = useState(true);
-  const [transitPlanetDesc, setTransitPlanetDesc] =
-    useState<TransitPlanetDesc>();
+export const useTransitPlanetDesc = (params: TransitPlanetDescParams, enabled: boolean = true) => {
+  const [loading, setLoading] = useState(false);
+  const [transitPlanetDesc, setTransitPlanetDesc] = useState<TransitPlanetDesc>({
+    description: "temp",
+  });
 
-  useEffect(() => {
-    if (!enabled) return;
+  // useEffect(() => {
+  //   if (!enabled) return;
 
-    const fetchDesc = async () => {
-      setLoading(true);
-      const data = await apiFetch("/descriptions/transit-planet", {
-        method: "POST",
-        body: JSON.stringify(params),
-      });
-      setTransitPlanetDesc(data);
-      setLoading(false);
-    };
+  //   const fetchDesc = async () => {
+  //     setLoading(true);
+  //     const data = await apiFetch("/descriptions/transit-planet", {
+  //       method: "POST",
+  //       body: JSON.stringify(params),
+  //     });
+  //     setTransitPlanetDesc(data);
+  //     setLoading(false);
+  //   };
 
-    fetchDesc();
-  }, [params.planet, params.sign, params.house, enabled]);
+  //   fetchDesc();
+  // }, [params.planet, params.sign, params.house, enabled]);
 
   return { loading, transitPlanetDesc };
 };

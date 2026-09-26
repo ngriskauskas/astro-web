@@ -1,32 +1,26 @@
-import {
-  createContext,
-  useEffect,
-  useState,
-  useContext,
-  type ReactNode,
-} from "react";
+import { createContext, useEffect, useState, useContext, type ReactNode } from "react";
 import { apiFetch } from "../utils/api";
 
 export interface BirthProfile {
   id: number;
-  birth_date: string;
-  birth_time: string | null;
-  birth_place: string;
+  birthDate: string;
+  birthTime: string | null;
+  location: string;
   latitude: number;
   longitude: number;
-  main: boolean;
-  birth_time_unknown: boolean;
+  isMain: boolean;
+  birthTimeUnknown: boolean;
   name: string;
 }
 
 export interface BirthProfileInput {
-  birth_date: string;
-  birth_time: string | null;
-  birth_place: string;
+  birthDate: string;
+  birthTime: string | null;
+  location: string;
   latitude: number;
   longitude: number;
-  main: boolean;
-  birth_time_unknown: boolean;
+  isMain: boolean;
+  birthTimeUnknown: boolean;
   name: string;
 }
 
@@ -39,15 +33,9 @@ interface BirthProfileContextType {
   createProfile: (profile: BirthProfileInput) => Promise<void>;
 }
 
-const BirthProfilesContext = createContext<BirthProfileContextType | undefined>(
-  undefined,
-);
+const BirthProfilesContext = createContext<BirthProfileContextType | undefined>(undefined);
 
-export const BirthProfilesProvider = ({
-  children,
-}: {
-  children: ReactNode;
-}) => {
+export const BirthProfilesProvider = ({ children }: { children: ReactNode }) => {
   const [profiles, setProfiles] = useState<BirthProfile[]>([]);
   const [mainProfile, setMainProfile] = useState<BirthProfile>();
   const [loading, setLoading] = useState(true);
@@ -58,17 +46,17 @@ export const BirthProfilesProvider = ({
 
   useEffect(() => {
     if (profiles.length === 0) return;
-    setMainProfile(profiles.find((x) => x.main));
+    setMainProfile(profiles.find((x) => x.isMain));
     setLoading(false);
   }, [profiles]);
 
   const fetchProfiles = async () => {
     setLoading(true);
     try {
-      const data = await apiFetch("/me/birth_profiles", {
+      const data = await apiFetch("/birth-profiles", {
         method: "GET",
       });
-      const birth_profiles = data.birth_profiles as BirthProfile[];
+      const birth_profiles = data as BirthProfile[];
       setProfiles(birth_profiles);
     } catch (err) {
       console.log(err);
@@ -76,27 +64,23 @@ export const BirthProfilesProvider = ({
   };
 
   const updateProfile = async (id: number, profile: BirthProfileInput) => {
-    const data = await apiFetch(`/birth_profiles/${id}`, {
+    const data = await apiFetch(`/birth-profiles/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ birth_profile: profile }),
+      body: JSON.stringify(profile),
     });
-    setProfiles((x) =>
-      x.map((profile) =>
-        profile.id === data.birth_profile.id ? data.birth_profile : profile,
-      ),
-    );
+    setProfiles((x) => x.map((profile) => (profile.id === data.id ? data : profile)));
   };
 
   const createProfile = async (profile: BirthProfileInput) => {
-    const data = await apiFetch("/me/birth_profiles", {
+    const data = await apiFetch("/birth-profiles", {
       method: "POST",
-      body: JSON.stringify({ birth_profile: profile }),
+      body: JSON.stringify(profile),
     });
-    setProfiles((x) => [...x, data.birth_profile]);
+    setProfiles((x) => [...x, data]);
   };
 
   const deleteProfile = async (id: number) => {
-    await apiFetch(`/birth_profiles/${id}`, {
+    await apiFetch(`/birth-profiles/${id}`, {
       method: "DELETE",
     });
     setProfiles((x) => x.filter((profile) => profile.id !== id));
@@ -121,9 +105,7 @@ export const BirthProfilesProvider = ({
 export const useBirthProfiles = () => {
   const context = useContext(BirthProfilesContext);
   if (!context) {
-    throw new Error(
-      "useBirthProfiles must be used inside BirthProfilesProvider,",
-    );
+    throw new Error("useBirthProfiles must be used inside BirthProfilesProvider,");
   }
   return context;
 };

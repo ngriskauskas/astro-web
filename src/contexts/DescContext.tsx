@@ -1,14 +1,11 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { ZodiacSign } from "../types/zodiac";
-import { type AspectDisplay } from "../types/aspect";
+import { type Aspect, type AspectDisplay } from "../types/aspect";
 import { type PlanetName } from "../types/planet";
 import type { CuspType, KeyType } from "../types/cusp";
 import type { OwnerType } from "./MultiWheelContext";
 import type { MoonPhaseTiming } from "../hooks/timings/useMoonTimings";
-import type {
-  DailyAspectTiming,
-  KeyAngleTiming,
-} from "../hooks/timings/useDailyTimings";
+import type { DailyAspectTiming, KeyAngleTiming } from "../hooks/timings/useDailyTimings";
 import type { AspectTiming, TimingEvent } from "../hooks/timings/useTimings";
 
 export type ActiveType =
@@ -27,15 +24,16 @@ export type ActiveType =
 export interface Active {
   type: ActiveType;
   value:
-  | PlanetName
-  | ZodiacSign
-  | CuspType
-  | AspectDisplay
-  | MoonPhaseTiming
-  | KeyType
-  | KeyAngleTiming
-  | DailyAspectTiming
-  | TimingEvent;
+    | PlanetName
+    | ZodiacSign
+    | CuspType
+    | AspectDisplay
+    | Aspect
+    | MoonPhaseTiming
+    | KeyType
+    | KeyAngleTiming
+    | DailyAspectTiming
+    | TimingEvent;
   owner?: OwnerType;
 }
 

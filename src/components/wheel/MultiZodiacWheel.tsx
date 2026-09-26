@@ -7,6 +7,7 @@ import { MultiAspects } from "./layers/MultiAspects";
 import { useWheel } from "../../hooks/useWheel";
 import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
 import { type PlanetName } from "../../types/planet";
+import { useChartSettings } from "../../contexts/ChartSettingsContext";
 
 export const MultiZodiacWheel = () => {
   const [hoveredPlanet, setHoveredPlanet] = useState<{
@@ -26,8 +27,11 @@ export const MultiZodiacWheel = () => {
     mainKeyAngles,
     otherKeyAngles,
     aspects,
-    settings: { aspectOptions },
   } = useWheel() as MultiWheelContextType;
+
+  const {
+    settings: { aspectOptions },
+  } = useChartSettings();
 
   const size = 800;
   const radius = size / 2;
@@ -36,12 +40,7 @@ export const MultiZodiacWheel = () => {
     <div className="flex gap-5 items-center mx-20 mr-28">
       <div className="flex-[3] flex-shrink-0 flex justify-center">
         {mainPlanetAngles ? (
-          <svg
-            viewBox={`0 0 ${size} ${size}`}
-            width="100%"
-            height="auto"
-            preserveAspectRatio="xMidYMid meet"
-          >
+          <svg viewBox={`0 0 ${size} ${size}`} width="100%" preserveAspectRatio="xMidYMid meet">
             <Background radius={radius} />
             <Houses
               center={radius}
@@ -66,18 +65,16 @@ export const MultiZodiacWheel = () => {
               radius={radius - 55}
               angles={mainPlanetAngles}
               hoverAspectedPlanets={
-                hoverAspectedPlanets?.profile === "main"
-                  ? hoverAspectedPlanets.planets
-                  : []
+                hoverAspectedPlanets?.profile === "main" ? hoverAspectedPlanets.planets : []
               }
               onHoverPlanet={(planet) => {
                 setHoveredPlanet({ planet, profile: "main" });
-                aspects.forEach(({ planet1, planet2, orb, type }) => {
+                aspects.forEach(({ point1, point2, orb, type }) => {
                   const { minOrb, show } = aspectOptions[type];
                   if (!show || orb > minOrb) return;
-                  if (planet1.name === planet)
+                  if (point1.value.name === planet)
                     setHoverAspectedPlanets((prev) => ({
-                      planets: [planet2.name, ...(prev?.planets || [])],
+                      planets: [point2.value.name, ...(prev?.planets || [])],
                       profile: "other",
                     }));
                 });
@@ -94,18 +91,16 @@ export const MultiZodiacWheel = () => {
               radius={radius - 145}
               angles={otherPlanetAngles}
               hoverAspectedPlanets={
-                hoverAspectedPlanets?.profile === "other"
-                  ? hoverAspectedPlanets.planets
-                  : []
+                hoverAspectedPlanets?.profile === "other" ? hoverAspectedPlanets.planets : []
               }
               onHoverPlanet={(planet) => {
                 setHoveredPlanet({ planet, profile: "other" });
-                aspects.forEach(({ planet1, planet2, orb, type }) => {
+                aspects.forEach(({ point1, point2, orb, type }) => {
                   const { minOrb, show } = aspectOptions[type];
                   if (!show || orb > minOrb) return;
-                  if (planet2.name === planet)
+                  if (point2.value.name === planet)
                     setHoverAspectedPlanets((prev) => ({
-                      planets: [planet1.name, ...(prev?.planets || [])],
+                      planets: [point1.value.name, ...(prev?.planets || [])],
                       profile: "main",
                     }));
                 });
@@ -115,16 +110,10 @@ export const MultiZodiacWheel = () => {
                 setHoverAspectedPlanets(null);
               }}
             />
-            <MultiAspects
-              center={radius}
-              radius={radius - 240}
-              hoveredPlanet={hoveredPlanet}
-            />
+            <MultiAspects center={radius} radius={radius - 240} hoveredPlanet={hoveredPlanet} />
           </svg>
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            Loading...
-          </div>
+          <div className="flex items-center justify-center h-full text-gray-500">Loading...</div>
         )}
       </div>
     </div>

@@ -21,17 +21,9 @@ export const SignChip = ({ sign }: { sign: ZodiacSign }) => {
   );
 };
 
-export const SignGroup = ({
-  title,
-  signs,
-}: {
-  title: string;
-  signs: ZodiacSign[];
-}) => (
+export const SignGroup = ({ title, signs }: { title: string; signs: ZodiacSign[] }) => (
   <div className="flex flex-col gap-1">
-    <span className="text-gray-500 text-xs uppercase tracking-wide">
-      {title}
-    </span>
+    <span className="text-gray-500 text-xs uppercase tracking-wide">{title}</span>
 
     <div className="flex flex-wrap gap-1">
       {signs.length === 0 ? (
@@ -43,13 +35,7 @@ export const SignGroup = ({
   </div>
 );
 
-export const SignCircle = ({
-  sign,
-  size = 10,
-}: {
-  sign: ZodiacSign;
-  size?: number;
-}) => {
+export const SignCircle = ({ sign, size = 10 }: { sign: ZodiacSign; size?: number }) => {
   const signData = ZodiacData[sign];
   const color = signData.color;
 
@@ -69,11 +55,7 @@ export const SignCircle = ({
         borderWidth: 1,
       }}
     >
-      <img
-        src={signData.glyph}
-        alt={sign}
-        className="w-1/2 h-1/2 object-contain"
-      />
+      <img src={signData.glyph} alt={sign} className="w-1/2 h-1/2 object-contain" />
     </div>
   );
 };

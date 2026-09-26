@@ -3,6 +3,7 @@ import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, midpointAngle, polarToCartesian } from "./Utils";
 import type { OwnerType } from "../../../contexts/MultiWheelContext";
+import { useChartSettings } from "../../../contexts/ChartSettingsContext";
 
 export interface CuspAngle extends Cusp {
   angle: number;
@@ -22,19 +23,12 @@ interface HouseProps {
   owner?: OwnerType;
 }
 
-export const Houses = ({
-  radius,
-  innerRadius,
-  center,
-  angles,
-  owner,
-  keyAngles,
-}: HouseProps) => {
+export const Houses = ({ radius, innerRadius, center, angles, owner, keyAngles }: HouseProps) => {
   const {
     settings: {
       displayOptions: { angleLabels: showAngleLabels },
     },
-  } = useWheel();
+  } = useChartSettings();
 
   const { open } = useDesc();
 
@@ -47,20 +41,10 @@ export const Houses = ({
       {houseAngles.map((house) => {
         const { name, angle, endAngle } = house;
 
-        const wedgePath = createWedgePath(
-          center,
-          innerRadius,
-          outerRadius,
-          angle,
-          endAngle,
-        );
+        const wedgePath = createWedgePath(center, innerRadius, outerRadius, angle, endAngle);
         const midAngle = midpointAngle(angle, endAngle);
 
-        const { x: tx, y: ty } = polarToCartesian(
-          center,
-          innerRadius + 15,
-          midAngle,
-        );
+        const { x: tx, y: ty } = polarToCartesian(center, innerRadius + 15, midAngle);
 
         return (
           <g key={name}>
@@ -83,53 +67,28 @@ export const Houses = ({
               strokeWidth={1}
               onClick={() => open({ type: "house", value: house.name, owner })}
             />
-            <text
-              x={tx}
-              y={ty}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="white"
-            >
+            <text x={tx} y={ty} textAnchor="middle" dominantBaseline="middle" fill="white">
               {name}
             </text>
           </g>
         );
       })}
       {keyAngles.map((keyAngle) => {
-        const { name, angle, deg_min } = keyAngle;
-        const { x: innerX, y: innerY } = polarToCartesian(
-          center,
-          innerRadius,
+        const {
+          name,
           angle,
-        );
-        const { x: outerX, y: outerY } = polarToCartesian(
-          center,
-          outerRadius,
-          angle,
-        );
-        const { x: lx, y: ly } = polarToCartesian(
-          center,
-          innerRadius + 18,
-          angle + 4,
-        );
-        const { x: dx, y: dy } = polarToCartesian(
-          center,
-          outerRadius - 15,
-          angle + 2,
-        );
-        const [deg, min] = deg_min;
+          position: { degMin },
+        } = keyAngle;
+        const { x: innerX, y: innerY } = polarToCartesian(center, innerRadius, angle);
+        const { x: outerX, y: outerY } = polarToCartesian(center, outerRadius, angle);
+        const { x: lx, y: ly } = polarToCartesian(center, innerRadius + 18, angle + 4);
+        const { x: dx, y: dy } = polarToCartesian(center, outerRadius - 15, angle + 2);
+        const [deg, min] = degMin;
         const degLabel = `${Math.round(deg)}° ${Math.round(min)}′`;
 
         return (
           <g key={name}>
-            <line
-              x1={innerX}
-              y1={innerY}
-              x2={outerX}
-              y2={outerY}
-              stroke="white"
-              strokeWidth={3}
-            />
+            <line x1={innerX} y1={innerY} x2={outerX} y2={outerY} stroke="white" strokeWidth={3} />
             <text
               className="cursor-pointer fill-current hover:text-yellow-300
               ease-in-out hover:scale-101 duration-200 origin-[50%_50%]"
@@ -138,9 +97,7 @@ export const Houses = ({
               textAnchor="middle"
               dominantBaseline="middle"
               fill="white"
-              onClick={() =>
-                open({ type: "angle", value: keyAngle.name, owner })
-              }
+              onClick={() => open({ type: "angle", value: keyAngle.name, owner })}
             >
               {name.toUpperCase()}
             </text>

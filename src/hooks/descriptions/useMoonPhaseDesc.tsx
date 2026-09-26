@@ -13,29 +13,26 @@ interface MoonPhaseDescParams {
   sign: ZodiacSign;
 }
 
-export const useMoonPhaseDesc = (
-  params: MoonPhaseDescParams,
-  enabled: boolean = true,
-) => {
-  const [loading, setLoading] = useState(true);
-  const [moonPhaseDesc, setMoonPhaseDesc] = useState<MoonPhaseDesc>();
+export const useMoonPhaseDesc = (params: MoonPhaseDescParams, enabled: boolean = true) => {
+  const [loading, setLoading] = useState(false);
+  const [moonPhaseDesc, setMoonPhaseDesc] = useState<MoonPhaseDesc>({ description: "temp" });
 
   const { type } = useWheel();
-  useEffect(() => {
-    if (!enabled) return;
+  // useEffect(() => {
+  //   if (!enabled) return;
 
-    const fetchDesc = async () => {
-      setLoading(true);
-      const data = await apiFetch("/descriptions/moon-phase", {
-        method: "POST",
-        body: JSON.stringify({ ...params, type }),
-      });
-      setMoonPhaseDesc(data);
-      setLoading(false);
-    };
+  //   const fetchDesc = async () => {
+  //     setLoading(true);
+  //     const data = await apiFetch("/descriptions/moon-phase", {
+  //       method: "POST",
+  //       body: JSON.stringify({ ...params, type }),
+  //     });
+  //     setMoonPhaseDesc(data);
+  //     setLoading(false);
+  //   };
 
-    fetchDesc();
-  }, [params.phase, params.sign, type, enabled]);
+  //   fetchDesc();
+  // }, [params.phase, params.sign, type, enabled]);
 
   return { loading, moonPhaseDesc };
 };

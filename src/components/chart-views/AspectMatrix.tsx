@@ -11,9 +11,7 @@ export const AspectMatrix = () => {
   const { open } = useDesc();
 
   const sortByPlanetOrder = (arr: Planet[]) =>
-    [...arr].sort(
-      (a, b) => PLANET_ORDER.indexOf(a.name) - PLANET_ORDER.indexOf(b.name),
-    );
+    [...arr].sort((a, b) => PLANET_ORDER.indexOf(a.name) - PLANET_ORDER.indexOf(b.name));
 
   const { planetAngles } = useWheel() as SingleWheelContextType;
   const planets = sortByPlanetOrder(planetAngles);
@@ -81,15 +79,13 @@ export const AspectMatrix = () => {
 
                 const aspect = aspects.find(
                   (a) =>
-                    (a.planet1.name === rowPlanet.name &&
-                      a.planet2.name === colPlanet.name) ||
-                    (a.planet1.name === colPlanet.name &&
-                      a.planet2.name === rowPlanet.name),
+                    (a.point1.value.name === rowPlanet.name &&
+                      a.point2.value.name === colPlanet.name) ||
+                    (a.point1.value.name === colPlanet.name &&
+                      a.point2.value.name === rowPlanet.name),
                 );
 
-                const color = aspect
-                  ? AspectData[aspect.type].color
-                  : undefined;
+                const color = aspect ? AspectData[aspect.type].color : undefined;
 
                 return (
                   <td
@@ -97,8 +93,7 @@ export const AspectMatrix = () => {
                     className={`px-4 py-2 text-lg font-bold border border-gray-300 transition-all ${
                       aspect ? "cursor-pointer" : ""
                     } ${
-                      hoveredPlanet === rowPlanet.name ||
-                      hoveredPlanet === colPlanet.name
+                      hoveredPlanet === rowPlanet.name || hoveredPlanet === colPlanet.name
                         ? "ring-2 ring-yellow-300"
                         : ""
                     }`}
@@ -108,16 +103,12 @@ export const AspectMatrix = () => {
                     }}
                     onMouseEnter={(e) => {
                       if (aspect) {
-                        e.currentTarget.style.backgroundColor = color
-                          ? `${color}40`
-                          : "";
+                        e.currentTarget.style.backgroundColor = color ? `${color}40` : "";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (aspect) {
-                        e.currentTarget.style.backgroundColor = color
-                          ? `${color}20`
-                          : "";
+                        e.currentTarget.style.backgroundColor = color ? `${color}20` : "";
                       }
                     }}
                     onClick={() => {

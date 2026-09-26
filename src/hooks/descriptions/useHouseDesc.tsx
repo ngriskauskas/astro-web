@@ -26,34 +26,32 @@ interface HouseDescParams {
 }
 
 export const useHouseDesc = (params: HouseDescParams) => {
-  const [loading, setLoading] = useState(true);
-  const [houseDesc, setHouseDesc] = useState<HouseDesc>();
+  const [loading, setLoading] = useState(false);
+  const [houseDesc, setHouseDesc] = useState<HouseDesc>({
+    signs: {},
+    planets: {},
+    mainPlanets: {},
+    otherPlanets: {},
+  });
 
   const { type } = useWheel();
 
-  useEffect(() => {
-    const fetchDesc = async () => {
-      setLoading(true);
-      const data = await apiFetch("/descriptions/house", {
-        method: "POST",
-        body: JSON.stringify({
-          ...params,
-          type: type === "moment" ? "time" : type,
-        }),
-      });
-      setHouseDesc(data);
-      setLoading(false);
-    };
+  // useEffect(() => {
+  //   const fetchDesc = async () => {
+  //     setLoading(true);
+  //     const data = await apiFetch("/descriptions/house", {
+  //       method: "POST",
+  //       body: JSON.stringify({
+  //         ...params,
+  //         type: type === "moment" ? "time" : type,
+  //       }),
+  //     });
+  //     setHouseDesc(data);
+  //     setLoading(false);
+  //   };
 
-    fetchDesc();
-  }, [
-    params.house,
-    params.signs,
-    params.planets,
-    params.mainPlanets,
-    params.otherPlanets,
-    type,
-  ]);
+  //   fetchDesc();
+  // }, [params.house, params.signs, params.planets, params.mainPlanets, params.otherPlanets, type]);
 
   return { loading, houseDesc };
 };

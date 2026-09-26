@@ -2,29 +2,38 @@ import type { OwnerType } from "../contexts/MultiWheelContext";
 import type { KeyAngleDisplay } from "./cusp";
 import { type Planet, type PlanetBase } from "./planet";
 
+export type AspectPointType = "Planet" | "Angle";
+
 export interface Aspect {
   type: AspectType;
   angle: number;
   orb: number;
-  planet1: Planet;
-  planet1Owner?: OwnerType;
-  planet2: Planet;
+  point1: {
+    type: AspectPointType;
+    value: Planet;
+  };
+  point1Owner?: OwnerType;
+  point2: {
+    type: AspectPointType;
+    value: Planet;
+  };
 }
 
 export interface AspectDisplay {
   type: AspectType;
   orb?: number;
-  planet1: PlanetBase | KeyAngleDisplay;
-  planet2: PlanetBase | KeyAngleDisplay;
-  planet1Owner?: OwnerType;
+  point1: {
+    type: AspectPointType;
+    value: PlanetBase | KeyAngleDisplay;
+  };
+  point2: {
+    type: AspectPointType;
+    value: PlanetBase | KeyAngleDisplay;
+  };
+  point1Owner?: OwnerType;
 }
 
-export type AspectType =
-  | "conjunction"
-  | "opposition"
-  | "square"
-  | "trine"
-  | "sextile";
+export type AspectType = "CONJUNCTION" | "OPPOSITION" | "SQUARE" | "TRINE" | "SEXTILE";
 
 interface AspectInfo {
   name: string;
@@ -34,37 +43,34 @@ interface AspectInfo {
 }
 
 export const AspectData: Record<AspectType, AspectInfo> = {
-  conjunction: {
+  CONJUNCTION: {
     name: "Conjunction",
     glyph: "☌",
     color: "#6B7280",
-    description:
-      "Merges the energies of both planets, intensifying their influence.",
+    description: "Merges the energies of both planets, intensifying their influence.",
   },
-  opposition: {
+  OPPOSITION: {
     name: "Opposition",
     glyph: "☍",
     color: "#EF4444",
-    description:
-      "Creates tension and polarity, highlighting contrasts and challenges.",
+    description: "Creates tension and polarity, highlighting contrasts and challenges.",
   },
-  square: {
+  SQUARE: {
     name: "Square",
     glyph: "□",
     color: "#F97316",
     description: "Generates friction that motivates growth and action.",
   },
-  trine: {
+  TRINE: {
     name: "Trine",
     glyph: "△",
     color: "#3B82F6",
     description: "Flows easily, bringing harmony and supportive energy.",
   },
-  sextile: {
+  SEXTILE: {
     name: "Sextile",
     glyph: "✶",
     color: "#10B981",
-    description:
-      "Offers opportunity and cooperation, promoting positive outcomes.",
+    description: "Offers opportunity and cooperation, promoting positive outcomes.",
   },
 };

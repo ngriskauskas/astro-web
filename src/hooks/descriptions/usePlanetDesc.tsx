@@ -19,27 +19,32 @@ interface PlanetDescParams {
 }
 
 export const usePlanetDesc = (params: PlanetDescParams) => {
-  const [loading, setLoading] = useState(true);
-  const [planetDesc, setPlanetDesc] = useState<PlanetDesc>();
+  const [loading, setLoading] = useState(false);
+  const [planetDesc, setPlanetDesc] = useState<PlanetDesc>({
+    retrograde: "temp",
+    sign: "temp",
+    house: "temp",
+    combined: "temp",
+  });
 
   const { type } = useWheel();
 
-  useEffect(() => {
-    const fetchDesc = async () => {
-      setLoading(true);
-      const data = await apiFetch("/descriptions/planet", {
-        method: "POST",
-        body: JSON.stringify({
-          ...params,
-          type: type === "moment" ? "time" : type,
-        }),
-      });
-      setPlanetDesc(data);
-      setLoading(false);
-    };
+  // useEffect(() => {
+  //   const fetchDesc = async () => {
+  //     setLoading(true);
+  //     const data = await apiFetch("/descriptions/planet", {
+  //       method: "POST",
+  //       body: JSON.stringify({
+  //         ...params,
+  //         type: type === "moment" ? "time" : type,
+  //       }),
+  //     });
+  //     setPlanetDesc(data);
+  //     setLoading(false);
+  //   };
 
-    fetchDesc();
-  }, [params.sign, params.planet, params.house, type]);
+  //   fetchDesc();
+  // }, [params.sign, params.planet, params.house, type]);
 
   return { loading, planetDesc };
 };

@@ -2,6 +2,7 @@ import { type ZodiacSign, ZodiacData } from "../../../types/zodiac";
 import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, polarToCartesian } from "./Utils";
+import { useChartSettings } from "../../../contexts/ChartSettingsContext";
 
 export interface SignAngle {
   sign: ZodiacSign;
@@ -14,12 +15,13 @@ interface SignProps {
 }
 
 export const Signs = ({ radius, center }: SignProps) => {
+  const { signAngles: angles } = useWheel();
+
   const {
-    signAngles: angles,
     settings: {
       displayOptions: { tickMarks: showTickMarks },
     },
-  } = useWheel();
+  } = useChartSettings();
 
   const { open } = useDesc();
 
@@ -40,13 +42,7 @@ export const Signs = ({ radius, center }: SignProps) => {
              ease-in-out hover:scale-101 origin-[50%_50%] hover:drop-shadow-lg hover:opacity-80"
           >
             <defs>
-              <linearGradient
-                id={`grad-${sign}`}
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="0%"
-              >
+              <linearGradient id={`grad-${sign}`} x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor={color} stopOpacity={0.5}>
                   <animate
                     attributeName="stop-opacity"
@@ -74,13 +70,7 @@ export const Signs = ({ radius, center }: SignProps) => {
               </linearGradient>
             </defs>
             <path
-              d={createWedgePath(
-                center,
-                innerRadius,
-                outerRadius,
-                angle,
-                angle + 30,
-              )}
+              d={createWedgePath(center, innerRadius, outerRadius, angle, angle + 30)}
               fill={`url(#grad-${sign})`}
               stroke="white"
               fillRule="evenodd"
@@ -107,11 +97,7 @@ export const Signs = ({ radius, center }: SignProps) => {
                 }
 
                 const p1 = polarToCartesian(center, innerRadius, tickAngle);
-                const p2 = polarToCartesian(
-                  center,
-                  innerRadius + tickLength,
-                  tickAngle,
-                );
+                const p2 = polarToCartesian(center, innerRadius + tickLength, tickAngle);
 
                 return (
                   <line
