@@ -2,15 +2,10 @@ import { useDesc } from "../../contexts/DescContext";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
 import { PlanetsData, type PlanetName } from "../../types/planet";
 
-export const PlanetChip = ({
-  planet,
-  owner,
-}: {
-  planet: PlanetName;
-  owner?: OwnerType;
-}) => {
+export const PlanetChip = ({ planet, owner }: { planet: PlanetName; owner?: OwnerType }) => {
   const { open } = useDesc();
-  const color = PlanetsData[planet].color;
+  const planetInfo = PlanetsData[planet];
+  const color = planetInfo.color;
   return (
     <div
       className="flex items-center gap-1 px-1.5 py-0.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md transition-all justify-center"
@@ -20,8 +15,8 @@ export const PlanetChip = ({
         borderColor: `${color}55`,
       }}
     >
-      <span className="text-base">{PlanetsData[planet].glyph}</span>
-      <span className="capitalize">{planet}</span>
+      <span className="text-base">{planetInfo.glyph}</span>
+      <span>{planetInfo.displayName}</span>
     </div>
   );
 };
@@ -36,17 +31,13 @@ export const PlanetGroup = ({
   owner?: "main" | "other";
 }) => (
   <div className="flex flex-col gap-1">
-    <span className="text-gray-500 text-xs uppercase tracking-wide">
-      {title}
-    </span>
+    <span className="text-gray-500 text-xs uppercase tracking-wide">{title}</span>
 
     <div className="flex flex-wrap gap-1">
       {planets.length === 0 ? (
         <span className="text-gray-500">—</span>
       ) : (
-        planets.map((planet) => (
-          <PlanetChip key={planet} planet={planet} owner={owner} />
-        ))
+        planets.map((planet) => <PlanetChip key={planet} planet={planet} owner={owner} />)
       )}
     </div>
   </div>

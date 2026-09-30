@@ -10,27 +10,18 @@ import { Section, DescSection } from "../utils/Section";
 import { SignChip } from "../utils/SignChip";
 import { BackButton, CloseButton, OverviewCard } from "./Helpers";
 
-export const HousePanel = ({
-  houseName,
-  owner,
-}: {
-  houseName: CuspType;
-  owner?: OwnerType;
-}) => {
+export const HousePanel = ({ houseName, owner }: { houseName: CuspType; owner?: OwnerType }) => {
   const houseInfo = HouseData[houseName];
   const { open } = useDesc();
 
-  const { house, planets, mainPlanets, otherPlanets, signs } = useHouseData(
-    houseName,
-    owner,
-  );
+  const { house, planets, mainPlanets, otherPlanets, signs } = useHouseData(houseName, owner);
 
   const { loading, houseDesc } = useHouseDesc({
-    signs,
     planets,
     mainPlanets,
     otherPlanets,
     house,
+    owner,
   });
 
   const { otherProfileName } = useProfileNames();
@@ -63,14 +54,12 @@ export const HousePanel = ({
             />
             <OverviewCard
               title="Polarity"
-              glyph={
-                <span className="text-xs">{houseInfo.info.polarity.glyph}</span>
-              }
+              glyph={<span className="text-xs">{houseInfo.info.polarity.glyph}</span>}
               value={houseInfo.info.polarity.name}
             />
             <OverviewCard
               title="Sign"
-              value={houseInfo.info.sign}
+              value={ZodiacData[houseInfo.info.sign].displayName}
               glyph={ZodiacData[houseInfo.info.sign].glyph}
               onClick={() => open({ type: "sign", value: houseInfo.info.sign })}
             />
@@ -84,10 +73,7 @@ export const HousePanel = ({
               ) : (
                 <div className="flex flex-col gap-3 w-full">
                   {planets.map(({ name }) => (
-                    <DescSection
-                      key={name}
-                      desc={houseDesc?.planets![name] ?? ""}
-                    >
+                    <DescSection key={name} desc={houseDesc?.planets![name] ?? ""}>
                       <PlanetChip planet={name} owner={owner} />
                     </DescSection>
                   ))}
@@ -97,18 +83,13 @@ export const HousePanel = ({
             {mainPlanets && otherPlanets && (
               <div className="flex flex-col gap-4 w-full">
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-gray-500">
-                    Your planets
-                  </span>
+                  <span className="text-xs font-medium text-gray-500">Your planets</span>
                   <div className="flex flex-col gap-2">
                     {mainPlanets.length === 0 ? (
                       <span className="text-gray-500">—</span>
                     ) : (
                       mainPlanets.map(({ name }) => (
-                        <DescSection
-                          key={name}
-                          desc={houseDesc?.mainPlanets![name] ?? ""}
-                        >
+                        <DescSection key={name} desc={houseDesc?.mainPlanets![name] ?? ""}>
                           <PlanetChip planet={name} owner="main" />
                         </DescSection>
                       ))
@@ -125,10 +106,7 @@ export const HousePanel = ({
                       <span className="text-gray-500">—</span>
                     ) : (
                       otherPlanets.map(({ name }) => (
-                        <DescSection
-                          key={name}
-                          desc={houseDesc?.otherPlanets![name] ?? ""}
-                        >
+                        <DescSection key={name} desc={houseDesc?.otherPlanets![name] ?? ""}>
                           <PlanetChip planet={name} owner="other" />
                         </DescSection>
                       ))
@@ -142,9 +120,9 @@ export const HousePanel = ({
         <Section title="Signs in this House" loading={loading}>
           <div className="flex flex-col gap-2 w-full">
             {signs.map(({ sign }) => (
-              <DescSection key={sign} desc={houseDesc?.signs[sign] ?? ""}>
+              <div key={sign}>
                 <SignChip sign={sign} />
-              </DescSection>
+              </div>
             ))}
           </div>
         </Section>

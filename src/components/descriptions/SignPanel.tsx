@@ -13,23 +13,13 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
   const signInfo = ZodiacData[sign];
   const { info } = signInfo;
 
-  const {
-    planets,
-    mainPlanets,
-    otherPlanets,
-    houses,
-    mainHouses,
-    otherHouses,
-  } = useSignData(sign);
+  const { planets, mainPlanets, otherPlanets, houses, mainHouses, otherHouses } = useSignData(sign);
 
   const { loading, signDesc } = useSignDesc({
     sign,
     planets,
     mainPlanets,
     otherPlanets,
-    houses,
-    mainHouses,
-    otherHouses,
   });
 
   const { otherProfileName } = useProfileNames();
@@ -41,9 +31,9 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
         style={{ backgroundColor: signInfo.color }}
       >
         <BackButton />
-        <img src={signInfo.glyph} alt={sign} width={32} height={32} />
-        <h2 className="text-xl font-semibold capitalize">{sign}</h2>
-        <img src={signInfo.drawing} alt={sign} width={32} height={32} />
+        <img src={signInfo.glyph} alt={signInfo.displayName} width={32} height={32} />
+        <h2 className="text-xl font-semibold">{signInfo.displayName}</h2>
+        <img src={signInfo.drawing} alt={signInfo.displayName} width={32} height={32} />
         <CloseButton />
       </div>
 
@@ -53,16 +43,8 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
             {signInfo.info.description}
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <OverviewCard
-              title="Element"
-              glyph={info.element.glyph}
-              value={info.element.name}
-            />
-            <OverviewCard
-              title="Modality"
-              glyph={info.modality.glyph}
-              value={info.modality.name}
-            />
+            <OverviewCard title="Element" glyph={info.element.glyph} value={info.element.name} />
+            <OverviewCard title="Modality" glyph={info.modality.glyph} value={info.modality.name} />
             <OverviewCard
               title="Polarity"
               glyph={<span className="text-xs">{info.polarity.glyph}</span>}
@@ -119,18 +101,13 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
             {mainPlanets && otherPlanets && (
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-gray-500">
-                    Your planets
-                  </span>
+                  <span className="text-xs font-medium text-gray-500">Your planets</span>
                   <div className="flex flex-col gap-2 w-full">
                     {mainPlanets.length === 0 ? (
                       <span>—</span>
                     ) : (
                       mainPlanets.map(({ name }) => (
-                        <DescSection
-                          key={name}
-                          desc={signDesc?.mainPlanets![name] ?? ""}
-                        >
+                        <DescSection key={name} desc={signDesc?.mainPlanets![name] ?? ""}>
                           <PlanetChip planet={name} owner="main" />
                         </DescSection>
                       ))
@@ -147,10 +124,7 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
                       <span>—</span>
                     ) : (
                       otherPlanets.map(({ name }) => (
-                        <DescSection
-                          key={name}
-                          desc={signDesc?.otherPlanets![name] ?? ""}
-                        >
+                        <DescSection key={name} desc={signDesc?.otherPlanets![name] ?? ""}>
                           <PlanetChip planet={name} owner="other" />
                         </DescSection>
                       ))
@@ -165,25 +139,20 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
           <div className="flex flex-col gap-2 w-full">
             {houses &&
               houses.map(({ name }) => (
-                <DescSection key={name} desc={signDesc?.houses![name] ?? ""}>
+                <div key={name}>
                   <HouseChip house={name} />
-                </DescSection>
+                </div>
               ))}
 
             {mainHouses && otherHouses && (
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-gray-500">
-                    Your Houses
-                  </span>
+                  <span className="text-xs font-medium text-gray-500">Your Houses</span>
                   <div className="flex flex-col gap-2 w-full">
                     {mainHouses.map(({ name }) => (
-                      <DescSection
-                        key={name}
-                        desc={signDesc?.mainHouses![name] ?? ""}
-                      >
+                      <div key={name}>
                         <HouseChip house={name} owner="main" />
-                      </DescSection>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -194,12 +163,9 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
                   </span>
                   <div className="flex flex-col gap-2 w-full">
                     {otherHouses.map(({ name }) => (
-                      <DescSection
-                        key={name}
-                        desc={signDesc?.otherHouses![name] ?? ""}
-                      >
+                      <div key={name}>
                         <HouseChip house={name} owner="other" />
-                      </DescSection>
+                      </div>
                     ))}
                   </div>
                 </div>

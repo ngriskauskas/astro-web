@@ -6,7 +6,7 @@ import { type PlanetAngle } from "../components/wheel/layers/Planets";
 import { type CuspAngle, type KeyAngleAngle } from "../components/wheel/layers/Houses";
 import { type SignAngle } from "../components/wheel/layers/Signs";
 import { ZodiacSigns, type ZodiacSign } from "../types/zodiac";
-import { type Aspect } from "../types/aspect";
+import { isPlanetAspect, type Aspect, type PlanetAspect } from "../types/aspect";
 import type { Planet } from "../types/planet";
 import { getLocalISODate, getLocalISOTime } from "../utils/funcs";
 import type { ZodiacSystem } from "../types/zodiac-system";
@@ -26,7 +26,8 @@ export interface MultiWheelContextType {
   mainKeyAngles: KeyAngleAngle[];
   otherKeyAngles: KeyAngleAngle[];
   signAngles: SignAngle[];
-  aspects: Aspect[];
+  aspects: PlanetAspect[];
+  chartAspects: Aspect[];
   type: "synastry" | "transit";
 }
 
@@ -50,7 +51,7 @@ export const MultiWheelProvider = ({
   const [otherCuspAngles, setOtherCuspAngles] = useState<CuspAngle[]>([]);
   const [mainKeyAngles, setMainKeyAngles] = useState<KeyAngleAngle[]>([]);
   const [otherKeyAngles, setOtherKeyAngles] = useState<KeyAngleAngle[]>([]);
-  const [aspects, setAspects] = useState<Aspect[]>([]);
+  const [aspects, setAspects] = useState<PlanetAspect[]>([]);
 
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
     profileId: mainProfile?.id,
@@ -132,8 +133,11 @@ export const MultiWheelProvider = ({
     return Math.round(num * 100) / 100;
   };
 
+  const getOrientationAscendant = (chart: MultiChart) =>
+    type === "transit" ? chart.other.houses[1] : chart.main.houses[1];
+
   const calcCuspAngles = (chart: MultiChart) => {
-    const ascPos = chart.main.houses[1].position.position;
+    const ascPos = getOrientationAscendant(chart).position.position;
 
     const mainCusps = Object.entries(chart.main.houses).map(([_key, cusp]) => ({
       ...cusp,
@@ -167,7 +171,7 @@ export const MultiWheelProvider = ({
   };
 
   const calcKeyAngles = (chart: MultiChart) => {
-    const ascPos = chart.main.houses[1].position.position;
+    const ascPos = getOrientationAscendant(chart).position.position;
 
     const main = Object.entries(chart.main.keyAngles).map(([_key, cusp]) => ({
       ...cusp,
@@ -216,7 +220,7 @@ export const MultiWheelProvider = ({
   };
 
   const calcPlanetAngles = (chart: MultiChart) => {
-    const ascPos = chart.main.houses[1].position.position;
+    const ascPos = getOrientationAscendant(chart).position.position;
 
     const rawMainPlanetAngles = calcInitialPlanetAngles(ascPos, chart.main.planets);
 
@@ -229,11 +233,12 @@ export const MultiWheelProvider = ({
   };
 
   const calcSignAngles = (chart: MultiChart) => {
-    const ascSign = chart.main.houses[1].sign;
+    const ascendant = getOrientationAscendant(chart);
+    const ascSign = ascendant.sign;
 
     const ascIndex = ZodiacSigns.indexOf(ascSign);
 
-    const startAngleFirstSign = -chart.main.houses[1].position.degInSign;
+    const startAngleFirstSign = -ascendant.position.degInSign;
     return ZodiacSigns.map((s, i) => {
       const offset = (i - ascIndex + 12) % 12;
       const angle = round((startAngleFirstSign + offset * 30 + 360) % 360);
@@ -257,11 +262,7 @@ export const MultiWheelProvider = ({
     setOtherKeyAngles(otherKAngles);
 
     setSignAngles(calcSignAngles(chart));
-    setAspects(
-      chart.aspects.filter(
-        ({ point1, point2 }) => point1.type === "Planet" && point2.type === "Planet",
-      ),
-    );
+    setAspects(chart.aspects.filter(isPlanetAspect));
   }, [chart]);
 
   return (
@@ -277,6 +278,7 @@ export const MultiWheelProvider = ({
         otherKeyAngles,
         signAngles,
         aspects,
+        chartAspects: chart?.aspects ?? [],
         type,
       }}
     >

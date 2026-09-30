@@ -22,6 +22,7 @@ export const PlanetPanel = ({
     planet,
     house: planet.house,
     sign: planet.sign,
+    owner,
   });
   const planetInfo = PlanetsData[planetName];
 
@@ -33,7 +34,7 @@ export const PlanetPanel = ({
       >
         <BackButton />
         <span className="text-2xl">{planetInfo.glyph}</span>
-        <h2 className="text-xl font-semibold capitalize">{planetName}</h2>
+        <h2 className="text-xl font-semibold">{planetInfo.displayName}</h2>
         <CloseButton />
       </div>
       <div className="p-2 flex-1 overflow-y-auto">

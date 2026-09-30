@@ -1,5 +1,5 @@
 import { useDesc } from "../../contexts/DescContext";
-import { PLANET_ORDER, PlanetsData, type PlanetBase, type PlanetName } from "../../types/planet";
+import { PlanetsData, type PlanetName } from "../../types/planet";
 import { AspectData, type AspectDisplay } from "../../types/aspect";
 import { SignCircle } from "./SignChip";
 
@@ -31,7 +31,11 @@ export const AspectChip = ({
           <span className="text-base">
             {PlanetsData[aspect.point1.value.name as PlanetName].glyph}
           </span>
-          {showPlanetName && <span className="capitalize text-xs">{aspect.point1.value.name}</span>}
+          {showPlanetName && (
+            <span className="text-xs">
+              {PlanetsData[aspect.point1.value.name as PlanetName].displayName}
+            </span>
+          )}
         </div>
       ) : (
         <span className="inline-block font-mono tracking-tight">
@@ -49,7 +53,9 @@ export const AspectChip = ({
           <span className="text-base">
             {PlanetsData[aspect.point2.value.name as PlanetName].glyph}
           </span>
-          {showPlanetName && <span className="capitalize">{aspect.point2.value.name}</span>}
+          {showPlanetName && (
+            <span>{PlanetsData[aspect.point2.value.name as PlanetName].displayName}</span>
+          )}
         </div>
       ) : (
         <span className="inline-block font-mono font-semibold tracking-tight">

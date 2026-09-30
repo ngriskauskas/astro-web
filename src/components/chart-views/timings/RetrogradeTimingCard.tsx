@@ -1,3 +1,4 @@
+/* Temporarily disabled until planet-specific timing responses are documented.
 import { useState } from "react";
 import { useRetrogradeDesc } from "../../../hooks/descriptions/useRetrogradeDesc";
 import type {
@@ -53,3 +54,4 @@ export const RetrogradeTimingCard = ({ event }: { event: TimingEvent }) => {
     </div>
   );
 };
+*/

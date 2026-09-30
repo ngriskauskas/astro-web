@@ -1,26 +1,23 @@
 import type { PlanetName } from "../../types/planet";
 import { useGeneratedDescriptions } from "./useGeneratedDescriptions";
 
-export interface RetrogradeDesc {
-  description: string;
-}
-
-interface RetrogradeDescParams {
+interface StationDescParams {
   planet: PlanetName;
+  retrograde: boolean;
 }
 
-export const useRetrogradeDesc = (params: RetrogradeDescParams) => {
+export const useStationDesc = (params: StationDescParams) => {
   const { loading, descriptions } = useGeneratedDescriptions([
     {
       type: "timing",
       timeScale: "LONG_TERM",
       event: {
-        type: "retrograde",
+        type: "station",
         planet: params.planet,
+        retrograde: params.retrograde,
       },
     },
   ]);
-  const retrogradeDesc: RetrogradeDesc = { description: descriptions[0] ?? "" };
 
-  return { loading, retrogradeDesc };
+  return { loading, description: descriptions[0] ?? "" };
 };

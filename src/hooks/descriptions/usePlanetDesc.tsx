@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
 import type { CuspType } from "../../types/cusp";
+import type { OwnerType } from "../../contexts/MultiWheelContext";
 import type { Planet } from "../../types/planet";
 import type { ZodiacSign } from "../../types/zodiac";
-import { apiFetch } from "../../utils/api";
 import { useWheel } from "../useWheel";
+import { getChartSource, useGeneratedDescriptions } from "./useGeneratedDescriptions";
 
 export interface PlanetDesc {
   retrograde?: string;
@@ -16,35 +16,34 @@ interface PlanetDescParams {
   planet: Planet;
   sign: ZodiacSign;
   house: CuspType;
+  owner?: OwnerType;
 }
 
 export const usePlanetDesc = (params: PlanetDescParams) => {
-  const [loading, setLoading] = useState(false);
-  const [planetDesc, setPlanetDesc] = useState<PlanetDesc>({
-    retrograde: "temp",
-    sign: "temp",
-    house: "temp",
-    combined: "temp",
-  });
-
   const { type } = useWheel();
+  const chart = getChartSource(type, params.owner);
+  const subject = {
+    chart,
+    point: { type: "planet" as const, name: params.planet.name },
+    sign: params.sign,
+    house: params.house,
+    retrograde: params.planet.retrograde,
+    stationary: params.planet.stationary,
+  };
+  const { loading, descriptions } = useGeneratedDescriptions([
+    { type: "placement", subject: { ...subject, house: null } },
+    { type: "placement", subject: { ...subject, sign: null } },
+    { type: "placement", subject },
+    params.planet.retrograde
+      ? {
+          type: "placement",
+          subject: { ...subject, retrograde: true },
+        }
+      : null,
+  ]);
 
-  // useEffect(() => {
-  //   const fetchDesc = async () => {
-  //     setLoading(true);
-  //     const data = await apiFetch("/descriptions/planet", {
-  //       method: "POST",
-  //       body: JSON.stringify({
-  //         ...params,
-  //         type: type === "moment" ? "time" : type,
-  //       }),
-  //     });
-  //     setPlanetDesc(data);
-  //     setLoading(false);
-  //   };
-
-  //   fetchDesc();
-  // }, [params.sign, params.planet, params.house, type]);
+  const [sign, house, combined, retrograde] = descriptions;
+  const planetDesc: PlanetDesc = { sign, house, combined, retrograde };
 
   return { loading, planetDesc };
 };

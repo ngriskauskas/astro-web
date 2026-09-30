@@ -52,14 +52,6 @@ createRoot(document.getElementById("root")!).render(
 
               <Route element={<ProtectedCharts />}>
                 <Route
-                  path="time/*"
-                  element={
-                    <ProtectedUserLocation>
-                      <Time />
-                    </ProtectedUserLocation>
-                  }
-                />
-                <Route
                   path="daily/*"
                   element={
                     <ProtectedUserLocation>

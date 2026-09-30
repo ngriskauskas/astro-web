@@ -41,6 +41,8 @@ export interface Planet {
   sign: ZodiacSign;
   retrograde: boolean;
   house: CuspType;
+  stationary: boolean;
+  speed: number;
 }
 
 export interface PlanetBase {
@@ -49,6 +51,7 @@ export interface PlanetBase {
 }
 
 interface PlanetInfo {
+  displayName: string;
   glyph: string;
   scale: number;
   color: string;
@@ -63,6 +66,7 @@ interface PlanetInfo {
 
 export const PlanetsData: Record<PlanetName, PlanetInfo> = {
   SUN: {
+    displayName: "Sun",
     glyph: "☉",
     scale: 1.5,
     color: "#FFD700",
@@ -76,6 +80,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   MOON: {
+    displayName: "Moon",
     glyph: "☽",
     scale: 1,
     color: "#B0C4DE",
@@ -89,6 +94,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   MERCURY: {
+    displayName: "Mercury",
     glyph: "☿",
     scale: 1.1,
     color: "#9ACD32",
@@ -102,6 +108,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   VENUS: {
+    displayName: "Venus",
     glyph: "♀",
     scale: 0.95,
     color: "#FF69B4",
@@ -115,6 +122,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   MARS: {
+    displayName: "Mars",
     glyph: "♂",
     scale: 0.9,
     color: "#FF4500",
@@ -128,6 +136,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   JUPITER: {
+    displayName: "Jupiter",
     glyph: "♃",
     scale: 1,
     color: "#F4A460",
@@ -141,6 +150,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   SATURN: {
+    displayName: "Saturn",
     glyph: "♄",
     scale: 1,
     color: "#708090",
@@ -154,6 +164,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   URANUS: {
+    displayName: "Uranus",
     glyph: "♅",
     scale: 1,
     color: "#40E0D0",
@@ -167,6 +178,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   NEPTUNE: {
+    displayName: "Neptune",
     glyph: "♆",
     scale: 1,
     color: "#4682B4",
@@ -180,6 +192,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   PLUTO: {
+    displayName: "Pluto",
     glyph: "♇",
     scale: 1,
     color: "#8B0000",
@@ -193,6 +206,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   CHIRON: {
+    displayName: "Chiron",
     glyph: "⚷",
     scale: 1,
     color: "#8A2BE2",
@@ -206,6 +220,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   LILITH: {
+    displayName: "Lilith",
     glyph: "⚸",
     scale: 1,
     color: "#800080",
@@ -219,6 +234,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   NORTH_NODE: {
+    displayName: "North Node",
     glyph: "☊",
     scale: 0.95,
     color: "#32CD32",
@@ -232,6 +248,7 @@ export const PlanetsData: Record<PlanetName, PlanetInfo> = {
     },
   },
   SOUTH_NODE: {
+    displayName: "South Node",
     glyph: "☋",
     scale: 0.95,
     color: "#FF6347",

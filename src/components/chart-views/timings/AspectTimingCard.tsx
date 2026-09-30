@@ -1,3 +1,4 @@
+/* Temporarily disabled until planet-specific timing responses are documented.
 import { useState } from "react";
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { useAspectDesc } from "../../../hooks/descriptions/useAspectDesc";
@@ -141,3 +142,4 @@ export const AspectTimingCard = ({ event }: { event: TimingEvent }) => {
     </div>
   );
 };
+*/

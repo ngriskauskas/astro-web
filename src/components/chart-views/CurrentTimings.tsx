@@ -1,34 +1,29 @@
-import {
-  convertToEvents,
-  useCurrentTimings,
-  type IngressTiming,
-  type TimingEvent,
-} from "../../hooks/timings/useTimings";
-import { AspectTimingCard } from "./timings/AspectTimingCard";
-import { IngressTimingCard } from "./timings/IngressTimingCard";
-import { RetrogradeTimingCard } from "./timings/RetrogradeTimingCard";
+import { convertToEvents, useCurrentTimings } from "../../hooks/timings/useTimings";
+import type { TimingEvent } from "../../types/timings";
 import { WeeklyTimeline } from "../timeline/WeeklyTimeline";
 import type { TimelineEvent } from "../timeline/types";
 import { AspectPreview } from "../descriptions/AspectTimingPanel";
 import { IngressPreview } from "../descriptions/IngressPanel";
 import { RetrogradePreview } from "../descriptions/RetrogradeTimingPanel";
+import { StationPreview } from "../descriptions/StationTimingPanel";
 
 export const CurrentTimings = () => {
   const { loading, timings } = useCurrentTimings();
 
   if (loading) return <div>Loading...</div>;
 
-  const { aspectEvents, ingressEvents, retrogradeEvents } =
-    convertToEvents(timings);
+  const { aspectEvents, ingressEvents, retrogradeEvents, stationEvents } = convertToEvents(timings);
 
   const aspectTimelineEvents = aspectsToEvents(aspectEvents);
   const ingressTimelineEvents = ingressesToEvents(ingressEvents);
   const retrogradeTimelineEvents = retrogradesToEvents(retrogradeEvents);
+  const stationTimelineEvents = stationsToEvents(stationEvents);
 
   const allTimelineEvents: TimelineEvent[] = [
     ...aspectTimelineEvents,
     ...ingressTimelineEvents,
     ...retrogradeTimelineEvents,
+    ...stationTimelineEvents,
   ];
 
   return (
@@ -38,39 +33,30 @@ export const CurrentTimings = () => {
   );
 };
 
-export const EventCard = ({ event }: { event: TimingEvent }) => {
-  return (
-    <div className="h-auto self-start">
-      {(() => {
-        switch (event.type) {
-          case "aspect":
-            return <AspectTimingCard event={event} />;
-          case "ingress":
-            return <IngressTimingCard ingress={event.data as IngressTiming} />;
-          case "retrograde":
-            return <RetrogradeTimingCard event={event} />;
-          default:
-            return null;
-        }
-      })()}
-    </div>
-  );
-};
-
-const aspectsToEvents = (aspects: TimingEvent[]): TimelineEvent[] =>
+const aspectsToEvents = (aspects: Extract<TimingEvent, { type: "aspect" }>[]): TimelineEvent[] =>
   aspects.map((a) => ({
     start: new Date(a.date),
     renderPreview: () => <AspectPreview aspect={a} />,
   }));
 
-const ingressesToEvents = (ingresses: TimingEvent[]): TimelineEvent[] =>
+const ingressesToEvents = (
+  ingresses: Extract<TimingEvent, { type: "ingress" }>[],
+): TimelineEvent[] =>
   ingresses.map((i) => ({
     start: new Date(i.date),
     renderPreview: () => <IngressPreview ingress={i} />,
   }));
 
-const retrogradesToEvents = (retrogrades: TimingEvent[]): TimelineEvent[] =>
+const retrogradesToEvents = (
+  retrogrades: Extract<TimingEvent, { type: "retrograde" }>[],
+): TimelineEvent[] =>
   retrogrades.map((r) => ({
     start: new Date(r.date),
     renderPreview: () => <RetrogradePreview retrograde={r} />,
+  }));
+
+const stationsToEvents = (stations: Extract<TimingEvent, { type: "station" }>[]): TimelineEvent[] =>
+  stations.map((station) => ({
+    start: new Date(station.date),
+    renderPreview: () => <StationPreview station={station} />,
   }));

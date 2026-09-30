@@ -1,22 +1,20 @@
 import { BackButton, CloseButton } from "./Helpers";
 import { Section } from "../utils/Section";
-import { DateChip } from "../utils/DateChip";
-import type { TimingEvent } from "../../hooks/timings/useTimings";
-import type { RetrogradeTiming } from "../../hooks/timings/useTimings";
+import { DateTimeChip } from "../utils/DateChip";
+import type { TimingEvent } from "../../types/timings";
 import { useDesc } from "../../contexts/DescContext";
 import { PlanetChip } from "../utils/PlanetChip";
 import { useRetrogradeDesc } from "../../hooks/descriptions/useRetrogradeDesc";
 import { PlanetsData } from "../../types/planet";
 
-export const RetrogradeTimingPanel = ({
-  retrograde,
-}: {
-  retrograde: TimingEvent;
-}) => {
-  const retroData = retrograde.data as RetrogradeTiming;
+type RetrogradeEvent = Extract<TimingEvent, { type: "retrograde" }>;
+
+export const RetrogradeTimingPanel = ({ retrograde }: { retrograde: RetrogradeEvent }) => {
+  const retroData = retrograde.data;
+  const planet = retroData.planet.name;
 
   const { loading, retrogradeDesc } = useRetrogradeDesc({
-    planet: retroData.planet,
+    planet,
   });
 
   return (
@@ -24,12 +22,8 @@ export const RetrogradeTimingPanel = ({
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-purple-50">
         <BackButton />
         <h2 className="text-xl flex items-center gap-2">
-          <span className="text-2xl">
-            {PlanetsData[retroData.planet].glyph}
-          </span>
-          <h2 className="text-xl font-semibold capitalize">
-            {retroData.planet}
-          </h2>
+          <span className="text-2xl">{PlanetsData[planet].glyph}</span>
+          <h2 className="text-xl font-semibold">{PlanetsData[planet].displayName}</h2>
           <span>retrograde</span>
         </h2>
         <CloseButton />
@@ -39,39 +33,31 @@ export const RetrogradeTimingPanel = ({
         <Section title="Overview">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-lg">℞</span>
-            <span className="font-semibold capitalize">
-              {retroData.planet} Retrograde
-            </span>
+            <span className="font-semibold">{PlanetsData[planet].displayName} Retrograde</span>
           </div>
           <div className="p-2 bg-white border rounded shadow-sm text-sm">
-            When a planet goes retrograde, it appears to move backward in the
-            sky from Earth's perspective. Retrogrades are periods of review,
-            reflection, and reorientation related to the planet's themes.
+            When a planet goes retrograde, it appears to move backward in the sky from Earth's
+            perspective. Retrogrades are periods of review, reflection, and reorientation related to
+            the planet's themes.
           </div>
         </Section>
 
         <Section title="Times">
           <div className="text-xs text-gray-700 flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <span className="font-semibold shrink-0 text-xs text-gray-500">
-                Start:
-              </span>
-              <DateChip date={retroData.start_date} format />
+              <span className="font-semibold shrink-0 text-xs text-gray-500">Start:</span>
+              <DateTimeChip datetime={retroData.startPlanet.dateTime} format />
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold shrink-0 text-xs text-gray-500">
-                End:
-              </span>
-              <DateChip date={retroData.end_date} format />
+              <span className="font-semibold shrink-0 text-xs text-gray-500">End:</span>
+              <DateTimeChip datetime={retroData.endPlanet.dateTime} format />
             </div>
           </div>
         </Section>
 
         <Section title="Details" loading={loading}>
           {retrogradeDesc && (
-            <div className="text-sm text-gray-600 mt-2 pl-2">
-              {retrogradeDesc.description}
-            </div>
+            <div className="text-sm text-gray-600 mt-2 pl-2">{retrogradeDesc.description}</div>
           )}
         </Section>
       </div>
@@ -79,12 +65,8 @@ export const RetrogradeTimingPanel = ({
   );
 };
 
-export const RetrogradePreview = ({
-  retrograde,
-}: {
-  retrograde: TimingEvent;
-}) => {
-  const retroData = retrograde.data as RetrogradeTiming;
+export const RetrogradePreview = ({ retrograde }: { retrograde: RetrogradeEvent }) => {
+  const retroData = retrograde.data;
   const { open } = useDesc();
 
   return (
@@ -98,7 +80,7 @@ export const RetrogradePreview = ({
       "
       onClick={() => open({ type: "retrogradeTiming", value: retrograde })}
     >
-      <PlanetChip planet={retroData.planet} />
+      <PlanetChip planet={retroData.planet.name} />
       <span className="text-sm font-semibold">℞</span>
     </div>
   );

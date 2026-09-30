@@ -4,9 +4,8 @@ import { type Aspect, type AspectDisplay } from "../types/aspect";
 import { type PlanetName } from "../types/planet";
 import type { CuspType, KeyType } from "../types/cusp";
 import type { OwnerType } from "./MultiWheelContext";
-import type { MoonPhaseTiming } from "../hooks/timings/useMoonTimings";
-import type { DailyAspectTiming, KeyAngleTiming } from "../hooks/timings/useDailyTimings";
-import type { AspectTiming, TimingEvent } from "../hooks/timings/useTimings";
+import type { AngleTiming, AspectTiming, TimingEvent } from "../types/timings";
+import type { MoonPhaseDescriptionValue } from "../types/moon";
 
 export type ActiveType =
   | "planet"
@@ -14,12 +13,13 @@ export type ActiveType =
   | "sign"
   | "aspect"
   | "angle"
-  | "moonphase"
   | "keyAngleTiming"
   | "dailyAspectTiming"
   | "aspectTiming"
   | "ingressTiming"
-  | "retrogradeTiming";
+  | "retrogradeTiming"
+  | "stationTiming"
+  | "moonphase";
 
 export interface Active {
   type: ActiveType;
@@ -29,11 +29,11 @@ export interface Active {
     | CuspType
     | AspectDisplay
     | Aspect
-    | MoonPhaseTiming
     | KeyType
-    | KeyAngleTiming
-    | DailyAspectTiming
-    | TimingEvent;
+    | AngleTiming
+    | AspectTiming
+    | TimingEvent
+    | MoonPhaseDescriptionValue;
   owner?: OwnerType;
 }
 

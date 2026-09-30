@@ -1,8 +1,5 @@
-import { useState, useEffect } from "react";
 import type { MoonPhase } from "../../types/moon";
-import type { ZodiacSign } from "../../types/zodiac";
-import { apiFetch } from "../../utils/api";
-import { useWheel } from "../useWheel";
+import { useGeneratedDescriptions, type DescriptionMoonPhase } from "./useGeneratedDescriptions";
 
 export interface MoonPhaseDesc {
   description: string;
@@ -10,29 +7,20 @@ export interface MoonPhaseDesc {
 
 interface MoonPhaseDescParams {
   phase: MoonPhase;
-  sign: ZodiacSign;
 }
 
-export const useMoonPhaseDesc = (params: MoonPhaseDescParams, enabled: boolean = true) => {
-  const [loading, setLoading] = useState(false);
-  const [moonPhaseDesc, setMoonPhaseDesc] = useState<MoonPhaseDesc>({ description: "temp" });
-
-  const { type } = useWheel();
-  // useEffect(() => {
-  //   if (!enabled) return;
-
-  //   const fetchDesc = async () => {
-  //     setLoading(true);
-  //     const data = await apiFetch("/descriptions/moon-phase", {
-  //       method: "POST",
-  //       body: JSON.stringify({ ...params, type }),
-  //     });
-  //     setMoonPhaseDesc(data);
-  //     setLoading(false);
-  //   };
-
-  //   fetchDesc();
-  // }, [params.phase, params.sign, type, enabled]);
+export const useMoonPhaseDesc = (params: MoonPhaseDescParams) => {
+  const { loading, descriptions } = useGeneratedDescriptions([
+    {
+      type: "timing",
+      timeScale: "DAILY",
+      event: {
+        type: "moonPhase",
+        phase: params.phase.toUpperCase().replace(/ /g, "_") as DescriptionMoonPhase,
+      },
+    },
+  ]);
+  const moonPhaseDesc: MoonPhaseDesc = { description: descriptions[0] ?? "" };
 
   return { loading, moonPhaseDesc };
 };

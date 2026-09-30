@@ -1,21 +1,37 @@
 import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
 import { useAspectDesc } from "../../hooks/descriptions/useAspectDesc";
 import { useWheel } from "../../hooks/useWheel";
-import { type AspectDisplay, AspectData } from "../../types/aspect";
-import type { KeyAngleDisplay, KeyType } from "../../types/cusp";
-import { PLANET_ORDER, PlanetsData, type PlanetBase, type PlanetName } from "../../types/planet";
+import {
+  type AspectDisplay,
+  AspectData,
+  AspectMotionData,
+  type AspectMotionState,
+} from "../../types/aspect";
+import type { KeyType } from "../../types/cusp";
+import { type PlanetName } from "../../types/planet";
 import { KeyAngleChip } from "../utils/KeyAngleChip";
 import { PlanetChip } from "../utils/PlanetChip";
 import { Section } from "../utils/Section";
 import { SignChip } from "../utils/SignChip";
 import { BackButton, CloseButton } from "./Helpers";
+import { TimingAspectTitle } from "../utils/TimingAspectTitle";
+
+const EXACT_ASPECT_ORB_CUTOFF = 0.25;
 
 export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
   const aspectInfo = AspectData[aspect.type];
+  const motionState: AspectMotionState | undefined = aspect.motion
+    ? aspect.orb !== undefined && aspect.orb < EXACT_ASPECT_ORB_CUTOFF
+      ? "EXACT"
+      : aspect.motion
+    : undefined;
   const { loading, aspectDesc } = useAspectDesc({
     aspect: aspect.type,
     point1: aspect.point1,
     point2: aspect.point2,
+    orb: aspect.orb,
+    motion: aspect.motion,
+    point1Owner: aspect.point1Owner,
   });
 
   const {
@@ -35,6 +51,8 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
   const otherProfileName = getProfileName(otherProfileId);
 
   const isMulti = type === "transit" || type === "synastry";
+  const point1Owner = aspect.point1Owner ?? "main";
+  const point2Owner = point1Owner === "main" ? "other" : "main";
 
   return (
     <div className="flex flex-col h-full">
@@ -44,38 +62,7 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
       >
         <BackButton />
         <h2 className="text-xl font-semibold capitalize flex items-center gap-2">
-          {aspect.point1.type === "Planet" ? (
-            <div>
-              <span className="text-xl mr-1">
-                {PlanetsData[aspect.point1.value.name as PlanetName].glyph}
-              </span>
-              <span className="capitalize">{aspect.point1.value.name}</span>
-            </div>
-          ) : (
-            <div>
-              <span className="inline-block font-mono tracking-tight">
-                <span className="capitalize">{aspect.point1.value.name.charAt(0)}</span>
-                <span className="relative -top-1 text-xs">{aspect.point1.value.name.slice(1)}</span>
-              </span>
-            </div>
-          )}
-
-          <span className="text-xl">{aspectInfo.glyph}</span>
-          {aspect.point2.type === "Planet" ? (
-            <div>
-              <span className="text-xl mr-1">
-                {PlanetsData[aspect.point2.value.name as PlanetName].glyph}
-              </span>
-              <span className="capitalize">{aspect.point2.value.name}</span>
-            </div>
-          ) : (
-            <div>
-              <span className="inline-block font-mono font-semibold tracking-tight">
-                <span className="text-base capitalize">{aspect.point2.value.name.charAt(0)}</span>
-                <span className="relative -top-1 text-xs">{aspect.point2.value.name.slice(1)}</span>
-              </span>
-            </div>
-          )}
+          <TimingAspectTitle aspect={aspect} />
         </h2>
         <CloseButton />
       </div>
@@ -88,6 +75,14 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
           <div className="p-2 bg-white border rounded shadow-sm text-sm mb-3">
             {aspectInfo.description}
           </div>
+          {motionState && (
+            <>
+              <div className="mb-2 font-semibold">{AspectMotionData[motionState].name}</div>
+              <div className="p-2 bg-white border rounded shadow-sm text-sm mb-3">
+                {AspectMotionData[motionState].description}
+              </div>
+            </>
+          )}
         </Section>
         <Section title="Details" loading={loading}>
           {aspect.orb && (
@@ -99,10 +94,10 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
           {isMulti ? (
             <div className="grid grid-cols-2 gap-x-6 gap-y-2">
               <span className="text-gray-400 text-xs uppercase tracking-wide text-center">
-                {aspect.point1Owner === "other" ? `${otherProfileName}'s` : `${mainProfileName}'s`}
+                {point1Owner === "other" ? `${otherProfileName}'s` : `${mainProfileName}'s`}
               </span>
               <span className="text-gray-400 text-xs uppercase tracking-wide text-center">
-                {aspect.point1Owner === "main" ? `${otherProfileName}'s` : `${mainProfileName}'s`}
+                {point2Owner === "other" ? `${otherProfileName}'s` : `${mainProfileName}'s`}
               </span>
               {aspect.point1.type === "Planet" ? (
                 <PlanetChip planet={aspect.point1.value.name as PlanetName} />

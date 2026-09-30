@@ -1,51 +1,61 @@
-import { useState } from "react";
-import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { Section } from "../utils/Section";
 import { BackButton, CloseButton } from "./Helpers";
 import { AspectChip } from "../utils/AspectChip";
-import { SignChip } from "../utils/SignChip";
-import { DateChip, DateTimeChip } from "../utils/DateChip";
 import { useDesc } from "../../contexts/DescContext";
-import { useAspectDesc } from "../../hooks/descriptions/useAspectDesc";
-import type { TimingEvent, AspectTiming } from "../../hooks/timings/useTimings";
+import { DateTimeChip } from "../utils/DateChip";
+import type { Aspect } from "../../types/aspect";
+import type { AspectTiming, TimingEvent } from "../../types/timings";
 import { AspectData } from "../../types/aspect";
-import { PlanetsData, type PlanetName } from "../../types/planet";
+import { TimingAspectTitle } from "../utils/TimingAspectTitle";
+import { TimingChipRow } from "./DailyAspectTimingPanel";
 import { useWheel } from "../../hooks/useWheel";
+import { useChartSettings } from "../../contexts/ChartSettingsContext";
+import type { AspectOptions } from "../../types/astrologySettings";
+import { getLocalISODateTime } from "../../utils/funcs";
+import { useTimingAspectDesc } from "../../hooks/descriptions/useAspectDesc";
 
-export const AspectTimingPanel = ({ event }: { event: TimingEvent }) => {
-  const aspect = event.data as AspectTiming;
-  const [expanded, setExpanded] = useState(false);
+type AspectEvent = Extract<TimingEvent, { type: "aspect" }>;
 
-  const ranges = aspect.exact_date_ranges || [];
-  const hasMultipleRanges = ranges.length > 1;
-  const displayedRanges = expanded ? ranges : ranges.slice(0, 1);
+const getEventAspect = (event: AspectEvent): AspectTiming["aspect"] => {
+  if (event.event === "start") return event.data.startAspect.aspect;
+  if (event.event === "end") return event.data.endAspect.aspect;
 
-  const { loading, aspectDesc } = useAspectDesc({
-    aspect: aspect.aspect_type,
-    planet1: aspect.planet1,
-    planet2: aspect.planet2,
+  return (
+    event.data.exactDateRanges.find((snapshot) => snapshot.dateTime === event.date)?.aspect ??
+    event.data.aspect
+  );
+};
+
+export const AspectTimingPanel = ({ event }: { event: AspectEvent }) => {
+  const aspect = event.data;
+  const selectedAspect = getEventAspect(event);
+  const aspectInfo = AspectData[selectedAspect.type];
+  const { loading: descriptionLoading, aspectDesc } = useTimingAspectDesc({
+    aspect: selectedAspect,
+    timeScale: "LONG_TERM",
   });
+  const wheel = useWheel();
+  const chartAspects = "chartAspects" in wheel ? wheel.chartAspects : [];
+  const {
+    settings: { aspectOptions },
+  } = useChartSettings();
+  const currentAspect = getCurrentAspect(aspect, chartAspects, aspectOptions);
+  const currentDateTime = getLocalISODateTime();
+  const timedAspects = [
+    { label: "Start", value: aspect.startAspect },
+    ...aspect.exactDateRanges.map((value, index) => ({
+      label: `Exact${aspect.exactDateRanges.length > 1 ? ` ${index + 1}` : ""}`,
+      value,
+    })),
+    { label: "End", value: aspect.endAspect },
+  ];
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-blue-50">
         <BackButton />
         <h2 className="text-xl font-semibold capitalize flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <span className="text-xl mr-1">
-              {PlanetsData[aspect.planet1.name as PlanetName].glyph}
-            </span>
-            <span className="capitalize">{aspect.planet1.name}</span>
-          </div>
-          <span className="text-xl">
-            {AspectData[aspect.aspect_type].glyph}
-          </span>
-          <div className="flex items-center gap-1">
-            <span className="text-xl mr-1">
-              {PlanetsData[aspect.planet2.name as PlanetName].glyph}
-            </span>
-            <span className="capitalize">{aspect.planet2.name}</span>
-          </div>
+          <TimingAspectTitle aspect={selectedAspect} />
         </h2>
         <CloseButton />
       </div>
@@ -53,77 +63,48 @@ export const AspectTimingPanel = ({ event }: { event: TimingEvent }) => {
       <div className="p-4 flex-1 overflow-y-auto">
         <Section title="Overview">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">
-              {AspectData[aspect.aspect_type].glyph}
-            </span>
-            <span className="font-semibold">
-              {AspectData[aspect.aspect_type].name}
-            </span>
+            <span className="text-lg">{aspectInfo.glyph}</span>
+            <span className="font-semibold">{aspectInfo.name}</span>
           </div>
           <div className="p-2 bg-white border rounded shadow-sm text-sm mb-3">
-            {AspectData[aspect.aspect_type].description}
+            {aspectInfo.description}
           </div>
         </Section>
         <Section title="Times">
-          <div className="text-xs text-gray-700 flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold w-[80px] shrink-0 text-xs text-gray-500">
-                Start:
-              </span>
-              <DateChip date={aspect.start_date} format />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-semibold w-[80px] shrink-0 text-xs text-gray-500">
-                End:
-              </span>
-              <DateChip date={aspect.end_date} format />
-            </div>
-          </div>
-
-          {ranges.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3 items-center">
-              <span className="font-semibold w-[80px] shrink-0 text-xs text-gray-500">
-                Exact Dates:
-              </span>
-              <div className="flex flex-wrap gap-2 flex-1 text-xs text-gray-500">
-                {displayedRanges.map(([start, end], i) =>
-                  start === end ? (
-                    <DateChip key={i} date={start} format />
-                  ) : (
-                    <div key={i} className="flex items-center gap-2">
-                      <DateChip date={start} format />
-                      <span>→</span>
-                      <DateChip date={end} format />
-                    </div>
-                  ),
-                )}
+          <div className="space-y-6 text-xs text-gray-700">
+            {currentAspect ? (
+              <TimingChipRow
+                label="Current"
+                aspect={currentAspect}
+                dateTime={currentDateTime}
+                showDate
+              />
+            ) : (
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Current</span>
+                  <DateTimeChip datetime={currentDateTime} format />
+                </div>
+                <span className="text-gray-500">Not currently in orb</span>
               </div>
-              {hasMultipleRanges && (
-                <button
-                  onClick={() => setExpanded(!expanded)}
-                  className="flex items-center gap-1 text-gray-500 text-xs cursor-pointer"
-                >
-                  {expanded ? (
-                    <FiChevronUp size={16} />
-                  ) : (
-                    <FiChevronDown size={16} />
-                  )}
-                </button>
-              )}
-            </div>
-          )}
-        </Section>
-        <Section title="Details" loading={loading}>
-          <div className="w-fit">
-            <AspectChip
-              aspect={{ ...aspect, type: aspect.aspect_type }}
-              showSign
-            />
+            )}
+            {timedAspects.map(({ label, value }) => (
+              <TimingChipRow
+                key={`${label}-${value.dateTime}`}
+                label={label}
+                aspect={value.aspect}
+                dateTime={value.dateTime}
+                showDate
+              />
+            ))}
           </div>
-          {aspectDesc && (
-            <div className="text-xs text-gray-600 mt-2 pl-2">
-              {aspectDesc.description}
-            </div>
+        </Section>
+        <Section title="Details" loading={descriptionLoading}>
+          <p className="text-sm text-gray-600">
+            {selectedAspect.motion.toLowerCase()}, orb {selectedAspect.orb.toFixed(2)}°
+          </p>
+          {aspectDesc.description && (
+            <p className="text-sm text-gray-600 mt-2">{aspectDesc.description}</p>
           )}
         </Section>
       </div>
@@ -131,24 +112,44 @@ export const AspectTimingPanel = ({ event }: { event: TimingEvent }) => {
   );
 };
 
+const getCurrentAspect = (
+  timing: AspectTiming,
+  chartAspects: Aspect[],
+  aspectOptions: AspectOptions,
+): Aspect | undefined => {
+  const options = aspectOptions[timing.aspect.type];
+  if (!options.show) return undefined;
+
+  return chartAspects.find(
+    (current) =>
+      current.type === timing.aspect.type &&
+      current.orb <= options.minOrb &&
+      sameAspectPoints(current, timing.aspect),
+  );
+};
+
+const sameAspectPoints = (current: Aspect, target: AspectTiming["aspect"]) => {
+  const samePoint = (left: Aspect["point1"], right: Aspect["point1"]) =>
+    left.type === right.type && left.value.name === right.value.name;
+
+  return (
+    (samePoint(current.point1, target.point1) && samePoint(current.point2, target.point2)) ||
+    (samePoint(current.point1, target.point2) && samePoint(current.point2, target.point1))
+  );
+};
 export const AspectPreview = ({
   aspect,
   showLabel = true,
 }: {
-  aspect: TimingEvent;
+  aspect: AspectEvent;
   showLabel?: boolean;
 }) => {
   const { open } = useDesc();
 
-  const data = aspect.data as AspectTiming;
-  const { type } = useWheel();
+  const data = getEventAspect(aspect);
 
   const eventLabel =
-    aspect.event === "start"
-      ? "starts"
-      : aspect.event === "end"
-        ? "ends"
-        : "exact";
+    aspect.event === "start" ? "starts" : aspect.event === "end" ? "ends" : "exact";
 
   return (
     <div
@@ -158,21 +159,8 @@ export const AspectPreview = ({
     >
       <div className="flex justify-between items-center gap-2">
         <div className="flex items-center gap-1">
-          <AspectChip
-            aspect={{
-              type: data.aspect_type,
-              planet1: data.planet1,
-              planet2: data.planet2,
-              planet1Owner: type === "transit" ? "main" : undefined,
-            }}
-            showSign
-            showPlanetName={false}
-          />
-          {showLabel && (
-            <span className="text-xs font-semibold text-gray-500">
-              {eventLabel}
-            </span>
-          )}
+          <AspectChip aspect={data} showSign showPlanetName={false} />
+          {showLabel && <span className="text-xs font-semibold text-gray-500">{eventLabel}</span>}
         </div>
       </div>
     </div>

@@ -1,170 +1,132 @@
-import { useState } from "react";
-import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import { useDesc } from "../../contexts/DescContext";
-import { useIngressDesc } from "../../hooks/descriptions/useIngressDesc";
+import { useMoonTimings } from "../../hooks/timings/useMoonTimings";
 import {
-  useMoonTimings,
-  type IngressTiming,
+  getMoonPhase,
+  MOON_PHASES,
+  MoonPhasesData,
+  type MoonPhase,
   type MoonPhaseTiming,
-} from "../../hooks/timings/useMoonTimings";
-import { MoonPhasesData } from "../../types/moon";
-import { DateChip, DateTimeChip } from "../utils/DateChip";
-import { SignChip } from "../utils/SignChip";
+} from "../../types/moon";
+import { ZodiacData } from "../../types/zodiac";
+import { PlanetsData } from "../../types/planet";
+import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
+import { useWheel } from "../../hooks/useWheel";
+import { formatDegMin } from "../../utils/funcs";
 import { Spinner } from "../utils/Spinner";
 
 export const MoonTimings = () => {
   const { loading, timings } = useMoonTimings();
+  const { planetAngles } = useWheel() as SingleWheelContextType;
+  const currentMoon = planetAngles.find((planet) => planet.name === "MOON");
+  const currentPhase = timings ? getMoonPhase(timings.currentPhase.phase) : undefined;
+  const phaseTimings = new Map<MoonPhase, MoonPhaseTiming>();
+  const orderedPhaseTimings = [...(timings?.phaseLoop ?? [])]
+    .filter((timing) => Number.isFinite(new Date(timing.dateTime).getTime()))
+    .sort((left, right) => new Date(left.dateTime).getTime() - new Date(right.dateTime).getTime());
 
-  if (loading) return <div>Loading...</div>;
-
-  const { ingresses = [], phases = [] } = timings;
-
-  const sortedIngresses = [...ingresses].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-  );
-
-  const sortedPhases = [...phases].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-  );
-
-  const today = new Date();
-  const todayNum =
-    today.getFullYear() * 10000 +
-    (today.getMonth() + 1) * 100 +
-    today.getDate();
-  let currentIndex = 0;
-  for (let i = 0; i < sortedIngresses.length; i++) {
-    const [y, m, d] = sortedIngresses[i].date.split("-").map(Number);
-    const ingressNum = y * 10000 + m * 100 + d;
-    if (ingressNum <= todayNum) {
-      currentIndex = i;
-    } else {
-      break;
-    }
-  }
-
-  const upcomingIngresses = sortedIngresses.slice(currentIndex);
-
-  today.setHours(0, 0, 0, 0);
-
-  const currentPhaseIndex = sortedPhases.reduceRight((acc, phase, idx) => {
-    const phaseDate = new Date(phase.date);
-    phaseDate.setHours(0, 0, 0, 0);
-    return acc === -1 && phaseDate <= today ? idx : acc;
-  }, -1);
+  orderedPhaseTimings.forEach((timing) => {
+    const phase = getMoonPhase(timing.phase);
+    if (phase && !phaseTimings.has(phase)) phaseTimings.set(phase, timing);
+  });
+  const phasesByTime = [...MOON_PHASES].sort((leftPhase, rightPhase) => {
+    const leftTime = phaseTimings.get(leftPhase)?.dateTime;
+    const rightTime = phaseTimings.get(rightPhase)?.dateTime;
+    if (!leftTime)
+      return rightTime ? 1 : MOON_PHASES.indexOf(leftPhase) - MOON_PHASES.indexOf(rightPhase);
+    if (!rightTime) return -1;
+    return new Date(leftTime).getTime() - new Date(rightTime).getTime();
+  });
 
   return (
-    <div className="p-4 ml-4 space-y-8">
-      <div>
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">
-          Moon Phases
-        </h2>
-        {sortedPhases.length === 0 ? (
-          <div>No Moon phases available for this period.</div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {sortedPhases.map((phase, i) => (
-              <div key={i}>
-                {renderMoonPhase(phase, i === currentPhaseIndex)}
-              </div>
-            ))}
+    <section className="border-t border-gray-200 py-5">
+      <div className="mb-3 flex min-h-7 flex-wrap items-center justify-between gap-x-4 gap-y-1">
+        <h2 className="text-lg font-semibold text-gray-900">Moon Timings</h2>
+        {currentMoon && (
+          <div
+            className="inline-flex items-center gap-1.5 text-xs text-gray-600"
+            aria-label={`Current Moon placement: ${ZodiacData[currentMoon.sign].displayName} ${formatDegMin(currentMoon.position.degMin)}`}
+          >
+            <span
+              className="text-base"
+              style={{ color: PlanetsData.MOON.color }}
+              aria-hidden="true"
+            >
+              {PlanetsData.MOON.glyph}
+            </span>
+            <span className="font-medium">Moon</span>
+            <img src={ZodiacData[currentMoon.sign].glyph} alt="" className="h-4 w-4" />
+            <span>{ZodiacData[currentMoon.sign].displayName}</span>
+            <span className="font-mono tabular-nums">
+              {formatDegMin(currentMoon.position.degMin)}
+            </span>
           </div>
         )}
       </div>
-
-      <div>
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">
-          Moon Ingresses
-        </h2>
-        {upcomingIngresses.length === 0 ? (
-          <div>No upcoming Moon ingresses in this period.</div>
-        ) : (
-          <div className="space-y-3">
-            {upcomingIngresses.map((ingress, i) => (
-              <MoonIngress key={i} ingress={ingress} isCurrent={i === 0} />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+      {loading ? (
+        <Spinner />
+      ) : timings ? (
+        <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
+          {phasesByTime.map((phase) => (
+            <PhaseSummary
+              key={phase}
+              phase={phase}
+              timing={phaseTimings.get(phase)}
+              isCurrent={phase === currentPhase}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-gray-500">Moon timings are unavailable right now.</p>
+      )}
+    </section>
   );
 };
 
-const MoonIngress = ({
-  ingress,
+const PhaseSummary = ({
+  phase,
+  timing,
   isCurrent,
 }: {
-  ingress: IngressTiming;
+  phase: MoonPhase;
+  timing?: MoonPhaseTiming;
   isCurrent: boolean;
 }) => {
-  const [open, setOpen] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-
-  const { loading, ingressDesc } = useIngressDesc(
-    { planet: "moon", sign: ingress.sign },
-    expanded,
-  );
-
-  return (
-    <div
-      className={`mr-15 ml-5 p-3 border rounded-md shadow-sm flex flex-col transition transform ${isCurrent
-          ? "bg-gradient-to-br from-blue-50 to-blue-100 border-blue-400 ring-2 ring-blue-300 scale-105"
-          : "bg-white border-gray-200 hover:shadow-md"
-        }`}
-    >
-      <div
-        className="flex justify-between items-center cursor-pointer"
-        onClick={() => {
-          setOpen(!open);
-          setExpanded(true);
-        }}
-      >
-        <DateChip date={ingress.date} />
-        <span className="text-gray-700 font-medium">
-          {isCurrent ? "Current" : "enters"}
-        </span>
-        <SignChip sign={ingress.sign} />
-        <div>
-          {open ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
-        </div>
-      </div>
-
-      {open && (
-        <div className="mt-2 text-gray-600 text-sm">
-          {loading ? (
-            <Spinner />
-          ) : (
-            ingressDesc?.description || "No description available."
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
-const renderMoonPhase = (phase: MoonPhaseTiming, isCurrent: boolean) => {
   const { open } = useDesc();
-  const phaseData = MoonPhasesData[phase.phase];
+  const phaseData = MoonPhasesData[phase];
+  const displayName = phase.replace(/\b\w/g, (letter) => letter.toUpperCase());
 
   return (
-    <div
-      className={`p-4 flex flex-col items-center justify-center rounded-full shadow-lg border transition-transform duration-200 transform hover:scale-110 cursor-pointer
-        ${isCurrent
-          ? "bg-gradient-to-br from-purple-50 to-purple-100 border-purple-400 ring-4 ring-purple-300 "
-          : "bg-white border-gray-200 hover:shadow-xl"
-        }`}
-      onClick={() => open({ type: "moonphase", value: phase })}
+    <button
+      type="button"
+      className={`flex min-h-20 w-full min-w-0 cursor-pointer flex-col items-start justify-between gap-2 border p-3 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500 ${
+        isCurrent ? "border-gray-800 bg-gray-100" : "border-gray-200 bg-white hover:bg-gray-50"
+      }`}
+      onClick={() => open({ type: "moonphase", value: { phase, timing } })}
+      aria-label={`View ${displayName} details`}
+      aria-current={isCurrent ? "true" : undefined}
     >
-      <div className="text-sm text-gray-500 mb-2">
-        <DateTimeChip datetime={phase.date} format />
-      </div>
-      <div className="flex flex-col items-center">
-        <div className="text-5xl mb-2">{phaseData.glyph}</div>
-        <div className="text-md font-semibold capitalize">{phase.phase}</div>
-      </div>
-      <div className="flex items-center space-x-2 mt-2">
-        <SignChip sign={phase.sign} />
-      </div>
-    </div>
+      <span className="text-2xl" aria-hidden="true">
+        {phaseData.glyph}
+      </span>
+      <span className="min-w-0 text-xs font-medium leading-tight text-gray-900">{displayName}</span>
+      {timing ? (
+        <>
+          <time className="text-[10px] leading-tight text-gray-500" dateTime={timing.dateTime}>
+            {new Date(timing.dateTime).toLocaleString(undefined, {
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+            })}
+          </time>
+          <span className="flex min-w-0 items-center gap-1 text-[10px] leading-tight text-gray-600">
+            <img src={ZodiacData[timing.planet.sign].glyph} alt="" className="h-3 w-3 shrink-0" />
+            <span className="truncate">{ZodiacData[timing.planet.sign].displayName}</span>
+          </span>
+        </>
+      ) : (
+        <span className="text-[10px] text-gray-400">Timing unavailable</span>
+      )}
+    </button>
   );
 };

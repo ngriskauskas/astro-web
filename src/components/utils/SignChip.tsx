@@ -15,8 +15,8 @@ export const SignChip = ({ sign }: { sign: ZodiacSign }) => {
         borderColor: `${color}55`,
       }}
     >
-      <img src={signData.glyph} alt={sign} className="w-4.5 h-6" />
-      <span className="capitalize">{sign}</span>
+      <img src={signData.glyph} alt={signData.displayName} className="w-4.5 h-6" />
+      <span>{signData.displayName}</span>
     </div>
   );
 };
@@ -43,7 +43,7 @@ export const SignCircle = ({ sign, size = 10 }: { sign: ZodiacSign; size?: numbe
 
   return (
     <div
-      title={sign}
+      title={signData.displayName}
       className={`
         ${sizeClass} 
         flex items-center justify-center 
@@ -55,7 +55,7 @@ export const SignCircle = ({ sign, size = 10 }: { sign: ZodiacSign; size?: numbe
         borderWidth: 1,
       }}
     >
-      <img src={signData.glyph} alt={sign} className="w-1/2 h-1/2 object-contain" />
+      <img src={signData.glyph} alt={signData.displayName} className="w-1/2 h-1/2 object-contain" />
     </div>
   );
 };

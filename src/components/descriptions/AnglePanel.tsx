@@ -6,16 +6,10 @@ import { Section } from "../utils/Section";
 import { SignChip } from "../utils/SignChip";
 import { BackButton, CloseButton } from "./Helpers";
 
-export const AnglePanel = ({
-  angle,
-  owner,
-}: {
-  angle: KeyType;
-  owner?: OwnerType;
-}) => {
+export const AnglePanel = ({ angle, owner }: { angle: KeyType; owner?: OwnerType }) => {
   const { sign } = useKeyAngleData(angle, owner);
 
-  const { loading, keyAngleDesc } = useKeyAngleDesc({ sign, angle });
+  const { loading, keyAngleDesc } = useKeyAngleDesc({ sign, angle, owner });
   const angleInfo = AngleData[angle];
 
   return (
@@ -39,9 +33,7 @@ export const AnglePanel = ({
             <SignChip sign={sign} />
           </div>
           {keyAngleDesc && (
-            <div className="text-xs text-gray-600 mt-2 pl-2">
-              {keyAngleDesc.sign}
-            </div>
+            <div className="text-xs text-gray-600 mt-2 pl-2">{keyAngleDesc.sign}</div>
           )}
         </Section>
       </div>

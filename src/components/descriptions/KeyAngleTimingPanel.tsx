@@ -1,19 +1,23 @@
 import { useDesc } from "../../contexts/DescContext";
 import { useKeyAngleDesc } from "../../hooks/descriptions/useKeyAngleDesc";
-import type { KeyAngleTiming } from "../../hooks/timings/useDailyTimings";
+import type { AngleTiming } from "../../types/timings";
 import { AngleData } from "../../types/cusp";
 import { TimeChip } from "../utils/DateChip";
 import { KeyAngleChip } from "../utils/KeyAngleChip";
 import { Section } from "../utils/Section";
 import { SignChip, SignCircle } from "../utils/SignChip";
 import { BackButton, CloseButton } from "./Helpers";
+import { useWheel } from "../../hooks/useWheel";
 
-export const KeyAngleTimingPanel = ({ timing }: { timing: KeyAngleTiming }) => {
-  const angleInfo = AngleData[timing.angle_type];
+export const KeyAngleTimingPanel = ({ timing }: { timing: AngleTiming }) => {
+  const angle = timing.angle.name;
+  const angleInfo = AngleData[angle];
+  const { type } = useWheel();
 
   const { loading, keyAngleDesc } = useKeyAngleDesc({
-    sign: timing.sign,
-    angle: timing.angle_type,
+    sign: timing.angle.sign,
+    angle,
+    owner: type === "transit" ? "other" : undefined,
   });
 
   return (
@@ -23,9 +27,7 @@ export const KeyAngleTimingPanel = ({ timing }: { timing: KeyAngleTiming }) => {
         style={{ backgroundColor: angleInfo.color }}
       >
         <BackButton />
-        <h2 className="text-xl font-semibold capitalize">
-          {timing.angle_type}
-        </h2>
+        <h2 className="text-xl font-semibold capitalize">{angle}</h2>
         <CloseButton />
       </div>
 
@@ -39,10 +41,7 @@ export const KeyAngleTimingPanel = ({ timing }: { timing: KeyAngleTiming }) => {
         <Section title="Times">
           <div className="text-xs text-gray-700 flex flex-col gap-3">
             <div>
-              Start: <TimeChip datetime={timing.start_time} />
-            </div>
-            <div>
-              End: <TimeChip datetime={timing.end_time} />
+              Time: <TimeChip datetime={timing.dateTime} />
             </div>
           </div>
         </Section>
@@ -50,14 +49,12 @@ export const KeyAngleTimingPanel = ({ timing }: { timing: KeyAngleTiming }) => {
         <Section title="Details" loading={loading}>
           <div>
             <div className="flex gap-1 items-center">
-              <KeyAngleChip angle={timing.angle_type} />
+              <KeyAngleChip angle={angle} />
               <span className="text-gray-500">→</span>
-              <SignChip sign={timing.sign} />
+              <SignChip sign={timing.angle.sign} />
             </div>
             {keyAngleDesc && (
-              <div className="text-xs text-gray-600 mt-2 pl-2">
-                {keyAngleDesc.sign}
-              </div>
+              <div className="text-xs text-gray-600 mt-2 pl-2">{keyAngleDesc.sign}</div>
             )}
           </div>
         </Section>
@@ -66,9 +63,9 @@ export const KeyAngleTimingPanel = ({ timing }: { timing: KeyAngleTiming }) => {
   );
 };
 
-export const KeyAnglePreview = ({ timing }: { timing: KeyAngleTiming }) => {
+export const KeyAnglePreview = ({ timing }: { timing: AngleTiming }) => {
   const { open } = useDesc();
-  const startTime = new Date(timing.start_time)
+  const startTime = new Date(timing.dateTime)
     .toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
@@ -91,9 +88,33 @@ export const KeyAnglePreview = ({ timing }: { timing: KeyAngleTiming }) => {
       onClick={() => open({ type: "keyAngleTiming", value: timing })}
     >
       <span className="text-gray-700 font-mono text-xs">{startTime}</span>
-      <KeyAngleChip angle={timing.angle_type} small />
+      <KeyAngleChip angle={timing.angle.name} small />
       <span className="text-gray-500">→</span>
-      <SignCircle sign={timing.sign} />
+      <SignCircle sign={timing.angle.sign} />
+    </div>
+  );
+};
+
+export const DailyAnglePreview = ({ timing }: { timing: AngleTiming }) => {
+  const { open } = useDesc();
+  const startTime = new Date(timing.dateTime)
+    .toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    })
+    .replace(/ AM| PM/, "")
+    .replace(/^0/, "");
+
+  return (
+    <div
+      className="flex items-center gap-1 px-1 py-0.5 rounded-md border border-purple-300 bg-purple-50/30 shadow-sm text-[10px] cursor-pointer transition-all duration-150 hover:shadow-md hover:border-purple-400"
+      onClick={() => open({ type: "keyAngleTiming", value: timing })}
+    >
+      <span className="text-gray-700 font-mono text-xs">{startTime}</span>
+      <KeyAngleChip angle={timing.angle.name} small />
+      <span className="text-gray-500">→</span>
+      <SignCircle sign={timing.angle.sign} />
     </div>
   );
 };

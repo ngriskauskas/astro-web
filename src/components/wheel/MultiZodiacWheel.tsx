@@ -37,8 +37,8 @@ export const MultiZodiacWheel = () => {
   const radius = size / 2;
 
   return (
-    <div className="flex gap-5 items-center mx-20 mr-28">
-      <div className="flex-[3] flex-shrink-0 flex justify-center">
+    <div className="flex w-full justify-center">
+      <div className="w-full max-w-[760px]">
         {mainPlanetAngles ? (
           <svg viewBox={`0 0 ${size} ${size}`} width="100%" preserveAspectRatio="xMidYMid meet">
             <Background radius={radius} />
@@ -46,49 +46,23 @@ export const MultiZodiacWheel = () => {
               center={radius}
               radius={radius - 55}
               innerRadius={radius - 145}
-              angles={mainCuspAngles}
-              keyAngles={mainKeyAngles}
-              owner="main"
+              angles={otherCuspAngles}
+              keyAngles={otherKeyAngles}
+              owner="other"
             />
             <Houses
               center={radius}
               radius={radius - 145}
               innerRadius={radius - 240}
-              angles={otherCuspAngles}
-              keyAngles={otherKeyAngles}
-              owner="other"
+              angles={mainCuspAngles}
+              keyAngles={mainKeyAngles}
+              owner="main"
             />
             <Signs center={radius} radius={radius - 5} />
             <Planets
-              owner="main"
-              center={radius}
-              radius={radius - 55}
-              angles={mainPlanetAngles}
-              hoverAspectedPlanets={
-                hoverAspectedPlanets?.profile === "main" ? hoverAspectedPlanets.planets : []
-              }
-              onHoverPlanet={(planet) => {
-                setHoveredPlanet({ planet, profile: "main" });
-                aspects.forEach(({ point1, point2, orb, type }) => {
-                  const { minOrb, show } = aspectOptions[type];
-                  if (!show || orb > minOrb) return;
-                  if (point1.value.name === planet)
-                    setHoverAspectedPlanets((prev) => ({
-                      planets: [point2.value.name, ...(prev?.planets || [])],
-                      profile: "other",
-                    }));
-                });
-              }}
-              onLeavePlanet={() => {
-                setHoveredPlanet(null);
-                setHoverAspectedPlanets(null);
-              }}
-            />
-
-            <Planets
               owner="other"
               center={radius}
-              radius={radius - 145}
+              radius={radius - 55}
               angles={otherPlanetAngles}
               hoverAspectedPlanets={
                 hoverAspectedPlanets?.profile === "other" ? hoverAspectedPlanets.planets : []
@@ -102,6 +76,32 @@ export const MultiZodiacWheel = () => {
                     setHoverAspectedPlanets((prev) => ({
                       planets: [point1.value.name, ...(prev?.planets || [])],
                       profile: "main",
+                    }));
+                });
+              }}
+              onLeavePlanet={() => {
+                setHoveredPlanet(null);
+                setHoverAspectedPlanets(null);
+              }}
+            />
+
+            <Planets
+              owner="main"
+              center={radius}
+              radius={radius - 145}
+              angles={mainPlanetAngles}
+              hoverAspectedPlanets={
+                hoverAspectedPlanets?.profile === "main" ? hoverAspectedPlanets.planets : []
+              }
+              onHoverPlanet={(planet) => {
+                setHoveredPlanet({ planet, profile: "main" });
+                aspects.forEach(({ point1, point2, orb, type }) => {
+                  const { minOrb, show } = aspectOptions[type];
+                  if (!show || orb > minOrb) return;
+                  if (point1.value.name === planet)
+                    setHoverAspectedPlanets((prev) => ({
+                      planets: [point2.value.name, ...(prev?.planets || [])],
+                      profile: "other",
                     }));
                 });
               }}

@@ -6,11 +6,9 @@ import { useBirthProfiles } from "./BirthProfilesContext";
 import { type PlanetAngle } from "../components/wheel/layers/Planets";
 import { type CuspAngle, type KeyAngleAngle } from "../components/wheel/layers/Houses";
 import { type SignAngle } from "../components/wheel/layers/Signs";
-import { type Aspect } from "../types/aspect";
+import { isPlanetAspect, type Aspect, type PlanetAspect } from "../types/aspect";
 import type { Planet } from "../types/planet";
 import { getLocalISODate, getLocalISODateTime, getLocalISOTime } from "../utils/funcs";
-import type { ZodiacSystem } from "../types/zodiac-system";
-import type { Ayanamsa } from "../types/ayanamsa";
 import { useSearchParams } from "react-router-dom";
 import type { SingleChart } from "../types/chart";
 
@@ -21,7 +19,8 @@ export interface SingleWheelContextType {
   cuspAngles: CuspAngle[];
   signAngles: SignAngle[];
   keyAngles: KeyAngleAngle[];
-  aspects: Aspect[];
+  aspects: PlanetAspect[];
+  chartAspects: Aspect[];
   type: "natal" | "time" | "moment";
 }
 
@@ -42,7 +41,8 @@ export const SingleWheelProvider = ({
   const [signAngles, setSignAngles] = useState<SignAngle[]>([]);
   const [cuspAngles, setCuspAngles] = useState<CuspAngle[]>([]);
   const [keyAngles, setKeyAngles] = useState<KeyAngleAngle[]>([]);
-  const [aspects, setAspects] = useState<Aspect[]>([]);
+  const [aspects, setAspects] = useState<PlanetAspect[]>([]);
+  const [chartAspects, setChartAspects] = useState<Aspect[]>([]);
 
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
     profileId: mainProfile?.id,
@@ -195,12 +195,8 @@ export const SingleWheelProvider = ({
     setCuspAngles(calcCuspAngles(chart));
     setSignAngles(calcSignAngles(chart));
     setKeyAngles(calcKeyAngles(chart));
-    //TODO for now just use planet aspects
-    setAspects(
-      chart.aspects.filter(
-        ({ point1, point2 }) => point1.type === "Planet" && point2.type === "Planet",
-      ),
-    );
+    setChartAspects(chart.aspects);
+    setAspects(chart.aspects.filter(isPlanetAspect));
   }, [chart]);
 
   return (
@@ -213,6 +209,7 @@ export const SingleWheelProvider = ({
         cuspAngles,
         keyAngles,
         aspects,
+        chartAspects,
         type,
       }}
     >

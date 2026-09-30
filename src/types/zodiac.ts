@@ -57,6 +57,7 @@ export type ZodiacSign =
   | "PISCES";
 
 interface ZodiacInfo {
+  displayName: string;
   glyph: string;
   color: string;
   drawing: string;
@@ -75,6 +76,7 @@ interface ZodiacInfo {
 
 export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
   ARIES: {
+    displayName: "Aries",
     glyph: AriesSvg,
     color: ElementData["fire"].color,
     drawing: AriesDrawing,
@@ -92,6 +94,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
     },
   },
   TAURUS: {
+    displayName: "Taurus",
     glyph: TaurusSvg,
     color: ElementData["earth"].color,
     drawing: TaurusDrawing,
@@ -109,6 +112,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
     },
   },
   GEMINI: {
+    displayName: "Gemini",
     glyph: GeminiSvg,
     color: ElementData["air"].color,
     drawing: GeminiDrawing,
@@ -126,6 +130,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
     },
   },
   CANCER: {
+    displayName: "Cancer",
     glyph: CancerSvg,
     color: ElementData["water"].color,
     drawing: CancerDrawing,
@@ -143,6 +148,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
     },
   },
   LEO: {
+    displayName: "Leo",
     glyph: LeoSvg,
     color: ElementData["fire"].color,
     drawing: LeoDrawing,
@@ -160,6 +166,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
     },
   },
   VIRGO: {
+    displayName: "Virgo",
     glyph: VirgoSvg,
     color: ElementData["earth"].color,
     drawing: VirgoDrawing,
@@ -177,6 +184,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
     },
   },
   LIBRA: {
+    displayName: "Libra",
     glyph: LibraSvg,
     color: ElementData["air"].color,
     drawing: LibraDrawing,
@@ -194,6 +202,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
     },
   },
   SCORPIO: {
+    displayName: "Scorpio",
     glyph: ScorpioSvg,
     color: ElementData["water"].color,
     drawing: ScorpioDrawing,
@@ -211,6 +220,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
     },
   },
   SAGITTARIUS: {
+    displayName: "Sagittarius",
     glyph: SagittariusSvg,
     color: ElementData["fire"].color,
     drawing: SagittariusDrawing,
@@ -228,6 +238,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
     },
   },
   CAPRICORN: {
+    displayName: "Capricorn",
     glyph: CapricornSvg,
     color: ElementData["earth"].color,
     drawing: CapricornDrawing,
@@ -245,6 +256,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
     },
   },
   AQUARIUS: {
+    displayName: "Aquarius",
     glyph: AquariusSvg,
     color: ElementData["air"].color,
     drawing: AquariusDrawing,
@@ -262,6 +274,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
     },
   },
   PISCES: {
+    displayName: "Pisces",
     glyph: PiscesSvg,
     color: ElementData["water"].color,
     drawing: PiscesDrawing,

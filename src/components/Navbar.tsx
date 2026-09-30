@@ -21,9 +21,6 @@ export const Navbar = () => {
         <Link to="/natal" className="text-gray-700 hover:text-gray-900">
           Charts
         </Link>
-        <Link to="/time" className="text-gray-700 hover:text-gray-900">
-          Now
-        </Link>
         <Link to="/moment" className="text-gray-700 hover:text-gray-900">
           Moment
         </Link>

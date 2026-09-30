@@ -1,3 +1,4 @@
+/* Temporarily disabled until planet-specific timing responses are documented.
 import { useState } from "react";
 import { useIngressDesc } from "../../../hooks/descriptions/useIngressDesc";
 import type { IngressTiming } from "../../../hooks/timings/useTimings";
@@ -37,3 +38,4 @@ export const IngressTimingCard = ({ ingress }: { ingress: IngressTiming }) => {
     </div>
   );
 };
+*/

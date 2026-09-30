@@ -1,17 +1,16 @@
-import { useState, useEffect } from "react";
-import type { SignAngle } from "../../components/wheel/layers/Signs";
-import type { CuspType, Cusp } from "../../types/cusp";
+import type { OwnerType } from "../../contexts/MultiWheelContext";
+import type { Cusp } from "../../types/cusp";
 import type { PlanetName, Planet } from "../../types/planet";
-import type { ZodiacSign } from "../../types/zodiac";
-import { apiFetch } from "../../utils/api";
 import { useWheel } from "../useWheel";
+import {
+  getChartSource,
+  useGeneratedDescriptions,
+  type DescriptionContext,
+} from "./useGeneratedDescriptions";
 
-export type signDescriptions = Partial<Record<ZodiacSign, string>>;
 export type planetDescriptions = Partial<Record<PlanetName, string>>;
-export type houseDescriptions = Partial<Record<CuspType, string>>;
 
 export interface HouseDesc {
-  signs: signDescriptions;
   planets?: planetDescriptions;
   mainPlanets?: planetDescriptions;
   otherPlanets?: planetDescriptions;
@@ -19,39 +18,51 @@ export interface HouseDesc {
 
 interface HouseDescParams {
   house: Cusp;
-  signs: SignAngle[];
   planets?: Planet[];
   mainPlanets?: Planet[];
   otherPlanets?: Planet[];
+  owner?: OwnerType;
 }
 
 export const useHouseDesc = (params: HouseDescParams) => {
-  const [loading, setLoading] = useState(false);
-  const [houseDesc, setHouseDesc] = useState<HouseDesc>({
-    signs: {},
-    planets: {},
-    mainPlanets: {},
-    otherPlanets: {},
-  });
-
   const { type } = useWheel();
+  const entries = [
+    ...(params.planets ?? []).map((planet) => ({ group: "planets", owner: params.owner, planet })),
+    ...(params.mainPlanets ?? []).map((planet) => ({
+      group: "mainPlanets",
+      owner: "main" as OwnerType,
+      planet,
+    })),
+    ...(params.otherPlanets ?? []).map((planet) => ({
+      group: "otherPlanets",
+      owner: "other" as OwnerType,
+      planet,
+    })),
+  ];
+  const contexts: DescriptionContext[] = entries.map(({ planet, owner }) => ({
+    type: "placement",
+    subject: {
+      chart: getChartSource(type, owner),
+      point: { type: "planet", name: planet.name },
+      sign: planet.sign,
+      house: params.house.name,
+      retrograde: planet.retrograde,
+      stationary: planet.stationary,
+    },
+  }));
+  const { loading, descriptions } = useGeneratedDescriptions(contexts);
+  const getDescriptions = (group: string) =>
+    Object.fromEntries(
+      entries.flatMap(({ group: entryGroup, planet }, index) =>
+        entryGroup === group ? [[planet.name, descriptions[index] ?? ""]] : [],
+      ),
+    );
 
-  // useEffect(() => {
-  //   const fetchDesc = async () => {
-  //     setLoading(true);
-  //     const data = await apiFetch("/descriptions/house", {
-  //       method: "POST",
-  //       body: JSON.stringify({
-  //         ...params,
-  //         type: type === "moment" ? "time" : type,
-  //       }),
-  //     });
-  //     setHouseDesc(data);
-  //     setLoading(false);
-  //   };
-
-  //   fetchDesc();
-  // }, [params.house, params.signs, params.planets, params.mainPlanets, params.otherPlanets, type]);
+  const houseDesc: HouseDesc = {
+    planets: getDescriptions("planets") as HouseDesc["planets"],
+    mainPlanets: getDescriptions("mainPlanets") as HouseDesc["mainPlanets"],
+    otherPlanets: getDescriptions("otherPlanets") as HouseDesc["otherPlanets"],
+  };
 
   return { loading, houseDesc };
 };

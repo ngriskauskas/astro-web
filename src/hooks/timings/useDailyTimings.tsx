@@ -2,43 +2,20 @@ import { useState, useEffect } from "react";
 import { useWheel } from "../useWheel";
 import { apiFetch } from "../../utils/api";
 import { getLocalISODate } from "../../utils/funcs";
-import type { PlanetName } from "../../types/planet";
-import type { AspectType } from "../../types/aspect";
-import type { ZodiacSign } from "../../types/zodiac";
 import { useAuth } from "../../contexts/AuthContext";
-import type { KeyType } from "../../types/cusp";
-
-export interface DailyAspectTiming {
-  angle_type: KeyType;
-  planet: PlanetName;
-  start_time: string;
-  end_time: string;
-  sign: ZodiacSign;
-  aspect_type: AspectType;
-}
-
-export interface KeyAngleTiming {
-  angle_type: KeyType;
-  sign: ZodiacSign;
-  start_time: string;
-  end_time: string;
-}
-
-export interface DailyTimingsType {
-  daily_aspects: DailyAspectTiming[];
-  key_angles: KeyAngleTiming[];
-}
+import type { AspectPoint } from "../../types/aspect";
+import type { DailyTimingsType } from "../../types/timings";
 
 export const useDailyTimings = () => {
   const {
-    settings: { zodiacSystem, ayanamsa, profileId, houseSystem },
+    settings: { profileId },
     type,
   } = useWheel();
   const { user } = useAuth();
 
   const [timings, setTimings] = useState<DailyTimingsType>({
-    daily_aspects: [],
-    key_angles: [],
+    aspects: [],
+    angleTimings: [],
   });
   const [loading, setLoading] = useState(false);
 
@@ -48,40 +25,53 @@ export const useDailyTimings = () => {
     const fetchDailyTimings = async () => {
       setLoading(true);
       try {
-        const res = await apiFetch("/timing/daily", {
+        const res: DailyTimingsType = await apiFetch("/timing/daily", {
           method: "POST",
           body: JSON.stringify({
             date: getLocalISODate(),
-            zodiac_system: zodiacSystem,
-            ayanamsa: zodiacSystem === "tropical" ? null : ayanamsa,
-            house_system: houseSystem,
           }),
         });
-        setTimings(res);
+        setTimings({
+          ...res,
+          aspects: res.aspects.filter(
+            ({ aspect }) =>
+              aspect.type === "CONJUNCTION" &&
+              (isAscendant(aspect.point1) || isAscendant(aspect.point2)),
+          ),
+        });
       } catch (err) {
         console.error("Failed to fetch daily timings", err);
-        setTimings({ daily_aspects: [], key_angles: [] });
+        setTimings({ aspects: [], angleTimings: [] });
       } finally {
         setLoading(false);
       }
     };
-    const fetchTransitTimings = async () => {
+    const fetchDailyTransitTimings = async () => {
+      if (profileId === undefined) {
+        setTimings({ aspects: [], angleTimings: [] });
+        return;
+      }
+
       setLoading(true);
       try {
-        const res = await apiFetch("/timing/daily-transit", {
+        const res: DailyTimingsType = await apiFetch("/timing/daily-transit", {
           method: "POST",
           body: JSON.stringify({
             date: getLocalISODate(),
-            birth_profile_id: profileId,
-            zodiac_system: zodiacSystem,
-            ayanamsa: zodiacSystem === "tropical" ? null : ayanamsa,
-            house_system: houseSystem,
+            birthProfileId: profileId,
           }),
         });
-        setTimings(res);
+        setTimings({
+          ...res,
+          aspects: res.aspects.filter(
+            ({ aspect }) =>
+              aspect.type === "CONJUNCTION" &&
+              (isAscendant(aspect.point1) || isAscendant(aspect.point2)),
+          ),
+        });
       } catch (err) {
-        console.error("Failed to fetch daily timings", err);
-        setTimings({ daily_aspects: [], key_angles: [] });
+        console.error("Failed to fetch daily transit timings", err);
+        setTimings({ aspects: [], angleTimings: [] });
       } finally {
         setLoading(false);
       }
@@ -89,8 +79,10 @@ export const useDailyTimings = () => {
 
     if (!user) return;
     if (type === "time") fetchDailyTimings();
-    else if (type === "transit") fetchTransitTimings();
-  }, [zodiacSystem, ayanamsa, profileId, houseSystem, user]);
+    else if (type === "transit") fetchDailyTransitTimings();
+  }, [profileId, user, type]);
 
   return { timings, loading };
 };
+
+const isAscendant = (point: AspectPoint) => point.type === "Angle" && point.value.name === "ASC";

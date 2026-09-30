@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import type { OwnerType } from "../../contexts/MultiWheelContext";
 import type { ZodiacSign } from "../../types/zodiac";
-import { apiFetch } from "../../utils/api";
-import { useWheel } from "../useWheel";
 import type { KeyType } from "../../types/cusp";
+import { useWheel } from "../useWheel";
+import { getChartSource, useGeneratedDescriptions } from "./useGeneratedDescriptions";
 
 export interface KeyAngleDesc {
   sign: string;
@@ -11,27 +11,20 @@ export interface KeyAngleDesc {
 interface KeyAngleDescParams {
   sign: ZodiacSign;
   angle: KeyType;
+  owner?: OwnerType;
 }
 
 export const useKeyAngleDesc = (params: KeyAngleDescParams) => {
-  const [loading, setLoading] = useState(false);
-  const [keyAngleDesc, setKeyAngleDesc] = useState<KeyAngleDesc>({ sign: "temp" });
-
   const { type } = useWheel();
-
-  // useEffect(() => {
-  //   const fetchDesc = async () => {
-  //     setLoading(true);
-  //     const data = await apiFetch("/descriptions/key_angle", {
-  //       method: "POST",
-  //       body: JSON.stringify({ ...params, type }),
-  //     });
-  //     setKeyAngleDesc(data);
-  //     setLoading(false);
-  //   };
-
-  //   fetchDesc();
-  // }, [params.angle, params.sign, type]);
-
-  return { loading, keyAngleDesc };
+  const { loading, descriptions } = useGeneratedDescriptions([
+    {
+      type: "placement",
+      subject: {
+        chart: getChartSource(type, params.owner),
+        point: { type: "keyAngle", name: params.angle },
+        sign: params.sign,
+      },
+    },
+  ]);
+  return { loading, keyAngleDesc: { sign: descriptions[0] ?? "" } };
 };
