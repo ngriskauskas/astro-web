@@ -12,7 +12,6 @@ import { Profile } from "./pages/Profile.tsx";
 import { BirthProfilesProvider } from "./contexts/BirthProfilesContext.tsx";
 import { ChartProvider } from "./contexts/ChartContext.tsx";
 import { Charts } from "./pages/Charts.tsx";
-import { Time } from "./pages/Time.tsx";
 import { Synastry } from "./pages/Synastry.tsx";
 import { Transits } from "./pages/Transits.tsx";
 import { LoginEmail } from "./pages/LoginEmail.tsx";
@@ -28,7 +27,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={clientid}>
       <AuthProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <Routes>
             <Route
               path="/"

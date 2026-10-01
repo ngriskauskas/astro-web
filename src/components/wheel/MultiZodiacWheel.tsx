@@ -7,7 +7,6 @@ import { MultiAspects } from "./layers/MultiAspects";
 import { useWheel } from "../../hooks/useWheel";
 import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
 import { type PlanetName } from "../../types/planet";
-import { useChartSettings } from "../../contexts/ChartSettingsContext";
 
 export const MultiZodiacWheel = () => {
   const [hoveredPlanet, setHoveredPlanet] = useState<{
@@ -28,10 +27,6 @@ export const MultiZodiacWheel = () => {
     otherKeyAngles,
     aspects,
   } = useWheel() as MultiWheelContextType;
-
-  const {
-    settings: { aspectOptions },
-  } = useChartSettings();
 
   const size = 800;
   const radius = size / 2;
@@ -69,10 +64,12 @@ export const MultiZodiacWheel = () => {
               }
               onHoverPlanet={(planet) => {
                 setHoveredPlanet({ planet, profile: "other" });
-                aspects.forEach(({ point1, point2, orb, type }) => {
-                  const { minOrb, show } = aspectOptions[type];
-                  if (!show || orb > minOrb) return;
-                  if (point2.value.name === planet)
+                aspects.forEach(({ point1, point2 }) => {
+                  if (
+                    point1.type === "Planet" &&
+                    point2.type === "Planet" &&
+                    point2.value.name === planet
+                  )
                     setHoverAspectedPlanets((prev) => ({
                       planets: [point1.value.name, ...(prev?.planets || [])],
                       profile: "main",
@@ -95,10 +92,12 @@ export const MultiZodiacWheel = () => {
               }
               onHoverPlanet={(planet) => {
                 setHoveredPlanet({ planet, profile: "main" });
-                aspects.forEach(({ point1, point2, orb, type }) => {
-                  const { minOrb, show } = aspectOptions[type];
-                  if (!show || orb > minOrb) return;
-                  if (point1.value.name === planet)
+                aspects.forEach(({ point1, point2 }) => {
+                  if (
+                    point1.type === "Planet" &&
+                    point2.type === "Planet" &&
+                    point1.value.name === planet
+                  )
                     setHoverAspectedPlanets((prev) => ({
                       planets: [point2.value.name, ...(prev?.planets || [])],
                       profile: "other",

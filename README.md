@@ -1,69 +1,32 @@
-# React + TypeScript + Vite
+# Astro Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Astro Web is a React and TypeScript application built with Vite.
 
-Currently, two official plugins are available:
+## Local development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```sh
+npm ci
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+For API and Google sign-in features, create a local `.env` file with:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```dotenv
+VITE_API_URL=https://your-api.example.com
+VITE_GOOGLE_CLIENT_ID=your-google-oauth-client-id
 ```
+
+These are public frontend configuration values, not secrets. Never put private API credentials in `VITE_*` variables.
+
+## GitHub Pages deployment
+
+The `Deploy to GitHub Pages` workflow publishes this repository at `https://ngriskauskas.github.io/astro-web/` when changes are pushed to `main`. In the repository's **Settings > Pages**, set the build and deployment source to **GitHub Actions**.
+
+Add the following repository Actions variables under **Settings > Secrets and variables > Actions > Variables**:
+
+- `VITE_API_URL`: the HTTPS base URL for the API, without a trailing slash.
+- `VITE_GOOGLE_CLIENT_ID`: the Google OAuth web client ID.
+
+The API must be deployed separately, allow the Pages origin through CORS, and enforce authentication and authorization server-side. Configure the Google OAuth client to allow the Pages origin. A static frontend cannot keep secrets or replace backend security controls.
+
+GitHub Pages serves the built app as a static site. The deployment includes a `404.html` fallback for client-side routes.

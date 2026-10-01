@@ -9,8 +9,6 @@ import { AspectData } from "../../types/aspect";
 import { TimingAspectTitle } from "../utils/TimingAspectTitle";
 import { TimingChipRow } from "./DailyAspectTimingPanel";
 import { useWheel } from "../../hooks/useWheel";
-import { useChartSettings } from "../../contexts/ChartSettingsContext";
-import type { AspectOptions } from "../../types/astrologySettings";
 import { getLocalISODateTime } from "../../utils/funcs";
 import { useTimingAspectDesc } from "../../hooks/descriptions/useAspectDesc";
 
@@ -36,10 +34,7 @@ export const AspectTimingPanel = ({ event }: { event: AspectEvent }) => {
   });
   const wheel = useWheel();
   const chartAspects = "chartAspects" in wheel ? wheel.chartAspects : [];
-  const {
-    settings: { aspectOptions },
-  } = useChartSettings();
-  const currentAspect = getCurrentAspect(aspect, chartAspects, aspectOptions);
+  const currentAspect = getCurrentAspect(aspect, chartAspects);
   const currentDateTime = getLocalISODateTime();
   const timedAspects = [
     { label: "Start", value: aspect.startAspect },
@@ -112,19 +107,9 @@ export const AspectTimingPanel = ({ event }: { event: AspectEvent }) => {
   );
 };
 
-const getCurrentAspect = (
-  timing: AspectTiming,
-  chartAspects: Aspect[],
-  aspectOptions: AspectOptions,
-): Aspect | undefined => {
-  const options = aspectOptions[timing.aspect.type];
-  if (!options.show) return undefined;
-
+const getCurrentAspect = (timing: AspectTiming, chartAspects: Aspect[]): Aspect | undefined => {
   return chartAspects.find(
-    (current) =>
-      current.type === timing.aspect.type &&
-      current.orb <= options.minOrb &&
-      sameAspectPoints(current, timing.aspect),
+    (current) => current.type === timing.aspect.type && sameAspectPoints(current, timing.aspect),
   );
 };
 

@@ -7,11 +7,8 @@ import { DateTimeChip, TimeChip } from "../utils/DateChip";
 import { AspectData } from "../../types/aspect";
 import type { Aspect, AspectPoint } from "../../types/aspect";
 import { isMulti, useWheel } from "../../hooks/useWheel";
-import { useChartSettings } from "../../contexts/ChartSettingsContext";
-import type { AspectOptions } from "../../types/astrologySettings";
 import { getLocalISODateTime } from "../../utils/funcs";
 import { TimingAspectTitle } from "../utils/TimingAspectTitle";
-import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { useTimingAspectDesc } from "../../hooks/descriptions/useAspectDesc";
 
 export const DailyAspectTimingPanel = ({ timing }: { timing: AspectTiming }) => {
@@ -25,17 +22,15 @@ export const DailyAspectTimingPanel = ({ timing }: { timing: AspectTiming }) => 
     firstOwner: isTransitDailyTiming ? "other" : undefined,
     secondOwner: isTransitDailyTiming ? "other" : undefined,
   });
-  const {
-    settings: { aspectOptions },
-  } = useChartSettings();
   const currentAspect = isMulti(wheel)
-    ? getCurrentMultiAscAspect({
-        timing,
-        chartAspects: wheel.chartAspects,
-        aspectOptions,
-        ascendantOwner: wheel.type === "transit" ? "other" : "main",
-      })
-    : getCurrentAscAspect({ timing, chartAspects: wheel.chartAspects, aspectOptions });
+    ? hasAscendant(timing.aspect)
+      ? getCurrentMultiAscAspect({
+          timing,
+          chartAspects: wheel.chartAspects,
+          ascendantOwner: wheel.type === "transit" ? "other" : "main",
+        })
+      : getCurrentAspect(timing, wheel.chartAspects, true)
+    : getCurrentAspect(timing, wheel.chartAspects);
   const currentDateTime = getLocalISODateTime();
   const timedAspects = [
     { label: "Start", value: timing.startAspect },
@@ -134,44 +129,30 @@ const TimingLabel = ({
   </div>
 );
 
-const getCurrentAscAspect = ({
-  timing,
-  chartAspects,
-  aspectOptions,
-}: {
-  timing: AspectTiming;
-  chartAspects: SingleWheelContextType["chartAspects"];
-  aspectOptions: AspectOptions;
-}): Aspect | undefined => {
-  const planetName = getAscendantPlanetName(timing.aspect);
-  const options = aspectOptions[timing.aspect.type];
-  if (!planetName || !options.show) return undefined;
-
-  return chartAspects.find(
+const getCurrentAspect = (
+  timing: AspectTiming,
+  chartAspects: Aspect[],
+  matchOwners = false,
+): Aspect | undefined =>
+  chartAspects.find(
     (aspect) =>
-      aspect.type === timing.aspect.type &&
-      aspect.orb <= options.minOrb &&
-      hasAscendantPlanetPoints(aspect, planetName),
+      aspect.type === timing.aspect.type && sameAspectPoints(aspect, timing.aspect, matchOwners),
   );
-};
 
 const getCurrentMultiAscAspect = ({
   timing,
   chartAspects,
-  aspectOptions,
   ascendantOwner,
 }: {
   timing: AspectTiming;
   chartAspects: Aspect[];
-  aspectOptions: AspectOptions;
   ascendantOwner: "main" | "other";
 }): Aspect | undefined => {
   const planetName = getAscendantPlanetName(timing.aspect);
-  const options = aspectOptions[timing.aspect.type];
-  if (!planetName || !options.show) return undefined;
+  if (!planetName) return undefined;
 
   return chartAspects.find((aspect) => {
-    if (aspect.type !== timing.aspect.type || aspect.orb > options.minOrb) return false;
+    if (aspect.type !== timing.aspect.type) return false;
 
     const point1Owner = aspect.point1Owner ?? "main";
     const point2Owner = point1Owner === "main" ? "other" : "main";
@@ -204,14 +185,30 @@ const getAscendantPlanetName = (aspect: Aspect): string | undefined => {
   return planetPoint && hasAscendant ? planetPoint.value.name : undefined;
 };
 
-const hasAscendantPlanetPoints = (aspect: Aspect, planetName: string) => {
-  const isAscendant = (point: AspectPoint) => point.type === "Angle" && point.value.name === "ASC";
-  const isPlanet = (point: AspectPoint) =>
-    point.type === "Planet" && point.value.name === planetName;
+const hasAscendant = (aspect: Aspect) =>
+  (aspect.point1.type === "Angle" && aspect.point1.value.name === "ASC") ||
+  (aspect.point2.type === "Angle" && aspect.point2.value.name === "ASC");
+
+const sameAspectPoints = (current: Aspect, target: Aspect, matchOwners: boolean) => {
+  const ownerAt = (aspect: Aspect, pointIndex: 1 | 2) => {
+    const point1Owner = aspect.point1Owner ?? "main";
+    return pointIndex === 1 ? point1Owner : point1Owner === "main" ? "other" : "main";
+  };
+  const samePoint = (
+    currentPoint: AspectPoint,
+    targetPoint: AspectPoint,
+    currentOwner: "main" | "other",
+    targetOwner: "main" | "other",
+  ) =>
+    currentPoint.type === targetPoint.type &&
+    currentPoint.value.name === targetPoint.value.name &&
+    (!matchOwners || currentOwner === targetOwner);
 
   return (
-    (isPlanet(aspect.point1) && isAscendant(aspect.point2)) ||
-    (isAscendant(aspect.point1) && isPlanet(aspect.point2))
+    (samePoint(current.point1, target.point1, ownerAt(current, 1), ownerAt(target, 1)) &&
+      samePoint(current.point2, target.point2, ownerAt(current, 2), ownerAt(target, 2))) ||
+    (samePoint(current.point1, target.point2, ownerAt(current, 1), ownerAt(target, 2)) &&
+      samePoint(current.point2, target.point1, ownerAt(current, 2), ownerAt(target, 1)))
   );
 };
 

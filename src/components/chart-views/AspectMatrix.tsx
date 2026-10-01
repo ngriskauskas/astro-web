@@ -1,7 +1,8 @@
 import { useState } from "react";
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { useWheel } from "../../hooks/useWheel";
-import { AspectData } from "../../types/aspect";
+import { AspectData, type AspectPoint } from "../../types/aspect";
+import { AngleData } from "../../types/cusp";
 import { PLANET_ORDER, PlanetsData, type Planet } from "../../types/planet";
 import { useDesc } from "../../contexts/DescContext";
 import { useWheelData } from "../../hooks/chart/useWheelData";
@@ -13,54 +14,61 @@ export const AspectMatrix = () => {
   const sortByPlanetOrder = (arr: Planet[]) =>
     [...arr].sort((a, b) => PLANET_ORDER.indexOf(a.name) - PLANET_ORDER.indexOf(b.name));
 
-  const { planetAngles } = useWheel() as SingleWheelContextType;
+  const { planetAngles, keyAngles } = useWheel() as SingleWheelContextType;
   const planets = sortByPlanetOrder(planetAngles);
+  const matrixKeyAngles = keyAngles.filter(({ name }) => name === "ASC" || name === "MC");
+  const points: AspectPoint[] = [
+    ...planets.map((value) => ({ type: "Planet" as const, value })),
+    ...matrixKeyAngles.map((value) => ({ type: "Angle" as const, value })),
+  ];
   const aspects = useWheelData().getFilteredAspects();
 
   return (
     <div className="overflow-x-auto ml-4">
-      <table className="table-fixed border border-gray-300 rounded-lg shadow-md overflow-hidden text-center">
+      <table className="w-max table-fixed border border-gray-300 rounded-lg shadow-md overflow-hidden text-center">
         <thead className="bg-gray-100 text-sm font-semibold">
           <tr>
-            <th className="px-4 py-2 border border-gray-300"></th>
-            {planets.map((p) => (
+            <th className="w-12 min-w-12 max-w-12 px-1 py-2 border border-gray-300"></th>
+            {points.map((point) => (
               <th
-                key={p.name}
-                className={`px-4 py-2 text-xl border border-gray-300 cursor-pointer transition-colors ${
-                  hoveredPlanet === p.name ? "bg-yellow-100" : ""
+                key={`${point.type}-${point.value.name}`}
+                className={`w-12 min-w-12 max-w-12 px-1 py-2 ${point.type === "Angle" ? "text-xs" : "text-xl"} border border-gray-300 cursor-pointer transition-colors ${
+                  hoveredPlanet === point.value.name ? "bg-yellow-100" : ""
                 }`}
-                onMouseEnter={() => setHoveredPlanet(p.name)}
+                title={getPointTitle(point)}
+                onMouseEnter={() => setHoveredPlanet(point.value.name)}
                 onMouseLeave={() => setHoveredPlanet(null)}
               >
-                {PlanetsData[p.name].glyph}
+                {getPointLabel(point)}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {planets.map((rowPlanet, rowIndex) => (
+          {points.map((rowPoint, rowIndex) => (
             <tr
-              key={rowPlanet.name}
+              key={`${rowPoint.type}-${rowPoint.value.name}`}
               className={`text-sm transition-colors ${
-                hoveredPlanet === rowPlanet.name ? "bg-yellow-50" : ""
+                hoveredPlanet === rowPoint.value.name ? "bg-yellow-50" : ""
               }`}
             >
               <td
-                className={`px-4 py-2 text-xl font-semibold border border-gray-300 bg-gray-50 cursor-pointer transition-colors ${
-                  hoveredPlanet === rowPlanet.name ? "bg-yellow-100" : ""
+                className={`w-12 min-w-12 max-w-12 px-1 py-2 ${rowPoint.type === "Angle" ? "text-xs" : "text-xl"} font-semibold border border-gray-300 bg-gray-50 cursor-pointer transition-colors ${
+                  hoveredPlanet === rowPoint.value.name ? "bg-yellow-100" : ""
                 }`}
-                onMouseEnter={() => setHoveredPlanet(rowPlanet.name)}
+                title={getPointTitle(rowPoint)}
+                onMouseEnter={() => setHoveredPlanet(rowPoint.value.name)}
                 onMouseLeave={() => setHoveredPlanet(null)}
               >
-                {PlanetsData[rowPlanet.name].glyph}
+                {getPointLabel(rowPoint)}
               </td>
 
-              {planets.map((colPlanet, colIndex) => {
+              {points.map((colPoint, colIndex) => {
                 if (rowIndex === colIndex) {
                   return (
                     <td
-                      key={colPlanet.name}
-                      className="px-4 py-2 text-gray-300 border border-gray-300"
+                      key={`${colPoint.type}-${colPoint.value.name}`}
+                      className="w-12 min-w-12 max-w-12 px-1 py-2 text-gray-300 border border-gray-300"
                     >
                       –
                     </td>
@@ -70,30 +78,30 @@ export const AspectMatrix = () => {
                 if (colIndex > rowIndex) {
                   return (
                     <td
-                      key={colPlanet.name}
-                      className="px-4 py-2 border border-gray-200 bg-gray-100"
+                      key={`${colPoint.type}-${colPoint.value.name}`}
+                      className="w-12 min-w-12 max-w-12 px-1 py-2 border border-gray-200 bg-gray-100"
                       aria-hidden
                     />
                   );
                 }
 
                 const aspect = aspects.find(
-                  (a) =>
-                    (a.point1.value.name === rowPlanet.name &&
-                      a.point2.value.name === colPlanet.name) ||
-                    (a.point1.value.name === colPlanet.name &&
-                      a.point2.value.name === rowPlanet.name),
+                  (candidate) =>
+                    (samePoint(candidate.point1, rowPoint) &&
+                      samePoint(candidate.point2, colPoint)) ||
+                    (samePoint(candidate.point1, colPoint) &&
+                      samePoint(candidate.point2, rowPoint)),
                 );
 
                 const color = aspect ? AspectData[aspect.type].color : undefined;
 
                 return (
                   <td
-                    key={colPlanet.name}
-                    className={`px-4 py-2 text-lg font-bold border border-gray-300 transition-all ${
+                    key={`${colPoint.type}-${colPoint.value.name}`}
+                    className={`w-12 min-w-12 max-w-12 px-1 py-2 text-lg font-bold border border-gray-300 transition-all ${
                       aspect ? "cursor-pointer" : ""
                     } ${
-                      hoveredPlanet === rowPlanet.name || hoveredPlanet === colPlanet.name
+                      hoveredPlanet === rowPoint.value.name || hoveredPlanet === colPoint.value.name
                         ? "ring-2 ring-yellow-300"
                         : ""
                     }`}
@@ -129,3 +137,14 @@ export const AspectMatrix = () => {
     </div>
   );
 };
+
+const samePoint = (left: AspectPoint, right: AspectPoint) =>
+  left.type === right.type && left.value.name === right.value.name;
+
+const getPointLabel = (point: AspectPoint) =>
+  point.type === "Planet" ? PlanetsData[point.value.name].glyph : point.value.name;
+
+const getPointTitle = (point: AspectPoint) =>
+  point.type === "Planet"
+    ? PlanetsData[point.value.name].displayName
+    : AngleData[point.value.name].name;

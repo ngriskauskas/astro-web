@@ -56,8 +56,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       const user = data as User;
       setUser(user);
-    } catch (err) {
+    } catch {
       localStorage.removeItem("token");
+      localStorage.removeItem("refresh");
       setToken(null);
       setUser(null);
     } finally {
@@ -103,6 +104,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("refresh");
     setToken(null);
     setUser(null);
   };

@@ -6,13 +6,12 @@ import { type PlanetAngle } from "../components/wheel/layers/Planets";
 import { type CuspAngle, type KeyAngleAngle } from "../components/wheel/layers/Houses";
 import { type SignAngle } from "../components/wheel/layers/Signs";
 import { ZodiacSigns, type ZodiacSign } from "../types/zodiac";
-import { isPlanetAspect, type Aspect, type PlanetAspect } from "../types/aspect";
+import type { Aspect } from "../types/aspect";
 import type { Planet } from "../types/planet";
 import { getLocalISODate, getLocalISOTime } from "../utils/funcs";
-import type { ZodiacSystem } from "../types/zodiac-system";
-import type { Ayanamsa } from "../types/ayanamsa";
 import { useSearchParams } from "react-router-dom";
 import type { MultiChart } from "../types/chart";
+import { useChartSettings } from "./ChartSettingsContext";
 
 export type OwnerType = "main" | "other";
 
@@ -26,7 +25,7 @@ export interface MultiWheelContextType {
   mainKeyAngles: KeyAngleAngle[];
   otherKeyAngles: KeyAngleAngle[];
   signAngles: SignAngle[];
-  aspects: PlanetAspect[];
+  aspects: Aspect[];
   chartAspects: Aspect[];
   type: "synastry" | "transit";
 }
@@ -44,6 +43,9 @@ export const MultiWheelProvider = ({
   const [chart, setChart] = useState<MultiChart | undefined>();
   const { getSynastryChart, getTransitChart } = useCharts();
   const { mainProfile, profiles } = useBirthProfiles();
+  const {
+    settings: { aspectOptions },
+  } = useChartSettings();
   const [mainPlanetAngles, setMainPlanetAngles] = useState<PlanetAngle[]>([]);
   const [otherPlanetAngles, setOtherPlanetAngles] = useState<PlanetAngle[]>([]);
   const [signAngles, setSignAngles] = useState<SignAngle[]>([]);
@@ -51,29 +53,11 @@ export const MultiWheelProvider = ({
   const [otherCuspAngles, setOtherCuspAngles] = useState<CuspAngle[]>([]);
   const [mainKeyAngles, setMainKeyAngles] = useState<KeyAngleAngle[]>([]);
   const [otherKeyAngles, setOtherKeyAngles] = useState<KeyAngleAngle[]>([]);
-  const [aspects, setAspects] = useState<PlanetAspect[]>([]);
+  const [aspects, setAspects] = useState<Aspect[]>([]);
 
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
     profileId: mainProfile?.id,
     otherProfileId: type === "synastry" ? profiles[1].id : undefined,
-    zodiacSystem: "tropical",
-    houseSystem: "placidus",
-    ayanamsa: "lahiri",
-    aspectOptions: {
-      CONJUNCTION: { show: true, minOrb: 3 },
-      OPPOSITION: { show: true, minOrb: 3 },
-      SQUARE: { show: true, minOrb: 3 },
-      TRINE: { show: true, minOrb: 3 },
-      SEXTILE: { show: true, minOrb: 3 },
-    },
-    objectOptions: {
-      showChiron: true,
-      showLilith: true,
-    },
-    displayOptions: {
-      angleLabels: false,
-      tickMarks: true,
-    },
     datetimeOptions:
       type === "synastry"
         ? undefined
@@ -103,8 +87,6 @@ export const MultiWheelProvider = ({
     if (type !== "transit") return;
     const dateParam = searchParams.get("date");
     const timeParam = searchParams.get("time") || "23:59:00";
-    const zodiacParam = searchParams.get("zodiac_system");
-    const ayanamsaParam = searchParams.get("ayanamsa");
 
     setSettings((prev) => ({
       ...prev,
@@ -112,22 +94,13 @@ export const MultiWheelProvider = ({
         date: dateParam || prev.datetimeOptions?.date || getLocalISODate(),
         time: (dateParam && timeParam) || prev.datetimeOptions?.time || getLocalISOTime(),
       },
-      zodiacSystem: (zodiacParam as ZodiacSystem) || prev.zodiacSystem,
-      ayanamsa: (ayanamsaParam as Ayanamsa) || prev.ayanamsa,
     }));
   }, [searchParams]);
 
   useEffect(() => {
     if (type === "synastry") fetchSynastryChart();
     else if (type === "transit") fetchCurrentChart();
-  }, [
-    settings.profileId,
-    settings.otherProfileId,
-    settings.ayanamsa,
-    settings.houseSystem,
-    settings.zodiacSystem,
-    settings.datetimeOptions,
-  ]);
+  }, [aspectOptions, settings.profileId, settings.otherProfileId, settings.datetimeOptions]);
 
   const round = (num: number): number => {
     return Math.round(num * 100) / 100;
@@ -262,7 +235,7 @@ export const MultiWheelProvider = ({
     setOtherKeyAngles(otherKAngles);
 
     setSignAngles(calcSignAngles(chart));
-    setAspects(chart.aspects.filter(isPlanetAspect));
+    setAspects(chart.aspects);
   }, [chart]);
 
   return (

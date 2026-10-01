@@ -2,9 +2,9 @@ import { polarToCartesian } from "./Utils";
 import { useWheel } from "../../../hooks/useWheel";
 import type { MultiWheelContextType } from "../../../contexts/MultiWheelContext";
 import type { PlanetName } from "../../../types/planet";
-import { useEffect } from "react";
-import type { AspectType } from "../../../types/aspect";
+import type { AspectPoint, AspectType } from "../../../types/aspect";
 import { useChartSettings } from "../../../contexts/ChartSettingsContext";
+import type { OwnerType } from "../../../contexts/MultiWheelContext";
 
 const aspectColors: Record<AspectType, string> = {
   CONJUNCTION: "#FFD700",
@@ -21,18 +21,16 @@ interface MultiAspectProps {
 }
 
 export const MultiAspects = ({ radius, center, hoveredPlanet }: MultiAspectProps) => {
-  const { mainPlanetAngles, otherPlanetAngles, aspects } = useWheel() as MultiWheelContextType;
+  const { mainPlanetAngles, otherPlanetAngles, mainKeyAngles, otherKeyAngles, aspects } =
+    useWheel() as MultiWheelContextType;
 
   const {
-    settings: { objectOptions, aspectOptions },
+    settings: { objectOptions },
   } = useChartSettings();
 
   return (
     <g>
-      {aspects.map(({ type, orb, point1, point2 }, i) => {
-        const { minOrb, show } = aspectOptions[type];
-        if (!show || orb > minOrb) return;
-
+      {aspects.map(({ type, orb, point1, point1Owner, point2 }, i) => {
         if (
           !objectOptions.showChiron &&
           (point1.value.name === "CHIRON" || point2.value.name === "CHIRON")
@@ -44,17 +42,37 @@ export const MultiAspects = ({ radius, center, hoveredPlanet }: MultiAspectProps
         )
           return;
 
+        const firstOwner = point1Owner ?? "main";
+        const secondOwner = otherOwner(firstOwner);
         const isHighlighted =
           hoveredPlanet &&
-          ((hoveredPlanet.profile === "main" && point1.value.name === hoveredPlanet.planet) ||
-            (hoveredPlanet.profile === "other" && point2.value.name === hoveredPlanet.planet));
+          ((point1.type === "Planet" &&
+            firstOwner === hoveredPlanet.profile &&
+            point1.value.name === hoveredPlanet.planet) ||
+            (point2.type === "Planet" &&
+              secondOwner === hoveredPlanet.profile &&
+              point2.value.name === hoveredPlanet.planet));
 
-        const planet1Angle = mainPlanetAngles.find(({ name }) => name === point1.value.name)!.angle;
-        const planet2Angle = otherPlanetAngles.find(
-          ({ name }) => name === point2.value.name,
-        )!.angle;
-        const { x: x1, y: y1 } = polarToCartesian(center, radius, planet1Angle);
-        const { x: x2, y: y2 } = polarToCartesian(center, radius, planet2Angle);
+        const point1Angle = getPointAngle(
+          point1,
+          firstOwner,
+          mainPlanetAngles,
+          otherPlanetAngles,
+          mainKeyAngles,
+          otherKeyAngles,
+        );
+        const point2Angle = getPointAngle(
+          point2,
+          secondOwner,
+          mainPlanetAngles,
+          otherPlanetAngles,
+          mainKeyAngles,
+          otherKeyAngles,
+        );
+        if (point1Angle === undefined || point2Angle === undefined) return null;
+
+        const { x: x1, y: y1 } = polarToCartesian(center, radius, point1Angle);
+        const { x: x2, y: y2 } = polarToCartesian(center, radius, point2Angle);
 
         return (
           <line
@@ -74,4 +92,21 @@ export const MultiAspects = ({ radius, center, hoveredPlanet }: MultiAspectProps
       })}
     </g>
   );
+};
+
+const otherOwner = (owner: OwnerType): OwnerType => (owner === "main" ? "other" : "main");
+
+const getPointAngle = (
+  point: AspectPoint,
+  owner: OwnerType,
+  mainPlanets: MultiWheelContextType["mainPlanetAngles"],
+  otherPlanets: MultiWheelContextType["otherPlanetAngles"],
+  mainKeyAngles: MultiWheelContextType["mainKeyAngles"],
+  otherKeyAngles: MultiWheelContextType["otherKeyAngles"],
+) => {
+  const planets = owner === "main" ? mainPlanets : otherPlanets;
+  const keyAngles = owner === "main" ? mainKeyAngles : otherKeyAngles;
+  return point.type === "Planet"
+    ? planets.find(({ name }) => name === point.value.name)?.angle
+    : keyAngles.find(({ name }) => name === point.value.name)?.angle;
 };

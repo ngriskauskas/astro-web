@@ -10,25 +10,17 @@ export const DateChip = ({
   format?: boolean;
   style?: boolean;
 }) => {
-  const {
-    settings: { zodiacSystem, ayanamsa },
-    type,
-  } = useWheel();
+  const { type } = useWheel();
   const urlDate = encodeURIComponent(date);
-  const urlZodiac = encodeURIComponent(zodiacSystem);
-  const urlAyanamsa = encodeURIComponent(ayanamsa || "");
   const displayDate = format
     ? new Date(`${date}T00:00`).toLocaleDateString(undefined, {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    })
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+      })
     : date;
 
-  const toLink =
-    type === "time"
-      ? `/moment?date=${urlDate}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`
-      : `/transit?date=${urlDate}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`;
+  const toLink = type === "time" ? `/moment?date=${urlDate}` : `/transit?date=${urlDate}`;
 
   return (
     <Link
@@ -39,9 +31,7 @@ export const DateChip = ({
           : ""
       }
     >
-      <span className={style ? "font-medium text-gray-600" : ""}>
-        {displayDate}
-      </span>
+      <span className={style ? "font-medium text-gray-600" : ""}>{displayDate}</span>
     </Link>
   );
 };
@@ -53,30 +43,24 @@ export const DateTimeChip = ({
   datetime: string;
   format?: boolean;
 }) => {
-  const {
-    settings: { zodiacSystem, ayanamsa },
-    type,
-  } = useWheel();
+  const { type } = useWheel();
 
   const [datePart, timePart] = datetime.split("T");
   const displayDateTime = format
     ? new Date(datetime).toLocaleString(undefined, {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    })
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
     : datetime;
 
   const urlDate = encodeURIComponent(datePart);
   const urlTime = encodeURIComponent(timePart);
-  const urlZodiac = encodeURIComponent(zodiacSystem);
-  const urlAyanamsa = encodeURIComponent(ayanamsa || "");
-
   const toLink =
     type === "time"
-      ? `/moment?date=${urlDate}&time=${urlTime}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`
-      : `/transit?date=${urlDate}&time=${urlTime}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`;
+      ? `/moment?date=${urlDate}&time=${urlTime}`
+      : `/transit?date=${urlDate}&time=${urlTime}`;
 
   return (
     <Link
@@ -97,29 +81,23 @@ export const TimeChip = ({
   format?: boolean;
   style?: boolean;
 }) => {
-  const {
-    settings: { zodiacSystem, ayanamsa },
-    type,
-  } = useWheel();
+  const { type } = useWheel();
 
   const [, timePart] = datetime.split("T");
 
   const displayTime = format
     ? new Date(datetime).toLocaleTimeString(undefined, {
-      hour: "numeric",
-      minute: "2-digit",
-    })
+        hour: "numeric",
+        minute: "2-digit",
+      })
     : timePart;
 
   const urlDate = encodeURIComponent(datetime.split("T")[0]);
   const urlTime = encodeURIComponent(timePart);
-  const urlZodiac = encodeURIComponent(zodiacSystem);
-  const urlAyanamsa = encodeURIComponent(ayanamsa || "");
-
   const toLink =
     type === "time"
-      ? `/moment?date=${urlDate}&time=${urlTime}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`
-      : `/transit?date=${urlDate}&time=${urlTime}&zodiac_system=${urlZodiac}&ayanamsa=${urlAyanamsa}`;
+      ? `/moment?date=${urlDate}&time=${urlTime}`
+      : `/transit?date=${urlDate}&time=${urlTime}`;
 
   return (
     <Link
@@ -130,9 +108,7 @@ export const TimeChip = ({
           : ""
       }
     >
-      <span className={style ? "font-medium text-gray-600" : ""}>
-        {displayTime}
-      </span>
+      <span className={style ? "font-medium text-gray-600" : ""}>{displayTime}</span>
     </Link>
   );
 };

@@ -1,6 +1,5 @@
 import { type PlanetName, type Planet, PlanetsData } from "../../../types/planet";
 import { useDesc } from "../../../contexts/DescContext";
-import { useWheel } from "../../../hooks/useWheel";
 import { polarToCartesian } from "./Utils";
 import type { OwnerType } from "../../../contexts/MultiWheelContext";
 import { formatDegMin } from "../../../utils/funcs";

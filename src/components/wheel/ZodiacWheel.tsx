@@ -7,17 +7,12 @@ import { Aspects } from "./layers/Aspects";
 import { useWheel } from "../../hooks/useWheel";
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { type PlanetName } from "../../types/planet";
-import { useChartSettings } from "../../contexts/ChartSettingsContext";
 
 export const ZodiacWheel = () => {
   const [hoveredPlanet, setHoveredPlanet] = useState<PlanetName | null>(null);
   const [hoverAspectedPlanets, setHoverAspectedPlanets] = useState<PlanetName[]>([]);
 
   const { aspects, planetAngles, cuspAngles, keyAngles } = useWheel() as SingleWheelContextType;
-
-  const {
-    settings: { aspectOptions },
-  } = useChartSettings();
 
   const size = 700;
   const radius = size / 2;
@@ -42,12 +37,18 @@ export const ZodiacWheel = () => {
             hoverAspectedPlanets={hoverAspectedPlanets}
             onHoverPlanet={(planet) => {
               setHoveredPlanet(planet);
-              aspects.forEach(({ point1, point2, orb, type }) => {
-                const { minOrb, show } = aspectOptions[type];
-                if (!show || orb > minOrb) return;
-                if (point1.value.name === planet)
+              aspects.forEach(({ point1, point2 }) => {
+                if (
+                  point1.type === "Planet" &&
+                  point2.type === "Planet" &&
+                  point1.value.name === planet
+                )
                   setHoverAspectedPlanets((prev) => [point2.value.name, ...prev]);
-                else if (point2.value.name === planet)
+                else if (
+                  point1.type === "Planet" &&
+                  point2.type === "Planet" &&
+                  point2.value.name === planet
+                )
                   setHoverAspectedPlanets((prev) => [point1.value.name, ...prev]);
               });
             }}

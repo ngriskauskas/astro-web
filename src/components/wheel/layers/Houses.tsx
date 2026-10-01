@@ -1,6 +1,5 @@
 import { type Cusp, type KeyAngle } from "../../../types/cusp";
 import { useDesc } from "../../../contexts/DescContext";
-import { useWheel } from "../../../hooks/useWheel";
 import { createWedgePath, midpointAngle, polarToCartesian } from "./Utils";
 import type { OwnerType } from "../../../contexts/MultiWheelContext";
 import { useChartSettings } from "../../../contexts/ChartSettingsContext";

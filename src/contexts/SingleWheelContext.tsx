@@ -6,11 +6,12 @@ import { useBirthProfiles } from "./BirthProfilesContext";
 import { type PlanetAngle } from "../components/wheel/layers/Planets";
 import { type CuspAngle, type KeyAngleAngle } from "../components/wheel/layers/Houses";
 import { type SignAngle } from "../components/wheel/layers/Signs";
-import { isPlanetAspect, type Aspect, type PlanetAspect } from "../types/aspect";
+import type { Aspect } from "../types/aspect";
 import type { Planet } from "../types/planet";
 import { getLocalISODate, getLocalISODateTime, getLocalISOTime } from "../utils/funcs";
 import { useSearchParams } from "react-router-dom";
 import type { SingleChart } from "../types/chart";
+import { useChartSettings } from "./ChartSettingsContext";
 
 export interface SingleWheelContextType {
   settings: ZodiacWheelOptions;
@@ -19,7 +20,7 @@ export interface SingleWheelContextType {
   cuspAngles: CuspAngle[];
   signAngles: SignAngle[];
   keyAngles: KeyAngleAngle[];
-  aspects: PlanetAspect[];
+  aspects: Aspect[];
   chartAspects: Aspect[];
   type: "natal" | "time" | "moment";
 }
@@ -37,11 +38,14 @@ export const SingleWheelProvider = ({
   const [chart, setChart] = useState<SingleChart | undefined>();
   const { getNatalChart, getCurrentChart } = useCharts();
   const { mainProfile } = useBirthProfiles();
+  const {
+    settings: { aspectOptions },
+  } = useChartSettings();
   const [planetAngles, setPlanetAngles] = useState<PlanetAngle[]>([]);
   const [signAngles, setSignAngles] = useState<SignAngle[]>([]);
   const [cuspAngles, setCuspAngles] = useState<CuspAngle[]>([]);
   const [keyAngles, setKeyAngles] = useState<KeyAngleAngle[]>([]);
-  const [aspects, setAspects] = useState<PlanetAspect[]>([]);
+  const [aspects, setAspects] = useState<Aspect[]>([]);
   const [chartAspects, setChartAspects] = useState<Aspect[]>([]);
 
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
@@ -99,7 +103,7 @@ export const SingleWheelProvider = ({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [settings.profileId, settings.datetimeOptions]);
+  }, [aspectOptions, settings.profileId, settings.datetimeOptions]);
 
   const round = (num: number): number => {
     return Math.round(num * 100) / 100;
@@ -196,7 +200,7 @@ export const SingleWheelProvider = ({
     setSignAngles(calcSignAngles(chart));
     setKeyAngles(calcKeyAngles(chart));
     setChartAspects(chart.aspects);
-    setAspects(chart.aspects.filter(isPlanetAspect));
+    setAspects(chart.aspects);
   }, [chart]);
 
   return (

@@ -3,6 +3,7 @@ import { useWheel } from "../useWheel";
 import { apiFetch } from "../../utils/api";
 import { getLocalISODateTime } from "../../utils/funcs";
 import { useAuth } from "../../contexts/AuthContext";
+import { useChartSettings } from "../../contexts/ChartSettingsContext";
 import type { CurrentTimingsType, TimingEvent, TransitTimingsType } from "../../types/timings";
 
 export const useCurrentTimings = ({
@@ -14,6 +15,9 @@ export const useCurrentTimings = ({
   } = useWheel();
 
   const { user } = useAuth();
+  const {
+    settings: { aspectOptions },
+  } = useChartSettings();
 
   const [timings, setTimings] = useState<CurrentTimingsType | TransitTimingsType>({
     retrogrades: [],
@@ -63,7 +67,7 @@ export const useCurrentTimings = ({
     if (!user) return;
     if (type === "time") fetchTimings();
     else if (type === "transit") fetchTransitTimings();
-  }, [filterKeyAngleAspects, profileId, user, type]);
+  }, [aspectOptions, filterKeyAngleAspects, profileId, user, type]);
 
   return { timings, loading };
 };

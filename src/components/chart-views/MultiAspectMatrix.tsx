@@ -1,7 +1,8 @@
 import { useState } from "react";
 import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
 import { useWheel } from "../../hooks/useWheel";
-import { AspectData } from "../../types/aspect";
+import { AspectData, type Aspect, type AspectPoint } from "../../types/aspect";
+import { AngleData } from "../../types/cusp";
 import { PLANET_ORDER, PlanetsData, type Planet } from "../../types/planet";
 import { useDesc } from "../../contexts/DescContext";
 import { useWheelData } from "../../hooks/chart/useWheelData";
@@ -15,10 +16,21 @@ export const MultiAspectMatrix = () => {
   const sortByPlanetOrder = (arr: Planet[]) =>
     [...arr].sort((a, b) => PLANET_ORDER.indexOf(a.name) - PLANET_ORDER.indexOf(b.name));
 
-  const { mainPlanetAngles, otherPlanetAngles } = useWheel() as MultiWheelContextType;
+  const { mainPlanetAngles, otherPlanetAngles, mainKeyAngles, otherKeyAngles } =
+    useWheel() as MultiWheelContextType;
 
   const mainPlanets = sortByPlanetOrder(mainPlanetAngles);
   const otherPlanets = sortByPlanetOrder(otherPlanetAngles);
+  const mainMatrixKeyAngles = mainKeyAngles.filter(({ name }) => name === "ASC" || name === "MC");
+  const otherMatrixKeyAngles = otherKeyAngles.filter(({ name }) => name === "ASC" || name === "MC");
+  const mainPoints: AspectPoint[] = [
+    ...mainPlanets.map((value) => ({ type: "Planet" as const, value })),
+    ...mainMatrixKeyAngles.map((value) => ({ type: "Angle" as const, value })),
+  ];
+  const otherPoints: AspectPoint[] = [
+    ...otherPlanets.map((value) => ({ type: "Planet" as const, value })),
+    ...otherMatrixKeyAngles.map((value) => ({ type: "Angle" as const, value })),
+  ];
 
   const aspects = useWheelData().getFilteredAspects();
   const { mainProfileName, otherProfileName } = useProfileNames();
@@ -27,61 +39,62 @@ export const MultiAspectMatrix = () => {
     <div className="overflow-x-auto">
       <div className="relative flex items-center">
         <div className="absolute -left-4 top-1/2 transform -translate-y-1/2 w-20 text-right font-semibold whitespace-nowrap rotate-[-90deg]">
-          {`${otherProfileName} Planets`}
+          {`${otherProfileName} Chart Points`}
         </div>
         <div className="ml-11">
-          <div className="text-center font-semibold mb-1">{`${mainProfileName} Planets`}</div>
-          <table className="table-fixed border border-gray-300 rounded-lg shadow-md overflow-hidden text-center">
+          <div className="text-center font-semibold mb-1">{`${mainProfileName} Chart Points`}</div>
+          <table className="w-max table-fixed border border-gray-300 rounded-lg shadow-md overflow-hidden text-center">
             <thead className="bg-gray-100 text-sm font-semibold">
               <tr>
-                <th className="px-4 py-2 border border-gray-300"></th>
-                {mainPlanets.map((p) => (
+                <th className="w-12 min-w-12 max-w-12 px-1 py-2 border border-gray-300"></th>
+                {mainPoints.map((point) => (
                   <th
-                    key={p.name}
-                    className={`px-4 py-2 text-xl border border-gray-300 cursor-pointer transition-colors ${
-                      hoveredColPlanet === p.name ? "bg-yellow-100" : ""
+                    key={`${point.type}-${point.value.name}`}
+                    className={`w-12 min-w-12 max-w-12 px-1 py-2 ${point.type === "Angle" ? "text-xs" : "text-xl"} border border-gray-300 cursor-pointer transition-colors ${
+                      hoveredColPlanet === point.value.name ? "bg-yellow-100" : ""
                     }`}
-                    onMouseEnter={() => setHoveredColPlanet(p.name)}
+                    title={getPointTitle(point)}
+                    onMouseEnter={() => setHoveredColPlanet(point.value.name)}
                     onMouseLeave={() => setHoveredColPlanet(null)}
                   >
-                    {PlanetsData[p.name].glyph}
+                    {getPointLabel(point)}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {otherPlanets.map((rowPlanet) => (
+              {otherPoints.map((rowPoint) => (
                 <tr
-                  key={rowPlanet.name}
+                  key={`${rowPoint.type}-${rowPoint.value.name}`}
                   className={`text-sm transition-colors ${
-                    hoveredRowPlanet === rowPlanet.name ? "bg-yellow-50" : ""
+                    hoveredRowPlanet === rowPoint.value.name ? "bg-yellow-50" : ""
                   }`}
                 >
                   <td
-                    className={`px-4 py-2 text-xl font-semibold border border-gray-300 bg-gray-50 cursor-pointer transition-colors ${
-                      hoveredRowPlanet === rowPlanet.name ? "bg-yellow-100" : ""
+                    className={`w-12 min-w-12 max-w-12 px-1 py-2 ${rowPoint.type === "Angle" ? "text-xs" : "text-xl"} font-semibold border border-gray-300 bg-gray-50 cursor-pointer transition-colors ${
+                      hoveredRowPlanet === rowPoint.value.name ? "bg-yellow-100" : ""
                     }`}
-                    onMouseEnter={() => setHoveredRowPlanet(rowPlanet.name)}
+                    title={getPointTitle(rowPoint)}
+                    onMouseEnter={() => setHoveredRowPlanet(rowPoint.value.name)}
                     onMouseLeave={() => setHoveredRowPlanet(null)}
                   >
-                    {PlanetsData[rowPlanet.name].glyph}
+                    {getPointLabel(rowPoint)}
                   </td>
 
-                  {mainPlanets.map((colPlanet) => {
-                    const aspect = aspects.find(
-                      (a) =>
-                        a.point1.value.name === colPlanet.name &&
-                        a.point2.value.name === rowPlanet.name,
+                  {mainPoints.map((colPoint) => {
+                    const aspect = aspects.find((candidate) =>
+                      matchesMainOtherPoints(candidate, colPoint, rowPoint),
                     );
                     const color = aspect ? AspectData[aspect.type].color : undefined;
 
                     return (
                       <td
-                        key={colPlanet.name}
-                        className={`px-4 py-2 text-lg font-bold border border-gray-300 transition-all ${
+                        key={`${colPoint.type}-${colPoint.value.name}`}
+                        className={`w-12 min-w-12 max-w-12 px-1 py-2 text-lg font-bold border border-gray-300 transition-all ${
                           aspect ? "cursor-pointer" : ""
                         } ${
-                          hoveredRowPlanet === rowPlanet.name || hoveredColPlanet === colPlanet.name
+                          hoveredRowPlanet === rowPoint.value.name ||
+                          hoveredColPlanet === colPoint.value.name
                             ? "ring-2 ring-yellow-300"
                             : ""
                         }`}
@@ -119,3 +132,34 @@ export const MultiAspectMatrix = () => {
     </div>
   );
 };
+
+const samePoint = (left: AspectPoint, right: AspectPoint) =>
+  left.type === right.type && left.value.name === right.value.name;
+
+const matchesMainOtherPoints = (
+  aspect: Aspect,
+  mainPoint: AspectPoint,
+  otherPoint: AspectPoint,
+) => {
+  const point1Owner = aspect.point1Owner ?? "main";
+  const point2Owner = point1Owner === "main" ? "other" : "main";
+
+  return (
+    (point1Owner === "main" &&
+      point2Owner === "other" &&
+      samePoint(aspect.point1, mainPoint) &&
+      samePoint(aspect.point2, otherPoint)) ||
+    (point1Owner === "other" &&
+      point2Owner === "main" &&
+      samePoint(aspect.point1, otherPoint) &&
+      samePoint(aspect.point2, mainPoint))
+  );
+};
+
+const getPointLabel = (point: AspectPoint) =>
+  point.type === "Planet" ? PlanetsData[point.value.name].glyph : point.value.name;
+
+const getPointTitle = (point: AspectPoint) =>
+  point.type === "Planet"
+    ? PlanetsData[point.value.name].displayName
+    : AngleData[point.value.name].name;

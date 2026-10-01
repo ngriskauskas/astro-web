@@ -6,6 +6,7 @@ import type { Aspect } from "../../types/aspect";
 import type { CuspType, KeyType } from "../../types/cusp";
 import type { Planet, PlanetName } from "../../types/planet";
 import type { ZodiacSign } from "../../types/zodiac";
+import type { HouseSystem } from "../../types/house-system";
 
 const computePlanets = (
   planetAngles: PlanetAngle[],
@@ -56,17 +57,28 @@ export const getPlanetAspects = (
   owner: OwnerType = "main",
 ): Aspect[] => {
   return ctx.aspects
-    .filter((x) =>
-      owner === "main" ? x.point1.value.name === planet : x.point2.value.name === planet,
-    )
-    .filter(({ type, orb }) => orb <= ctx.settings.aspectOptions[type].minOrb)
+    .filter((aspect) => {
+      const point1Owner = aspect.point1Owner ?? "main";
+      const point2Owner = point1Owner === "main" ? "other" : "main";
+      return (
+        (aspect.point1.type === "Planet" &&
+          point1Owner === owner &&
+          aspect.point1.value.name === planet) ||
+        (aspect.point2.type === "Planet" &&
+          point2Owner === owner &&
+          aspect.point2.value.name === planet)
+      );
+    })
     .map((x) => {
-      if (x.point1.value.name === planet) return { ...x, planet1Owner: owner };
+      const point1Owner = x.point1Owner ?? "main";
+      if (x.point1.type === "Planet" && point1Owner === owner && x.point1.value.name === planet) {
+        return { ...x, point1Owner: owner };
+      }
       return {
         ...x,
         point1: x.point2,
         point2: x.point1,
-        planet1Owner: owner,
+        point1Owner: owner,
       };
     })
     .sort((a, b) => a.orb - b.orb);
@@ -132,10 +144,11 @@ export const getSignsInHouse = (
   ctx: MultiWheelContextType,
   houseNum: CuspType,
   owner: OwnerType = "main",
+  houseSystem: HouseSystem,
 ) => {
   const house = getHouse(ctx, houseNum, owner);
 
-  if (ctx.settings.houseSystem === "whole_sign") {
+  if (houseSystem === "WHOLE_SIGN") {
     return ctx.signAngles.filter((x) => x.angle === house.angle);
   }
 
@@ -151,10 +164,14 @@ export const getSignsInHouse = (
   });
 };
 
-export const getHousesInSign = (ctx: MultiWheelContextType, sign: ZodiacSign) => {
+export const getHousesInSign = (
+  ctx: MultiWheelContextType,
+  sign: ZodiacSign,
+  houseSystem: HouseSystem,
+) => {
   const signAngle = ctx.signAngles.find((s) => s.sign === sign)!;
 
-  if (ctx.settings.houseSystem === "whole_sign") {
+  if (houseSystem === "WHOLE_SIGN") {
     return [
       ctx.mainCuspAngles.filter(({ angle }) => angle === signAngle.angle),
       ctx.otherCuspAngles.filter(({ angle }) => angle === signAngle.angle),
@@ -198,8 +215,5 @@ export const getSignInKeyAngle = (
 };
 
 export const getFilteredAspects = (ctx: MultiWheelContextType): Aspect[] => {
-  const aspectOptions = ctx.settings.aspectOptions;
-  return ctx.aspects
-    .filter(({ type, orb }) => aspectOptions[type].show && aspectOptions[type].minOrb >= orb)
-    .map((aspect) => ({ ...aspect, planet1Owner: "main" }));
+  return ctx.aspects;
 };

@@ -3,6 +3,7 @@ import { useWheel } from "../useWheel";
 import { apiFetch } from "../../utils/api";
 import { getLocalISODate } from "../../utils/funcs";
 import { useAuth } from "../../contexts/AuthContext";
+import { useChartSettings } from "../../contexts/ChartSettingsContext";
 import type { AspectPoint } from "../../types/aspect";
 import type { DailyTimingsType } from "../../types/timings";
 
@@ -12,6 +13,9 @@ export const useDailyTimings = () => {
     type,
   } = useWheel();
   const { user } = useAuth();
+  const {
+    settings: { aspectOptions },
+  } = useChartSettings();
 
   const [timings, setTimings] = useState<DailyTimingsType>({
     aspects: [],
@@ -80,7 +84,7 @@ export const useDailyTimings = () => {
     if (!user) return;
     if (type === "time") fetchDailyTimings();
     else if (type === "transit") fetchDailyTransitTimings();
-  }, [profileId, user, type]);
+  }, [aspectOptions, profileId, user, type]);
 
   return { timings, loading };
 };
