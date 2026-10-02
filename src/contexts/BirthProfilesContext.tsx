@@ -37,18 +37,12 @@ const BirthProfilesContext = createContext<BirthProfileContextType | undefined>(
 
 export const BirthProfilesProvider = ({ children }: { children: ReactNode }) => {
   const [profiles, setProfiles] = useState<BirthProfile[]>([]);
-  const [mainProfile, setMainProfile] = useState<BirthProfile>();
   const [loading, setLoading] = useState(true);
+  const mainProfile = profiles.find((x) => x.isMain);
 
   useEffect(() => {
     fetchProfiles();
   }, []);
-
-  useEffect(() => {
-    if (profiles.length === 0) return;
-    setMainProfile(profiles.find((x) => x.isMain));
-    setLoading(false);
-  }, [profiles]);
 
   const fetchProfiles = async () => {
     setLoading(true);
@@ -60,6 +54,8 @@ export const BirthProfilesProvider = ({ children }: { children: ReactNode }) => 
       setProfiles(birth_profiles);
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
