@@ -1,5 +1,6 @@
 import type { User } from "../../src/contexts/AuthContext";
 import type { BirthProfile } from "../../src/contexts/BirthProfilesContext";
+import type { AstrologySettings } from "../../src/types/astrologySettings";
 
 // Fixtures are fixed literals: nothing is derived from the current time or generated at
 // random. Tests that need a variation spread a fixture and override fields.
@@ -51,5 +52,75 @@ export const places: Place[] = [
   },
 ];
 
+// Profiles for other people. The last one has a long name and place, for layout.
+export const customBirthProfiles: BirthProfile[] = [
+  {
+    id: 2,
+    name: "Mum",
+    isMain: false,
+    birthDate: "1962-11-03",
+    birthTime: "14:45",
+    birthTimeUnknown: false,
+    location: "London, Ontario, Canada",
+    latitude: 42.9849,
+    longitude: -81.2453,
+  },
+  {
+    id: 3,
+    name: "Sam",
+    isMain: false,
+    birthDate: "1988-02-29",
+    birthTime: "",
+    birthTimeUnknown: true,
+    location: "London, Greater London, England, United Kingdom",
+    latitude: 51.5074,
+    longitude: -0.1278,
+  },
+  {
+    id: 4,
+    name: "Great-grandmother Wilhelmina Bartholomew-Featherstonehaugh",
+    isMain: false,
+    birthDate: "1901-07-21",
+    birthTime: "23:05",
+    birthTimeUnknown: false,
+    location:
+      "Llanfairpwllgwyngyll, Isle of Anglesey, Wales, LL61 5UJ, United Kingdom of Great Britain and Northern Ireland",
+    latitude: 53.2213,
+    longitude: -4.2099,
+  },
+];
+
 // The app merges this over its own defaults, so an empty object is a valid response.
-export const settings = {};
+export const settings: Partial<AstrologySettings> = {};
+
+// Mirrors DEFAULT_SETTINGS in src/contexts/ChartSettingsContext.tsx.
+export const defaultSettings: AstrologySettings = {
+  zodiacType: "TROPICAL",
+  houseSystem: "PLACIDUS",
+  ayanamsa: "LAHIRI",
+  aspectOptions: {
+    CONJUNCTION: { show: true, minOrb: 8 },
+    OPPOSITION: { show: true, minOrb: 8 },
+    TRINE: { show: true, minOrb: 8 },
+    SQUARE: { show: true, minOrb: 8 },
+    SEXTILE: { show: true, minOrb: 6 },
+  },
+  objectOptions: { showChiron: true, showLilith: false },
+  displayOptions: { tickMarks: true, angleLabels: true },
+};
+
+// Differs from the defaults in every group.
+export const savedSettings: AstrologySettings = {
+  zodiacType: "SIDEREAL",
+  houseSystem: "WHOLE_SIGN",
+  ayanamsa: "RAMAN",
+  aspectOptions: {
+    CONJUNCTION: { show: true, minOrb: 8 },
+    OPPOSITION: { show: true, minOrb: 5.5 },
+    TRINE: { show: true, minOrb: 8 },
+    SQUARE: { show: true, minOrb: 8 },
+    SEXTILE: { show: false, minOrb: 6 },
+  },
+  objectOptions: { showChiron: true, showLilith: true },
+  displayOptions: { tickMarks: false, angleLabels: true },
+};

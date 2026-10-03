@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "review:layout": "playwright test -c tests/review/playwright.config.ts"
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.2",

@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import toast from "react-hot-toast";
-import { BirthPlacePicker } from "./BirthPlacePicker";
+import { BirthPlacePicker, PLACE_NOT_PICKED_MESSAGE } from "./BirthPlacePicker";
 
 export const AccountInfoForm = () => {
   const { user, updateUser } = useAuth();
@@ -14,6 +14,10 @@ export const AccountInfoForm = () => {
       timezone: "",
     },
   });
+
+  const [placePending, setPlacePending] = useState(false);
+  const [placeError, setPlaceError] = useState(false);
+  const fieldId = useId();
 
   useEffect(() => {
     if (user) {
@@ -31,11 +35,15 @@ export const AccountInfoForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (placePending) {
+      setPlaceError(true);
+      return;
+    }
     try {
       await updateUser(userInfo);
       toast.success("Profile Updated");
-    } catch (err: any) {
-      if (err.message) toast.error(err.message);
+    } catch (err) {
+      if (err instanceof Error && err.message) toast.error(err.message);
     }
   };
 
@@ -47,8 +55,14 @@ export const AccountInfoForm = () => {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
         <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700">Username</label>
+          <label
+            htmlFor={`${fieldId}-username`}
+            className="block mb-1 text-sm font-medium text-gray-700"
+          >
+            Username
+          </label>
           <input
+            id={`${fieldId}-username`}
             type="text"
             name="username"
             value={userInfo.username}
@@ -59,8 +73,14 @@ export const AccountInfoForm = () => {
         </div>
 
         <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700">Email</label>
+          <label
+            htmlFor={`${fieldId}-email`}
+            className="block mb-1 text-sm font-medium text-gray-700"
+          >
+            Email
+          </label>
           <input
+            id={`${fieldId}-email`}
             type="email"
             name="email"
             value={user?.email || ""}
@@ -70,10 +90,18 @@ export const AccountInfoForm = () => {
         </div>
 
         <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700">Location</label>
+          <label
+            htmlFor={`${fieldId}-location`}
+            className="block mb-1 text-sm font-medium text-gray-700"
+          >
+            Location
+          </label>
           <BirthPlacePicker
+            id={`${fieldId}-location`}
             initialAddress={userInfo.location.address}
+            onPendingChange={setPlacePending}
             onSelect={({ address, latitude, longitude }) => {
+              setPlaceError(false);
               setUserInfo((prev) => ({
                 ...prev,
                 location: {
@@ -85,6 +113,11 @@ export const AccountInfoForm = () => {
               }));
             }}
           />
+          {placeError && placePending && (
+            <p role="alert" className="mt-1 text-sm text-red-600">
+              {PLACE_NOT_PICKED_MESSAGE}
+            </p>
+          )}
         </div>
       </div>
 

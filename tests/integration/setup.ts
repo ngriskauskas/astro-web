@@ -1,5 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
+import toast from "react-hot-toast";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 
@@ -46,6 +47,8 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  // Toasts live in a module-level store and would otherwise show up in the next test.
+  toast.remove();
   server.resetHandlers();
   localStorage.clear();
   vi.useRealTimers();

@@ -1,10 +1,12 @@
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { RequestHandler } from "msw";
 import type { ReactElement } from "react";
 import { Toaster } from "react-hot-toast";
 import { MemoryRouter } from "react-router-dom";
 import { AuthProvider } from "../../src/contexts/AuthContext";
 import { BirthProfilesProvider } from "../../src/contexts/BirthProfilesContext";
+import { ChartSettingsProvider } from "../../src/contexts/ChartSettingsContext";
 import { fakeToken, scenario, type ScenarioName } from "../mocks";
 import { server } from "./setup";
 
@@ -14,15 +16,19 @@ interface Options {
   // Whether the app starts with a live session.
   signedIn?: boolean;
   route?: string;
+  // Responses that replace the scenario's from the first request on (a later
+  // server.use() would race with the requests the providers make on mount).
+  handlers?: RequestHandler[];
 }
 
-// Renders `ui` inside the app's real auth and birth-profile providers, against the
-// mocked backend.
+// Renders `ui` inside the app's real auth, birth-profile and chart-settings providers,
+// against the mocked backend.
 export const renderWithApp = (
   ui: ReactElement,
-  { scenario: name = "newAccount", signedIn = true, route = "/" }: Options = {},
+  { scenario: name = "newAccount", signedIn = true, route = "/", handlers = [] }: Options = {},
 ) => {
   server.use(...scenario(name));
+  if (handlers.length > 0) server.use(...handlers);
   if (signedIn) {
     localStorage.setItem("token", fakeToken());
     localStorage.setItem("refresh", "test-refresh-token");
@@ -34,8 +40,10 @@ export const renderWithApp = (
       <AuthProvider>
         <MemoryRouter initialEntries={[route]}>
           <BirthProfilesProvider>
-            {ui}
-            <Toaster />
+            <ChartSettingsProvider>
+              {ui}
+              <Toaster />
+            </ChartSettingsProvider>
           </BirthProfilesProvider>
         </MemoryRouter>
       </AuthProvider>,

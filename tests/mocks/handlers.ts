@@ -1,7 +1,8 @@
 import { http, HttpResponse } from "msw";
 import type { BirthProfile, BirthProfileInput } from "../../src/contexts/BirthProfilesContext";
 import { API_URL } from "./auth";
-import { places, settings, user } from "./data";
+import type { AstrologySettings } from "../../src/types/astrologySettings";
+import { defaultSettings, places, settings, user } from "./data";
 
 export const PLACE_SEARCH_URL = "https://nominatim.openstreetmap.org/search";
 
@@ -17,10 +18,27 @@ export const getBirthProfiles = (profiles: BirthProfile[]) =>
 
 export const postBirthProfile = () =>
   http.post(`${API_URL}/birth-profiles`, async ({ request }) =>
-    HttpResponse.json({ ...((await request.json()) as BirthProfileInput), id: 1 }, { status: 201 }),
+    HttpResponse.json({ ...((await request.json()) as BirthProfileInput), id: 100 }, { status: 201 }),
   );
 
-export const getSettings = () => http.get(`${API_URL}/settings`, () => HttpResponse.json(settings));
+export const putBirthProfile = () =>
+  http.put(`${API_URL}/birth-profiles/:id`, async ({ request, params }) =>
+    HttpResponse.json({ ...((await request.json()) as BirthProfileInput), id: Number(params.id) }),
+  );
+
+export const deleteBirthProfile = () =>
+  http.delete(`${API_URL}/birth-profiles/:id`, () => new HttpResponse(null, { status: 204 }));
+
+export const getSettings = (data: Partial<AstrologySettings> = settings) =>
+  http.get(`${API_URL}/settings`, () => HttpResponse.json(data));
+
+export const putSettings = () =>
+  http.put(`${API_URL}/settings`, async ({ request }) =>
+    HttpResponse.json((await request.json()) as AstrologySettings),
+  );
+
+export const resetSettings = () =>
+  http.post(`${API_URL}/settings/reset`, () => HttpResponse.json(defaultSettings));
 
 export const searchPlaces = () => http.get(PLACE_SEARCH_URL, () => HttpResponse.json(places));
 
