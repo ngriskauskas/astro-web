@@ -22,9 +22,16 @@ export default tseslint.config([
   },
   {
     // Playwright fixtures call a parameter named `use`, which is not the React hook.
-    files: ['tests/e2e/**/*.ts'],
+    files: ['tests/e2e/**/*.ts', 'tests/review/**/*.ts'],
     rules: {
       'react-hooks/rules-of-hooks': 'off',
+    },
+  },
+  {
+    // Test helpers export a mix of components and functions and are never hot-reloaded.
+    files: ['tests/**/*.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   },
 ])

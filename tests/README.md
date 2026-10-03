@@ -27,8 +27,9 @@ npx playwright install chromium   # one-time browser download
 | `npm run test:e2e -- --project=phone` | One device size |
 | `npm run test:e2e -- new-account-modal` | One browser test file |
 | `npx playwright show-report` | Open the last browser report (screenshot and trace for each failure) |
+| `npm run review:layout` | Capture screenshots for the layout review (see [Layout review](#layout-review)); not a test |
 
-Measured on 2026-10-03: `npm test` about 1 second, `npm run test:e2e` about 10 seconds.
+Measured on 2026-10-03: `npm test` about 4 seconds, `npm run test:e2e` about 10 seconds.
 
 The browser tests start their own dev server on port 5174 with a fake API URL, so it does
 not matter whether your normal dev server is running.
@@ -43,6 +44,7 @@ not matter whether your normal dev server is running.
 |----------|---------|
 | `newAccount` | Signed-in user with no birth info (the new-account modal is shown) |
 | `withProfile` | Signed-in user with a complete main birth profile |
+| `withCustomProfiles` | The same user with three profiles for other people as well |
 
 To mock a new endpoint: add fixture data to `data.ts`, a handler to `handlers.ts`, and
 include it in `common()` (or in one scenario) in `scenarios.ts`.
@@ -70,8 +72,8 @@ test("shows something", async () => {
 });
 ```
 
-`renderWithApp` wraps the component in the real `AuthProvider` and `BirthProfilesProvider`
-with a memory router and the toast container, and starts signed in (`signedIn: false` to
+`renderWithApp` wraps the component in the real `AuthProvider`, `BirthProfilesProvider` and
+`ChartSettingsProvider` with a memory router and the toast container, and starts signed in (`signedIn: false` to
 start signed out). A component that needs another provider should have it added in
 `render.tsx`.
 
@@ -88,6 +90,17 @@ server.use(
   ),
 );
 ```
+
+To replace a response the app asks for as soon as it loads (birth profiles, settings), pass
+it to `renderWithApp` instead, so it is in place before the first request:
+
+```tsx
+renderWithApp(<Profile />, { scenario: "withProfile", handlers: [getSettings(savedSettings)] });
+```
+
+Profile page tests share helpers in `integration/profile.tsx`: `renderProfile()` renders the
+page and waits for its data, `section("Account Info")` scopes queries to one card,
+`capture("put", "/me")` records what was sent, and `reject(...)` makes an endpoint fail.
 
 ## Add a browser test
 
@@ -127,6 +140,26 @@ Where the UI differs by size, branch on what is on screen, not on the project na
 if (await menuButton.isVisible()) await menuButton.click();
 ```
 
+## Layout review
+
+Layout is not asserted by any test. Before a feature that changes what users see is
+complete, a Claude review subagent looks at the screens it touches at five sizes, defined
+in `review/sizes.ts`: 320, 390, 768, 1280 and 1920 wide.
+
+```sh
+npm run review:layout
+```
+
+runs the capture files in `tests/review/` (`*.capture.ts`) with the same mocks as the
+browser tests and writes `test-results/layout-review/<size>/<state>.png`, plus a
+`widths.json` per size giving the page width next to the screen width for each state. The
+reviewer reads every image and reports problems; fix them, capture again, and repeat until
+the review is clean. To cover another screen, add a capture file next to
+`profile.capture.ts`.
+
+Native date and time picker popups are drawn by the browser and do not appear in
+screenshots.
+
 ## Determinism
 
 Both layers freeze `Date` at 2026-01-15T12:00:00Z and use the `America/New_York` time zone
@@ -138,10 +171,13 @@ When a test fails because of an existing problem in the app that is not being fi
 mark it and record it in [KNOWN_ISSUES.md](./KNOWN_ISSUES.md):
 
 ```ts
-test.fail(testInfo.project.name === "phone", "KI-001: navbar is wider than the phone viewport");
+// Browser test
+test.fail(testInfo.project.name === "phone", "KI-002: save button is off-screen");
+// Integration test
+test.fails("KI-003: saves the timezone of the picked place", async () => { ... });
 ```
 
-It is then reported as an expected failure, and Playwright flags it when it starts passing.
+It is then reported as an expected failure, and flagged when it starts passing.
 Do not use `skip` or `fixme`.
 
 ## Things that differ from a real browser session

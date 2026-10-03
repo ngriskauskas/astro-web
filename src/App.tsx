@@ -9,7 +9,8 @@ function App() {
       <Navbar />
       <Outlet />
       <NewAccountModal />
-      <Toaster position="top-right" />
+      {/* Below the navigation bar, so a toast never covers the menu button. */}
+      <Toaster position="top-right" containerStyle={{ top: 72 }} />
     </>
   );
 }

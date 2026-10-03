@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import toast from "react-hot-toast";
 import { useChartSettings } from "../../contexts/ChartSettingsContext";
 import type { AspectOptions, AstrologySettings } from "../../types/astrologySettings";
@@ -17,6 +17,7 @@ export const AstrologySettingsForm = () => {
 
   const [settings, setSettings] = useState<AstrologySettings>(contextSettings);
   const [saving, setSaving] = useState(false);
+  const fieldId = useId();
 
   useEffect(() => {
     setSettings(contextSettings);
@@ -28,8 +29,8 @@ export const AstrologySettingsForm = () => {
       setSaving(true);
       await updateSettings(settings);
       toast.success("Astrology settings updated");
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to save settings");
+    } catch (err) {
+      toast.error((err instanceof Error && err.message) || "Failed to save settings");
     } finally {
       setSaving(false);
     }
@@ -40,8 +41,8 @@ export const AstrologySettingsForm = () => {
       setSaving(true);
       await resetSettings();
       toast.success("Settings reset to defaults");
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to reset settings");
+    } catch (err) {
+      toast.error((err instanceof Error && err.message) || "Failed to reset settings");
     } finally {
       setSaving(false);
     }
@@ -67,7 +68,7 @@ export const AstrologySettingsForm = () => {
         ...prev.aspectOptions,
         [key]: {
           ...prev.aspectOptions[key],
-          minOrb: value,
+          minOrb: Math.min(15, Math.max(0, value)),
         },
       },
     }));
@@ -86,8 +87,14 @@ export const AstrologySettingsForm = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">Zodiac System</label>
+            <label
+              htmlFor={`${fieldId}-zodiac`}
+              className="block mb-1 text-sm font-medium text-gray-700"
+            >
+              Zodiac System
+            </label>
             <select
+              id={`${fieldId}-zodiac`}
               value={settings.zodiacType}
               onChange={(e) => {
                 const newZodiacType = e.target.value as ZodiacSystem;
@@ -109,8 +116,14 @@ export const AstrologySettingsForm = () => {
           </div>
 
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">House System</label>
+            <label
+              htmlFor={`${fieldId}-house`}
+              className="block mb-1 text-sm font-medium text-gray-700"
+            >
+              House System
+            </label>
             <select
+              id={`${fieldId}-house`}
               value={settings.houseSystem}
               onChange={(e) =>
                 setSettings({ ...settings, houseSystem: e.target.value as HouseSystem })
@@ -127,8 +140,14 @@ export const AstrologySettingsForm = () => {
 
           {settings.zodiacType === "SIDEREAL" && (
             <div className="sm:col-span-2">
-              <label className="block mb-1 text-sm font-medium text-gray-700">Ayanamsa</label>
+              <label
+                htmlFor={`${fieldId}-ayanamsa`}
+                className="block mb-1 text-sm font-medium text-gray-700"
+              >
+                Ayanamsa
+              </label>
               <select
+                id={`${fieldId}-ayanamsa`}
                 value={settings.ayanamsa || "LAHIRI"}
                 onChange={(e) => setSettings({ ...settings, ayanamsa: e.target.value as Ayanamsa })}
                 className="w-full rounded-lg border border-gray-300 p-2 bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
@@ -156,7 +175,7 @@ export const AstrologySettingsForm = () => {
             return (
               <div
                 key={aspectKey}
-                className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-100"
+                className="flex items-center justify-between gap-2 bg-gray-50 p-3 rounded-lg border border-gray-100"
               >
                 <label className="flex items-center space-x-3 cursor-pointer">
                   <input
@@ -169,16 +188,17 @@ export const AstrologySettingsForm = () => {
                 </label>
 
                 <div className="flex items-center space-x-2">
-                  <span className="text-xs text-gray-500">Max Orb:</span>
+                  <span className="hidden min-[360px]:inline text-xs text-gray-500">Max Orb:</span>
                   <input
                     type="number"
+                    aria-label={`${aspectKey.toLowerCase()} max orb`}
                     min="0"
                     max="15"
                     step="0.5"
                     disabled={!aspect.show}
                     value={aspect.minOrb}
                     onChange={(e) => handleOrbChange(aspectKey, parseFloat(e.target.value) || 0)}
-                    className="w-16 rounded-md border border-gray-300 p-1 text-center text-sm focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:bg-gray-100"
+                    className="w-16 rounded-md border border-gray-300 px-1 py-2 text-center text-sm focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:bg-gray-100"
                   />
                   <span className="text-xs text-gray-500">°</span>
                 </div>
@@ -194,7 +214,7 @@ export const AstrologySettingsForm = () => {
         <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">
           Objects & Asteroids
         </h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <label className="flex items-center space-x-3 cursor-pointer bg-gray-50 p-3 rounded-lg border border-gray-100">
             <input
               type="checkbox"
@@ -233,7 +253,7 @@ export const AstrologySettingsForm = () => {
         <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">
           Wheel Display Options
         </h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <label className="flex items-center space-x-3 cursor-pointer bg-gray-50 p-3 rounded-lg border border-gray-100">
             <input
               type="checkbox"
@@ -266,7 +286,7 @@ export const AstrologySettingsForm = () => {
         </div>
       </div>
 
-      <div className="flex justify-end space-x-3 pt-2">
+      <div className="flex flex-wrap justify-end gap-3 pt-2">
         <button
           type="button"
           onClick={handleReset}

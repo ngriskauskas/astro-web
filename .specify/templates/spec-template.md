@@ -117,6 +117,19 @@
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
 
+### Standing Acceptance Criteria *(all features in this repo)*
+
+<!--
+  Keep this subsection in every spec. Remove it only if the feature changes nothing a user can see.
+-->
+
+- **Responsive layout review**: Before the feature is considered complete, a Claude review subagent
+  MUST review the running app in a browser at each standard screen size (320, 390, 768, 1280, and
+  1920 wide), covering every screen and state the feature touches, looking for any responsive layout
+  problem: sideways scrolling, clipped or overlapping content, unreachable or hard-to-tap controls,
+  unreadable text. Every problem found MUST be fixed and the affected size reviewed again until the
+  review finds none.
+
 ## Assumptions
 
 <!--

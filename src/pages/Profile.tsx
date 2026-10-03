@@ -8,25 +8,37 @@ export const Profile = () => {
   const { mainProfile } = useBirthProfiles();
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-6">
-      <div className="bg-white shadow rounded-xl p-6 space-y-6">
+    <div className="max-w-2xl mx-auto p-3 sm:p-6 space-y-6">
+      <section
+        aria-label="Account Info"
+        className="bg-white shadow rounded-xl p-4 sm:p-6 space-y-6"
+      >
         <h2 className="text-xl font-semibold">Account Info</h2>
         <AccountInfoForm />
-      </div>
+      </section>
 
-      <div className="bg-white shadow rounded-xl p-6 space-y-6">
+      <section
+        aria-label="My Birth Info"
+        className="bg-white shadow rounded-xl p-4 sm:p-6 space-y-6"
+      >
         <h2 className="text-xl font-semibold">My Birth Info</h2>
         <BirthInfoForm profileId={mainProfile?.id} isMainProfile={true} />
-      </div>
+      </section>
 
-      <div className="bg-white shadow rounded-xl p-6 space-y-6">
+      <section
+        aria-label="Custom Profiles"
+        className="bg-white shadow rounded-xl p-4 sm:p-6 space-y-6"
+      >
         <CustomProfileList />
-      </div>
+      </section>
 
-      <div className="bg-white shadow rounded-xl p-6 space-y-6">
+      <section
+        aria-label="Chart Default Settings"
+        className="bg-white shadow rounded-xl p-4 sm:p-6 space-y-6"
+      >
         <h2 className="text-xl font-semibold">Chart Default Settings</h2>
         <AstrologySettingsForm />
-      </div>
+      </section>
     </div>
   );
 };

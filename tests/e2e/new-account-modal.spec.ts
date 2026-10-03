@@ -1,12 +1,7 @@
 import { places } from "../mocks";
 import { expect, test } from "./fixtures";
 
-test("new account completes the blocking modal", async ({ page, requests }, testInfo) => {
-  test.fail(
-    testInfo.project.name === "phone",
-    "KI-001: navbar is wider than the phone viewport, pushing the modal's submit button off-screen",
-  );
-
+test("new account completes the blocking modal", async ({ page, requests }) => {
   await page.goto("/");
 
   const dialog = page.getByRole("dialog", { name: "Welcome! Let's set up your profile" });
@@ -39,12 +34,12 @@ test("new account completes the blocking modal", async ({ page, requests }, test
   // The app is now usable: reach Profile through the navigation as it is presented
   // at this size (a direct link on wide screens, behind the menu button on narrow ones).
   const nav = page.getByRole("navigation");
-  const menuButton = nav.locator("> button");
+  const menuButton = nav.getByRole("button", { name: "Menu" });
   if (await menuButton.isVisible()) {
     await menuButton.click();
-    await nav.getByRole("link", { name: "Profile" }).last().click();
+    await nav.getByRole("menuitem", { name: "Profile" }).click();
   } else {
-    await nav.getByRole("link", { name: "Profile" }).first().click();
+    await nav.getByRole("link", { name: "Profile" }).click();
   }
   await expect(page).toHaveURL(/\/profile$/);
 });
