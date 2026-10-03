@@ -1,8 +1,9 @@
-import { type Cusp, type KeyAngle } from "../../../types/cusp";
+import { AngleData, HouseData, type Cusp, type KeyAngle } from "../../../types/cusp";
 import { useDesc } from "../../../contexts/DescContext";
-import { createWedgePath, midpointAngle, polarToCartesian } from "./Utils";
+import { createWedgePath, midpointAngle, onActivate, polarToCartesian } from "./Utils";
 import type { OwnerType } from "../../../contexts/MultiWheelContext";
 import { useChartSettings } from "../../../contexts/ChartSettingsContext";
+import { useOwnerName } from "../../../hooks/chart/getNames";
 
 export interface CuspAngle extends Cusp {
   angle: number;
@@ -30,6 +31,8 @@ export const Houses = ({ radius, innerRadius, center, angles, owner, keyAngles }
   } = useChartSettings();
 
   const { open } = useDesc();
+  const ownerName = useOwnerName(owner);
+  const named = (name: string) => (ownerName ? `${name}, ${ownerName}` : name);
 
   const outerRadius = radius;
 
@@ -44,6 +47,7 @@ export const Houses = ({ radius, innerRadius, center, angles, owner, keyAngles }
         const midAngle = midpointAngle(angle, endAngle);
 
         const { x: tx, y: ty } = polarToCartesian(center, innerRadius + 15, midAngle);
+        const openHouse = () => open({ type: "house", value: house.name, owner });
 
         return (
           <g key={name}>
@@ -58,15 +62,26 @@ export const Houses = ({ radius, innerRadius, center, angles, owner, keyAngles }
               <stop offset="60%" stopColor="rgba(255,255,255,0.1)" />
             </radialGradient>
             <path
+              role="button"
+              tabIndex={0}
+              aria-label={named(HouseData[name].name)}
               className="cursor-pointer transition-transform duration-200
               ease-in-out hover:scale-101 origin-[50%_50%] hover:drop-shadow-lg hover:opacity-40"
               d={wedgePath}
               fill="url(#houseGradient)"
               stroke="white"
               strokeWidth={1}
-              onClick={() => open({ type: "house", value: house.name, owner })}
+              onClick={openHouse}
+              onKeyDown={onActivate(openHouse)}
             />
-            <text x={tx} y={ty} textAnchor="middle" dominantBaseline="middle" fill="white">
+            <text
+              x={tx}
+              y={ty}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="white"
+              pointerEvents="none"
+            >
               {name}
             </text>
           </g>
@@ -84,11 +99,15 @@ export const Houses = ({ radius, innerRadius, center, angles, owner, keyAngles }
         const { x: dx, y: dy } = polarToCartesian(center, outerRadius - 15, angle + 2);
         const [deg, min] = degMin;
         const degLabel = `${Math.round(deg)}° ${Math.round(min)}′`;
+        const openAngle = () => open({ type: "angle", value: keyAngle.name, owner });
 
         return (
           <g key={name}>
             <line x1={innerX} y1={innerY} x2={outerX} y2={outerY} stroke="white" strokeWidth={3} />
             <text
+              role="button"
+              tabIndex={0}
+              aria-label={named(AngleData[name].name)}
               className="cursor-pointer fill-current hover:text-yellow-300
               ease-in-out hover:scale-101 duration-200 origin-[50%_50%]"
               x={lx}
@@ -96,7 +115,8 @@ export const Houses = ({ radius, innerRadius, center, angles, owner, keyAngles }
               textAnchor="middle"
               dominantBaseline="middle"
               fill="white"
-              onClick={() => open({ type: "angle", value: keyAngle.name, owner })}
+              onClick={openAngle}
+              onKeyDown={onActivate(openAngle)}
             >
               {name.toUpperCase()}
             </text>
@@ -109,6 +129,7 @@ export const Houses = ({ radius, innerRadius, center, angles, owner, keyAngles }
                 dominantBaseline="middle"
                 fontFamily='"Segoe UI Symbol", "Noto Sans Symbols", sans-serif'
                 pointerEvents="none"
+                className="max-sm:hidden"
               >
                 {degLabel}
               </text>

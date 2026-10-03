@@ -26,50 +26,53 @@ export const useCurrentTimings = ({
     stations: [],
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
+    if (!user || (type !== "time" && type !== "transit")) return;
+    if (type === "transit" && profileId === undefined) return;
+
+    // Set when a newer request replaces this one, so a late answer is ignored.
+    let cancelled = false;
     const fetchTimings = async () => {
       setLoading(true);
+      setError(false);
       try {
-        const res: CurrentTimingsType = await apiFetch("/timing/current", {
-          method: "POST",
-          body: JSON.stringify({
-            dateTime: getLocalISODateTime(),
-          }),
-        });
-        setTimings(filterWeeklyAspects(res, filterKeyAngleAspects));
+        const res: CurrentTimingsType | TransitTimingsType =
+          type === "time"
+            ? await apiFetch("/timing/current", {
+                method: "POST",
+                body: JSON.stringify({ dateTime: getLocalISODateTime() }),
+              })
+            : await apiFetch("/timing/transit", {
+                method: "POST",
+                body: JSON.stringify({
+                  dateTime: getLocalISODateTime(),
+                  birthProfileId: profileId,
+                }),
+              });
+        if (!cancelled) setTimings(filterWeeklyAspects(res, filterKeyAngleAspects));
       } catch (err) {
+        if (cancelled) return;
         console.error("Failed to fetch timings", err);
-        setTimings({ retrogrades: [], ingresses: [], aspects: [], stations: [] });
+        setTimings(
+          type === "time"
+            ? { retrogrades: [], ingresses: [], aspects: [], stations: [] }
+            : { aspects: [] },
+        );
+        setError(true);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
-    const fetchTransitTimings = async () => {
-      setLoading(true);
-      try {
-        const res: TransitTimingsType = await apiFetch("/timing/transit", {
-          method: "POST",
-          body: JSON.stringify({
-            dateTime: getLocalISODateTime(),
-            birthProfileId: profileId,
-          }),
-        });
 
-        setTimings(filterWeeklyAspects(res, filterKeyAngleAspects));
-      } catch (err) {
-        console.error("Failed to fetch timings", err);
-        setTimings({ aspects: [] });
-      } finally {
-        setLoading(false);
-      }
+    fetchTimings();
+    return () => {
+      cancelled = true;
     };
-    if (!user) return;
-    if (type === "time") fetchTimings();
-    else if (type === "transit") fetchTransitTimings();
   }, [aspectOptions, filterKeyAngleAspects, profileId, user, type]);
 
-  return { timings, loading };
+  return { timings, loading, error };
 };
 
 const filterWeeklyAspects = <T extends CurrentTimingsType | TransitTimingsType>(

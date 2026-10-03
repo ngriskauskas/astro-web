@@ -13,9 +13,10 @@ import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { useWheel } from "../../hooks/useWheel";
 import { formatDegMin } from "../../utils/funcs";
 import { Spinner } from "../utils/Spinner";
+import { LoadError } from "../utils/LoadError";
 
 export const MoonTimings = () => {
-  const { loading, timings } = useMoonTimings();
+  const { loading, timings, error } = useMoonTimings();
   const { planetAngles } = useWheel() as SingleWheelContextType;
   const currentMoon = planetAngles.find((planet) => planet.name === "MOON");
   const currentPhase = timings ? getMoonPhase(timings.currentPhase.phase) : undefined;
@@ -38,9 +39,11 @@ export const MoonTimings = () => {
   });
 
   return (
-    <section className="border-t border-gray-200 py-5">
+    <section aria-labelledby="moon-heading" className="border-t border-gray-200 py-5">
       <div className="mb-3 flex min-h-7 flex-wrap items-center justify-between gap-x-4 gap-y-1">
-        <h2 className="text-lg font-semibold text-gray-900">Moon Timings</h2>
+        <h2 id="moon-heading" className="text-lg font-semibold text-gray-900">
+          Moon Timings
+        </h2>
         {currentMoon && (
           <div
             className="inline-flex items-center gap-1.5 text-xs text-gray-600"
@@ -64,7 +67,7 @@ export const MoonTimings = () => {
       </div>
       {loading ? (
         <Spinner />
-      ) : timings ? (
+      ) : timings && !error ? (
         <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
           {phasesByTime.map((phase) => (
             <PhaseSummary
@@ -76,7 +79,7 @@ export const MoonTimings = () => {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-gray-500">Moon timings are unavailable right now.</p>
+        <LoadError message="Moon timings are unavailable right now." />
       )}
     </section>
   );

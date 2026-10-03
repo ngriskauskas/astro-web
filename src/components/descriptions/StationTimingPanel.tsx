@@ -1,4 +1,5 @@
 import { useDesc } from "../../contexts/DescContext";
+import { LoadError } from "../utils/LoadError";
 import { useStationDesc } from "../../hooks/descriptions/useStationDesc";
 import { PlanetsData } from "../../types/planet";
 import type { TimingEvent } from "../../types/timings";
@@ -12,7 +13,7 @@ type StationEvent = Extract<TimingEvent, { type: "station" }>;
 export const StationTimingPanel = ({ station }: { station: StationEvent }) => {
   const planet = station.data.planet.name;
   const retrograde = station.data.exactStationPlanet.planet.retrograde;
-  const { loading, description } = useStationDesc({ planet, retrograde });
+  const { loading, error, description } = useStationDesc({ planet, retrograde });
   const action = retrograde ? "turns retrograde" : "turns direct";
 
   return (
@@ -39,6 +40,7 @@ export const StationTimingPanel = ({ station }: { station: StationEvent }) => {
             <PlanetChip planet={planet} />
             <span className="text-sm text-gray-600">{action}</span>
           </div>
+          {error && <LoadError message="Could not load this description." />}
           {description && <p className="mt-3 text-sm text-gray-600">{description}</p>}
         </Section>
       </div>

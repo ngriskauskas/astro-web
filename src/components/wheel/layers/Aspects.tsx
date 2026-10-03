@@ -57,6 +57,7 @@ export const Aspects = ({ radius, center, hoveredPlanet }: AspectProps) => {
               isHighlighted ? "opacity-100" : "opacity-50"
             }`}
             key={i}
+            data-aspect={type}
             x1={x1}
             y1={y1}
             x2={x2}

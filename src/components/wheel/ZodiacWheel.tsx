@@ -7,20 +7,30 @@ import { Aspects } from "./layers/Aspects";
 import { useWheel } from "../../hooks/useWheel";
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { type PlanetName } from "../../types/planet";
+import { LoadError } from "../utils/LoadError";
 
 export const ZodiacWheel = () => {
   const [hoveredPlanet, setHoveredPlanet] = useState<PlanetName | null>(null);
   const [hoverAspectedPlanets, setHoverAspectedPlanets] = useState<PlanetName[]>([]);
 
-  const { aspects, planetAngles, cuspAngles, keyAngles } = useWheel() as SingleWheelContextType;
+  const { aspects, planetAngles, cuspAngles, keyAngles, status } =
+    useWheel() as SingleWheelContextType;
 
   const size = 700;
   const radius = size / 2;
 
   return (
     <div>
-      {aspects ? (
-        <svg viewBox={`0 0 ${size} ${size}`} width="100%" preserveAspectRatio="xMidYMid meet">
+      {status === "error" ? (
+        <LoadError message="Could not load the chart." />
+      ) : planetAngles.length > 0 ? (
+        <svg
+          role="group"
+          aria-label="Chart wheel"
+          viewBox={`0 0 ${size} ${size}`}
+          width="100%"
+          preserveAspectRatio="xMidYMid meet"
+        >
           <Background radius={radius} />
           <Houses
             angles={cuspAngles}
@@ -60,7 +70,13 @@ export const ZodiacWheel = () => {
           <Aspects center={radius} radius={radius - 175} hoveredPlanet={hoveredPlanet} />
         </svg>
       ) : (
-        <div className="flex items-center justify-center h-full text-gray-500">Loading...</div>
+        <div
+          role="status"
+          aria-label="Loading"
+          className="flex items-center justify-center h-full text-gray-500"
+        >
+          Loading...
+        </div>
       )}
     </div>
   );

@@ -6,6 +6,8 @@ import type { CuspType, KeyType } from "../../types/cusp";
 import type { Planet, PlanetName } from "../../types/planet";
 import type { ZodiacSign } from "../../types/zodiac";
 import type { HouseSystem } from "../../types/house-system";
+import type { ObjectOptions } from "../../types/astrologySettings";
+import { hiddenPlanets } from "../../utils/hiddenPlanets";
 
 export const getPlanetsInSign = (ctx: SingleWheelContextType, sign: ZodiacSign) => {
   const planets = ctx.planetAngles.filter((x) => x.sign === sign);
@@ -101,6 +103,10 @@ export const getSignInKeyAngle = (ctx: SingleWheelContextType, keyAngle: KeyType
   return angleObj.sign;
 };
 
-export const getFilteredAspects = (ctx: SingleWheelContextType): Aspect[] => {
-  return ctx.aspects;
+// Aspects without those to an object the user has turned off in their settings.
+export const getFilteredAspects = (ctx: SingleWheelContextType, objectOptions: ObjectOptions): Aspect[] => {
+  const hidden = hiddenPlanets(objectOptions);
+  return ctx.aspects.filter(
+    ({ point1, point2 }) => !hidden.includes(point1.value.name) && !hidden.includes(point2.value.name),
+  );
 };

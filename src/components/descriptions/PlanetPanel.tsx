@@ -1,4 +1,5 @@
 import type { OwnerType } from "../../contexts/MultiWheelContext";
+import { LoadError } from "../utils/LoadError";
 import { usePlanetData } from "../../hooks/chart/useChartData";
 import { usePlanetDesc } from "../../hooks/descriptions/usePlanetDesc";
 import type { Aspect } from "../../types/aspect";
@@ -18,7 +19,7 @@ export const PlanetPanel = ({
   owner?: OwnerType;
 }) => {
   const { aspects, planet } = usePlanetData(planetName, owner);
-  const { loading, planetDesc } = usePlanetDesc({
+  const { loading, error, planetDesc } = usePlanetDesc({
     planet,
     house: planet.house,
     sign: planet.sign,
@@ -37,7 +38,7 @@ export const PlanetPanel = ({
         <h2 className="text-xl font-semibold">{planetInfo.displayName}</h2>
         <CloseButton />
       </div>
-      <div className="p-2 flex-1 overflow-y-auto">
+      <div className="p-3 flex-1 overflow-y-auto overscroll-contain">
         <Section title="Overview">
           <div className="p-2 bg-white border rounded shadow-sm text-sm mb-3">
             {planetInfo.info.description}
@@ -51,6 +52,7 @@ export const PlanetPanel = ({
         </Section>
         <Section title="Details" loading={loading}>
           <div className="flex flex-col gap-3">
+            {error && <LoadError message="Could not load this description." />}
             {planet.retrograde && (
               <DescSection title="Retrograde ℞" desc={planetDesc?.retrograde ?? ""} />
             )}

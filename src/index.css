@@ -9,3 +9,28 @@
   scrollbar-width: none;
   /* Firefox */
 }
+
+/* While the description drawer covers the screen on a phone, the page behind it
+   does not scroll. */
+@media (width < 48rem) {
+  body:has(aside[aria-label="Description"]) {
+    overflow: hidden;
+  }
+}
+
+/* A table that scrolls sideways inside its own area shows a soft shadow at an edge
+   while there is more to see in that direction. */
+.scroll-hint-x {
+  background:
+    linear-gradient(to right, white 30%, transparent) left center,
+    linear-gradient(to left, white 30%, transparent) right center,
+    radial-gradient(farthest-side at 0 50%, rgb(0 0 0 / 0.25), transparent) left center,
+    radial-gradient(farthest-side at 100% 50%, rgb(0 0 0 / 0.25), transparent) right center;
+  background-repeat: no-repeat;
+  background-size:
+    2.5rem 100%,
+    2.5rem 100%,
+    0.75rem 100%,
+    0.75rem 100%;
+  background-attachment: local, local, scroll, scroll;
+}

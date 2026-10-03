@@ -1,23 +1,31 @@
 import type { RequestHandler } from "msw";
-import { customBirthProfiles, mainBirthProfile } from "./data";
+import { customBirthProfiles, mainBirthProfile, userWithoutLocation } from "./data";
 import {
+  dailyTimingsFor,
   deleteBirthProfile,
+  descriptions,
+  genericChart,
   getBirthProfiles,
   getMe,
   getSettings,
   googleSignInScript,
+  moonTimingsFor,
+  natalChartFor,
   postBirthProfile,
   putBirthProfile,
   putMe,
   putSettings,
   resetSettings,
   searchPlaces,
+  synastryChartFor,
+  transitChartFor,
+  weeklyTimingsFor,
 } from "./handlers";
 
 // A scenario is a named situation the backend is in. Both test layers build their
 // mocks from these, so a scenario means the same thing in a browser test and an
 // integration test.
-export type ScenarioName = "newAccount" | "withProfile" | "withCustomProfiles";
+export type ScenarioName = "newAccount" | "withProfile" | "withCustomProfiles" | "noLocation";
 
 const common = (): RequestHandler[] => [
   getMe(),
@@ -30,6 +38,14 @@ const common = (): RequestHandler[] => [
   resetSettings(),
   searchPlaces(),
   googleSignInScript(),
+  natalChartFor(),
+  genericChart(),
+  transitChartFor(),
+  synastryChartFor(),
+  ...dailyTimingsFor(),
+  ...weeklyTimingsFor(),
+  moonTimingsFor(),
+  descriptions(),
 ];
 
 const scenarios: Record<ScenarioName, () => RequestHandler[]> = {
@@ -40,6 +56,13 @@ const scenarios: Record<ScenarioName, () => RequestHandler[]> = {
   // The same user with profiles for other people as well.
   withCustomProfiles: () => [
     getBirthProfiles([mainBirthProfile, ...customBirthProfiles]),
+    ...common(),
+  ],
+  // A complete main birth profile, but no location entered. The first matching handler
+  // answers, so this /me goes before the common one.
+  noLocation: () => [
+    getMe(userWithoutLocation),
+    getBirthProfiles([mainBirthProfile]),
     ...common(),
   ],
 };

@@ -1,4 +1,5 @@
 import { useDesc } from "../../contexts/DescContext";
+import { LoadError } from "../utils/LoadError";
 import { useProfileNames } from "../../hooks/chart/getNames";
 import { useSignData } from "../../hooks/chart/useChartData";
 import { useSignDesc } from "../../hooks/descriptions/useSignDesc";
@@ -15,7 +16,7 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
 
   const { planets, mainPlanets, otherPlanets, houses, mainHouses, otherHouses } = useSignData(sign);
 
-  const { loading, signDesc } = useSignDesc({
+  const { loading, error, signDesc } = useSignDesc({
     sign,
     planets,
     mainPlanets,
@@ -31,13 +32,13 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
         style={{ backgroundColor: signInfo.color }}
       >
         <BackButton />
-        <img src={signInfo.glyph} alt={signInfo.displayName} width={32} height={32} />
+        <img src={signInfo.glyph} alt="" width={32} height={32} />
         <h2 className="text-xl font-semibold">{signInfo.displayName}</h2>
-        <img src={signInfo.drawing} alt={signInfo.displayName} width={32} height={32} />
+        <img src={signInfo.drawing} alt="" width={32} height={32} />
         <CloseButton />
       </div>
 
-      <div className="p-2 flex-1 overflow-y-auto">
+      <div className="p-3 flex-1 overflow-y-auto overscroll-contain">
         <Section title="Overview">
           <div className="p-2 bg-white border rounded shadow-sm text-sm mb-3">
             {signInfo.info.description}
@@ -87,6 +88,7 @@ export const SignPanel = ({ sign }: { sign: ZodiacSign }) => {
         </Section>
         <Section title="Planets in this Sign" loading={loading}>
           <div className="flex flex-col gap-2 w-full">
+            {error && <LoadError message="Could not load this description." />}
             {planets &&
               (planets.length === 0 ? (
                 <span className="text-gray-500">—</span>

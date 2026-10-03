@@ -2,22 +2,52 @@ import { useDesc } from "../../contexts/DescContext";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
 import { PlanetsData, type PlanetName } from "../../types/planet";
 
-export const PlanetChip = ({ planet, owner }: { planet: PlanetName; owner?: OwnerType }) => {
+const CHIP =
+  "flex items-center gap-1 px-1.5 py-0.5 bg-white border rounded shadow-sm text-xs font-medium justify-center";
+
+// `interactive={false}` draws the chip without making it a button, for use inside
+// something that is already one.
+export const PlanetChip = ({
+  planet,
+  owner,
+  interactive = true,
+}: {
+  planet: PlanetName;
+  owner?: OwnerType;
+  interactive?: boolean;
+}) => {
   const { open } = useDesc();
   const planetInfo = PlanetsData[planet];
   const color = planetInfo.color;
-  return (
-    <div
-      className="flex items-center gap-1 px-1.5 py-0.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md transition-all justify-center"
-      onClick={() => open({ type: "planet", value: planet, owner })}
-      style={{
-        backgroundColor: `${color}11`, // color with low opacity
-        borderColor: `${color}55`,
-      }}
-    >
-      <span className="text-base">{planetInfo.glyph}</span>
+  const style = {
+    backgroundColor: `${color}11`, // color with low opacity
+    borderColor: `${color}55`,
+  };
+  const content = (
+    <>
+      <span className="text-base" aria-hidden="true">
+        {planetInfo.glyph}
+      </span>
       <span>{planetInfo.displayName}</span>
-    </div>
+    </>
+  );
+
+  if (!interactive) {
+    return (
+      <span className={CHIP} style={style}>
+        {content}
+      </span>
+    );
+  }
+  return (
+    <button
+      type="button"
+      className={`${CHIP} cursor-pointer hover:shadow-md transition-all`}
+      onClick={() => open({ type: "planet", value: planet, owner })}
+      style={style}
+    >
+      {content}
+    </button>
   );
 };
 

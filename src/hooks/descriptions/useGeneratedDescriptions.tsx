@@ -97,15 +97,16 @@ interface GenerateDescriptionResponse {
   contextType: string;
 }
 
-export const useGeneratedDescriptions = (
-  contexts: (DescriptionContext | null)[],
-) => {
+// `error` is true when any of the descriptions could not be loaded.
+export const useGeneratedDescriptions = (contexts: (DescriptionContext | null)[]) => {
   const [loading, setLoading] = useState(false);
   const [descriptions, setDescriptions] = useState<string[]>([]);
+  const [error, setError] = useState(false);
   const serializedContexts = JSON.stringify(contexts);
 
   useEffect(() => {
     const requestContexts = JSON.parse(serializedContexts) as (DescriptionContext | null)[];
+    setError(false);
     if (!requestContexts.some(Boolean)) {
       setDescriptions(requestContexts.map(() => ""));
       setLoading(false);
@@ -127,6 +128,7 @@ export const useGeneratedDescriptions = (
           })) as GenerateDescriptionResponse;
           return response.description ?? "";
         } catch {
+          if (active) setError(true);
           return "";
         }
       }),
@@ -143,5 +145,5 @@ export const useGeneratedDescriptions = (
     };
   }, [serializedContexts]);
 
-  return { loading, descriptions };
+  return { loading, descriptions, error };
 };

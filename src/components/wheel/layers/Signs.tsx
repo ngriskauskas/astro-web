@@ -1,7 +1,7 @@
 import { type ZodiacSign, ZodiacData } from "../../../types/zodiac";
 import { useDesc } from "../../../contexts/DescContext";
 import { useWheel } from "../../../hooks/useWheel";
-import { createWedgePath, polarToCartesian } from "./Utils";
+import { createWedgePath, onActivate, polarToCartesian } from "./Utils";
 import { useChartSettings } from "../../../contexts/ChartSettingsContext";
 
 export interface SignAngle {
@@ -30,7 +30,8 @@ export const Signs = ({ radius, center }: SignProps) => {
   return (
     <g>
       {angles.map(({ sign, angle }) => {
-        const { glyph, color } = ZodiacData[sign];
+        const { glyph, color, displayName } = ZodiacData[sign];
+        const openSign = () => open({ type: "sign", value: sign });
 
         const midRadius = (innerRadius + outerRadius) / 2;
         const { x, y } = polarToCartesian(center, midRadius, angle + 15);
@@ -70,20 +71,17 @@ export const Signs = ({ radius, center }: SignProps) => {
               </linearGradient>
             </defs>
             <path
+              role="button"
+              tabIndex={0}
+              aria-label={displayName}
               d={createWedgePath(center, innerRadius, outerRadius, angle, angle + 30)}
               fill={`url(#grad-${sign})`}
               stroke="white"
               fillRule="evenodd"
-              onClick={() => open({ type: "sign", value: sign })}
+              onClick={openSign}
+              onKeyDown={onActivate(openSign)}
             />
-            <image
-              href={glyph}
-              x={x - 12}
-              y={y - 12}
-              width={25}
-              height={25}
-              onClick={() => open({ type: "sign", value: sign })}
-            />
+            <image href={glyph} x={x - 12} y={y - 12} width={25} height={25} pointerEvents="none" />
             {showTickMarks &&
               Array.from({ length: 29 }, (_, i) => {
                 const tickAngle = angle + (i + 1);

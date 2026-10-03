@@ -13,7 +13,7 @@ interface IngressDescParams {
 }
 
 export const useIngressDesc = (params: IngressDescParams) => {
-  const { loading, descriptions } = useGeneratedDescriptions([
+  const { loading, descriptions, error } = useGeneratedDescriptions([
     {
       type: "timing",
       timeScale: "LONG_TERM",
@@ -27,5 +27,5 @@ export const useIngressDesc = (params: IngressDescParams) => {
   ]);
   const ingressDesc: IngressDesc = { description: descriptions[0] ?? "" };
 
-  return { loading, ingressDesc };
+  return { loading, error, ingressDesc };
 };

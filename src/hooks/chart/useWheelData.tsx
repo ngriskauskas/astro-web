@@ -10,7 +10,7 @@ import * as single from "./singleWheelData";
 export const useWheelData = (owner?: OwnerType) => {
   const ctx = useWheel();
   const {
-    settings: { houseSystem },
+    settings: { houseSystem, objectOptions },
   } = useChartSettings();
 
   if (isMulti(ctx)) {
@@ -24,7 +24,7 @@ export const useWheelData = (owner?: OwnerType) => {
       getSignsInHouse: (house: CuspType) => multi.getSignsInHouse(ctx, house, owner, houseSystem),
       getHousesInSign: (sign: ZodiacSign) => multi.getHousesInSign(ctx, sign, houseSystem),
       getSignInKeyAngle: (keyAngle: KeyType) => multi.getSignInKeyAngle(ctx, keyAngle, owner),
-      getFilteredAspects: () => multi.getFilteredAspects(ctx),
+      getFilteredAspects: () => multi.getFilteredAspects(ctx, objectOptions),
       getMainOfOtherPlanet: (planet: PlanetName) => multi.getMainOfOtherPlanet(ctx, planet),
     };
   } else {
@@ -38,7 +38,7 @@ export const useWheelData = (owner?: OwnerType) => {
       getSignsInHouse: (house: CuspType) => single.getSignsInHouse(ctx, house, houseSystem),
       getHousesInSign: (sign: ZodiacSign) => single.getHousesInSign(ctx, sign, houseSystem),
       getSignInKeyAngle: (keyAngle: KeyType) => single.getSignInKeyAngle(ctx, keyAngle),
-      getFilteredAspects: () => single.getFilteredAspects(ctx),
+      getFilteredAspects: () => single.getFilteredAspects(ctx, objectOptions),
     };
   }
 };

@@ -7,6 +7,7 @@ import { MultiAspects } from "./layers/MultiAspects";
 import { useWheel } from "../../hooks/useWheel";
 import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
 import { type PlanetName } from "../../types/planet";
+import { LoadError } from "../utils/LoadError";
 
 export const MultiZodiacWheel = () => {
   const [hoveredPlanet, setHoveredPlanet] = useState<{
@@ -26,6 +27,7 @@ export const MultiZodiacWheel = () => {
     mainKeyAngles,
     otherKeyAngles,
     aspects,
+    status,
   } = useWheel() as MultiWheelContextType;
 
   const size = 800;
@@ -34,8 +36,16 @@ export const MultiZodiacWheel = () => {
   return (
     <div className="flex w-full justify-center">
       <div className="w-full max-w-[760px]">
-        {mainPlanetAngles ? (
-          <svg viewBox={`0 0 ${size} ${size}`} width="100%" preserveAspectRatio="xMidYMid meet">
+        {status === "error" ? (
+          <LoadError message="Could not load the chart." />
+        ) : mainPlanetAngles.length > 0 ? (
+          <svg
+            role="group"
+            aria-label="Chart wheel"
+            viewBox={`0 0 ${size} ${size}`}
+            width="100%"
+            preserveAspectRatio="xMidYMid meet"
+          >
             <Background radius={radius} />
             <Houses
               center={radius}
@@ -112,7 +122,13 @@ export const MultiZodiacWheel = () => {
             <MultiAspects center={radius} radius={radius - 240} hoveredPlanet={hoveredPlanet} />
           </svg>
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">Loading...</div>
+          <div
+            role="status"
+            aria-label="Loading"
+            className="flex items-center justify-center h-full text-gray-500"
+          >
+            Loading...
+          </div>
         )}
       </div>
     </div>

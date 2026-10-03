@@ -1,4 +1,5 @@
 import { useDesc } from "../../contexts/DescContext";
+import { LoadError } from "../utils/LoadError";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
 import { useProfileNames } from "../../hooks/chart/getNames";
 import { useHouseData } from "../../hooks/chart/useChartData";
@@ -16,7 +17,7 @@ export const HousePanel = ({ houseName, owner }: { houseName: CuspType; owner?: 
 
   const { house, planets, mainPlanets, otherPlanets, signs } = useHouseData(houseName, owner);
 
-  const { loading, houseDesc } = useHouseDesc({
+  const { loading, error, houseDesc } = useHouseDesc({
     planets,
     mainPlanets,
     otherPlanets,
@@ -36,7 +37,7 @@ export const HousePanel = ({ houseName, owner }: { houseName: CuspType; owner?: 
         <h2 className="text-xl font-semibold capitalize">{houseInfo.name}</h2>
         <CloseButton />
       </div>
-      <div className="p-4 flex-1 overflow-y-auto">
+      <div className="p-3 flex-1 overflow-y-auto overscroll-contain">
         <Section title="Overview">
           <div className="p-2 bg-white border rounded shadow-sm text-sm mb-3">
             {houseInfo.info.description}
@@ -67,6 +68,7 @@ export const HousePanel = ({ houseName, owner }: { houseName: CuspType; owner?: 
         </Section>
         <Section title="Planets in this House" loading={loading}>
           <div className="flex flex-wrap gap-1">
+            {error && <LoadError message="Could not load this description." />}
             {planets &&
               (planets.length === 0 ? (
                 <span className="text-gray-500">—</span>

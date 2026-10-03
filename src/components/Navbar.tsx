@@ -10,10 +10,7 @@ const LINKS = [
   { to: "/synastry", label: "Synastry" },
 ];
 
-const ACCOUNT_LINKS = [
-  { to: "/friends", label: "Friends" },
-  { to: "/profile", label: "Profile" },
-];
+const ACCOUNT_LINKS = [{ to: "/profile", label: "Profile" }];
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);

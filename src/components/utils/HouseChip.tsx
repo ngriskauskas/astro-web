@@ -14,7 +14,8 @@ export const HouseChip = ({
   const color = houseInfo.color;
 
   return (
-    <div
+    <button
+      type="button"
       className="flex items-center gap-1 px-1 py-1.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md transition-all justify-center"
       onClick={() => open({ type: "house", value: house, owner })}
       style={{
@@ -23,6 +24,6 @@ export const HouseChip = ({
       }}
     >
       <span className="font-xs">{houseInfo.name}</span>
-    </div>
+    </button>
   );
 };

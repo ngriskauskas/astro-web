@@ -12,7 +12,6 @@ const DESTINATIONS = [
   "Daily",
   "Transits",
   "Synastry",
-  "Friends",
   "Profile",
   "Logout",
 ];
@@ -65,4 +64,13 @@ test("logging out from the menu ends the session", async () => {
 
   expect(localStorage.getItem("token")).toBeNull();
   expect(menuButton()).toHaveAttribute("aria-expanded", "false");
+});
+
+// The Friends page is switched off, so nothing in the navigation leads to it.
+test("there is no Friends destination", async () => {
+  const { user } = renderNavbar();
+
+  expect(screen.queryByRole("link", { name: "Friends" })).not.toBeInTheDocument();
+  await user.click(menuButton());
+  expect(screen.queryByRole("menuitem", { name: "Friends" })).not.toBeInTheDocument();
 });

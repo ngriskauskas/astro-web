@@ -21,13 +21,16 @@ for (const [name, viewport] of Object.entries(reviewSizes)) {
 
     test(`profile screen at ${viewport.width}px`, async ({ page }) => {
       const dir = path.join(OUTPUT, name as ReviewSize);
-      fs.rmSync(dir, { recursive: true, force: true });
+      // Other capture files write to the same folder, so only this one's images go.
       fs.mkdirSync(dir, { recursive: true });
+      for (const file of fs.readdirSync(dir)) {
+        if (file.startsWith("profile-")) fs.rmSync(path.join(dir, file));
+      }
       const widths: Record<string, { screen: number; page: number }> = {};
 
       const capture = async (state: string, { fullPage = true } = {}) => {
         widths[state] = await pageWidth(page);
-        await page.screenshot({ path: path.join(dir, `${state}.png`), fullPage });
+        await page.screenshot({ path: path.join(dir, `profile-${state}.png`), fullPage });
       };
 
       await page.goto("/profile");
@@ -94,7 +97,7 @@ for (const [name, viewport] of Object.entries(reviewSizes)) {
 
       // Page width next to screen width per state: a page wider than the screen
       // scrolls sideways, which a full-page screenshot alone does not make obvious.
-      fs.writeFileSync(path.join(dir, "widths.json"), JSON.stringify(widths, null, 2));
+      fs.writeFileSync(path.join(dir, "profile-widths.json"), JSON.stringify(widths, null, 2));
     });
   });
 }

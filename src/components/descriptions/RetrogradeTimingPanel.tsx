@@ -1,4 +1,5 @@
 import { BackButton, CloseButton } from "./Helpers";
+import { LoadError } from "../utils/LoadError";
 import { Section } from "../utils/Section";
 import { DateTimeChip } from "../utils/DateChip";
 import type { TimingEvent } from "../../types/timings";
@@ -13,7 +14,7 @@ export const RetrogradeTimingPanel = ({ retrograde }: { retrograde: RetrogradeEv
   const retroData = retrograde.data;
   const planet = retroData.planet.name;
 
-  const { loading, retrogradeDesc } = useRetrogradeDesc({
+  const { loading, error, retrogradeDesc } = useRetrogradeDesc({
     planet,
   });
 
@@ -23,13 +24,13 @@ export const RetrogradeTimingPanel = ({ retrograde }: { retrograde: RetrogradeEv
         <BackButton />
         <h2 className="text-xl flex items-center gap-2">
           <span className="text-2xl">{PlanetsData[planet].glyph}</span>
-          <h2 className="text-xl font-semibold">{PlanetsData[planet].displayName}</h2>
+          <span className="font-semibold">{PlanetsData[planet].displayName}</span>
           <span>retrograde</span>
         </h2>
         <CloseButton />
       </div>
 
-      <div className="p-4 flex-1 overflow-y-auto">
+      <div className="p-3 flex-1 overflow-y-auto overscroll-contain">
         <Section title="Overview">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-lg">℞</span>
@@ -56,6 +57,7 @@ export const RetrogradeTimingPanel = ({ retrograde }: { retrograde: RetrogradeEv
         </Section>
 
         <Section title="Details" loading={loading}>
+          {error && <LoadError message="Could not load this description." />}
           {retrogradeDesc && (
             <div className="text-sm text-gray-600 mt-2 pl-2">{retrogradeDesc.description}</div>
           )}
@@ -70,18 +72,14 @@ export const RetrogradePreview = ({ retrograde }: { retrograde: RetrogradeEvent 
   const { open } = useDesc();
 
   return (
-    <div
-      className="
-        flex items-center gap-1 px-1 py-1 rounded-md
-        border
-        bg-white
-        shadow-sm
-        cursor-pointer
-      "
+    <button
+      type="button"
+      aria-label={`${PlanetsData[retroData.planet.name].displayName} ${retrograde.event === "start" ? "starts" : "ends"} retrograde`}
+      className="flex items-center gap-1 px-1 py-1 rounded-md border bg-white shadow-sm cursor-pointer"
       onClick={() => open({ type: "retrogradeTiming", value: retrograde })}
     >
-      <PlanetChip planet={retroData.planet.name} />
+      <PlanetChip planet={retroData.planet.name} interactive={false} />
       <span className="text-sm font-semibold">℞</span>
-    </div>
+    </button>
   );
 };

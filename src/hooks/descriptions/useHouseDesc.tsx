@@ -50,7 +50,7 @@ export const useHouseDesc = (params: HouseDescParams) => {
       stationary: planet.stationary,
     },
   }));
-  const { loading, descriptions } = useGeneratedDescriptions(contexts);
+  const { loading, descriptions, error } = useGeneratedDescriptions(contexts);
   const getDescriptions = (group: string) =>
     Object.fromEntries(
       entries.flatMap(({ group: entryGroup, planet }, index) =>
@@ -64,5 +64,5 @@ export const useHouseDesc = (params: HouseDescParams) => {
     otherPlanets: getDescriptions("otherPlanets") as HouseDesc["otherPlanets"],
   };
 
-  return { loading, houseDesc };
+  return { loading, error, houseDesc };
 };

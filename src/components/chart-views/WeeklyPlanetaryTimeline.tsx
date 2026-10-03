@@ -7,6 +7,7 @@ import { PlanetsData, type PlanetName } from "../../types/planet";
 import type { CurrentTimingsType, TimingEvent, TransitTimingsType } from "../../types/timings";
 import { ZodiacData } from "../../types/zodiac";
 import { Spinner } from "../utils/Spinner";
+import { LoadError } from "../utils/LoadError";
 import { StationPreview } from "../descriptions/StationTimingPanel";
 
 const WEEKDAY_RULERS: readonly PlanetName[] = [
@@ -48,12 +49,14 @@ interface PositionedTimingEvent extends DatedTimingEvent {
 interface WeeklyPlanetaryTimelineProps {
   embedded?: boolean;
   loading: boolean;
+  error?: boolean;
   timings: CurrentTimingsType | TransitTimingsType;
 }
 
 export const WeeklyPlanetaryTimeline = ({
   embedded = false,
   loading,
+  error = false,
   timings,
 }: WeeklyPlanetaryTimelineProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -101,14 +104,17 @@ export const WeeklyPlanetaryTimeline = ({
     ((now.getTime() - nowDay.start.getTime()) / (nowDay.end.getTime() - nowDay.start.getTime())) *
       HOURS_PER_DAY;
 
+  // Bring the current time into view once, when the timeline first appears. Doing it
+  // again as the time moves on would undo the user's own scrolling.
+  const ready = !loading && !error;
   useEffect(() => {
-    if (!scrollRef.current) return;
-    scrollRef.current.scrollTop =
-      (nowPosition / TRACK_HEIGHT) * scrollRef.current.scrollHeight -
-      scrollRef.current.clientHeight / 2;
-  }, [nowPosition]);
+    if (!ready || !scrollRef.current) return;
+    scrollRef.current.scrollTop = nowPosition - scrollRef.current.clientHeight / 2;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
 
   if (loading) return <Spinner />;
+  if (error) return <LoadError message="Could not load this week's timings." />;
 
   return (
     <div className={embedded ? "" : "border-t border-gray-200 py-5"}>
@@ -120,10 +126,10 @@ export const WeeklyPlanetaryTimeline = ({
       )}
       <div
         ref={scrollRef}
-        className="max-h-[460px] overflow-y-auto overscroll-contain border-y border-gray-200"
+        className="max-h-[460px] overflow-y-auto border-y border-gray-200"
       >
         <div
-          className="relative grid grid-cols-[3.5rem_6.5rem_minmax(0,1fr)]"
+          className="relative grid grid-cols-[3rem_4.5rem_minmax(0,1fr)] sm:grid-cols-[3.5rem_6.5rem_minmax(0,1fr)]"
           style={{ height: TRACK_HEIGHT }}
         >
           <div className="relative text-[10px] text-gray-500">
@@ -291,19 +297,20 @@ const TimingEventPreview = ({ event, date }: { event: TimingEvent; date: Date })
       const aspect = getEventAspect(event);
       const point1 = formatAspectPoint(aspect.point1);
       const point2 = formatAspectPoint(aspect.point2);
+      const action = event.event === "start" ? "starts" : event.event === "end" ? "ends" : "exact";
       return (
         <button
           type="button"
           className={className}
-          title={`${point1} ${AspectData[aspect.type].name} ${point2} ${event.event} at ${time}`}
-          aria-label={`${point1} ${AspectData[aspect.type].name} ${point2} ${event.event} at ${time}`}
+          title={`${point1} ${AspectData[aspect.type].name} ${point2} ${action} at ${time}`}
+          aria-label={`${point1} ${AspectData[aspect.type].name} ${point2} ${action} at ${time}`}
           onClick={() => open({ type: "aspectTiming", value: event })}
         >
           <span className="shrink-0 tabular-nums text-gray-500">{time}</span>
           <AspectPointMarker point={aspect.point1} />
           <span className="shrink-0 font-semibold">{AspectData[aspect.type].glyph}</span>
           <AspectPointMarker point={aspect.point2} />
-          <span className="truncate text-gray-500">{event.event}</span>
+          <span className="truncate text-gray-500">{action}</span>
         </button>
       );
     }

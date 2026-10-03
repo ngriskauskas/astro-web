@@ -25,8 +25,11 @@ export const ZodiacWheelSettings = () => {
       {type !== "time" && type !== "moment" && profiles && (
         <div>
           <div className="flex flex-col">
-            <label className="font-medium text-gray-700 mb-1">Profile</label>
+            <label htmlFor="chart-profile" className="font-medium text-gray-700 mb-1">
+              Profile
+            </label>
             <select
+              id="chart-profile"
               value={profileId}
               onChange={(e) =>
                 setSettings((prev) => ({
@@ -34,7 +37,7 @@ export const ZodiacWheelSettings = () => {
                   profileId: Number(e.target.value),
                 }))
               }
-              className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full min-w-0 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
             >
               {profiles
                 .filter((p) => p.id !== otherProfileId)
@@ -56,8 +59,11 @@ export const ZodiacWheelSettings = () => {
           </div>
           {otherProfileId && (
             <div className="flex flex-col mt-4">
-              <label className="font-medium text-gray-700 mb-1">Other Profile</label>
+              <label htmlFor="chart-other-profile" className="font-medium text-gray-700 mb-1">
+                Other Profile
+              </label>
               <select
+                id="chart-other-profile"
                 value={otherProfileId}
                 onChange={(e) =>
                   setSettings((prev) => ({
@@ -65,7 +71,7 @@ export const ZodiacWheelSettings = () => {
                     otherProfileId: Number(e.target.value),
                   }))
                 }
-                className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                className="w-full min-w-0 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
               >
                 {profiles
                   .filter((p) => p.id !== profileId)
@@ -93,8 +99,11 @@ export const ZodiacWheelSettings = () => {
         <div className="grid grid-cols-1 gap-4">
           {/* Date */}
           <div className="flex flex-col">
-            <label className="font-medium text-gray-700 mb-1 text-xs">Date</label>
+            <label htmlFor="chart-date" className="font-medium text-gray-700 mb-1 text-xs">
+              Date
+            </label>
             <input
+              id="chart-date"
               type="date"
               value={datetimeOptions.date}
               onChange={(e) =>
@@ -106,14 +115,17 @@ export const ZodiacWheelSettings = () => {
                   },
                 }))
               }
-              className="border rounded px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full min-w-0 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-xs"
             />
           </div>
 
           {/* Time */}
           <div className="flex flex-col">
-            <label className="font-medium text-gray-700 mb-1 text-xs">Time</label>
+            <label htmlFor="chart-time" className="font-medium text-gray-700 mb-1 text-xs">
+              Time
+            </label>
             <input
+              id="chart-time"
               type="time"
               value={datetimeOptions.time}
               onChange={(e) =>
@@ -125,7 +137,7 @@ export const ZodiacWheelSettings = () => {
                   },
                 }))
               }
-              className="border rounded px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="w-full min-w-0 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-xs"
             />
           </div>
         </div>

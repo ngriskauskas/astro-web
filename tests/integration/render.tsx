@@ -6,9 +6,10 @@ import { Toaster } from "react-hot-toast";
 import { MemoryRouter } from "react-router-dom";
 import { AuthProvider } from "../../src/contexts/AuthContext";
 import { BirthProfilesProvider } from "../../src/contexts/BirthProfilesContext";
+import { ChartProvider } from "../../src/contexts/ChartContext";
 import { ChartSettingsProvider } from "../../src/contexts/ChartSettingsContext";
 import { fakeToken, scenario, type ScenarioName } from "../mocks";
-import { server } from "./setup";
+import { reapplyOverrides, server } from "./setup";
 
 interface Options {
   // Which backend situation the test starts in.
@@ -21,14 +22,15 @@ interface Options {
   handlers?: RequestHandler[];
 }
 
-// Renders `ui` inside the app's real auth, birth-profile and chart-settings providers,
-// against the mocked backend.
+// Renders `ui` inside the app's real auth, birth-profile, chart-settings and chart
+// providers, against the mocked backend.
 export const renderWithApp = (
   ui: ReactElement,
   { scenario: name = "newAccount", signedIn = true, route = "/", handlers = [] }: Options = {},
 ) => {
   server.use(...scenario(name));
   if (handlers.length > 0) server.use(...handlers);
+  reapplyOverrides();
   if (signedIn) {
     localStorage.setItem("token", fakeToken());
     localStorage.setItem("refresh", "test-refresh-token");
@@ -41,8 +43,10 @@ export const renderWithApp = (
         <MemoryRouter initialEntries={[route]}>
           <BirthProfilesProvider>
             <ChartSettingsProvider>
-              {ui}
-              <Toaster />
+              <ChartProvider>
+                {ui}
+                <Toaster />
+              </ChartProvider>
             </ChartSettingsProvider>
           </BirthProfilesProvider>
         </MemoryRouter>

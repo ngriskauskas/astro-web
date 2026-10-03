@@ -48,7 +48,7 @@ export const useSignDesc = (params: SignDescParams) => {
       stationary: planet.stationary,
     },
   }));
-  const { loading, descriptions } = useGeneratedDescriptions(contexts);
+  const { loading, descriptions, error } = useGeneratedDescriptions(contexts);
   const getPlanetDescriptions = (group: string) =>
     Object.fromEntries(
       entries.flatMap(({ group: entryGroup, planet }, index) =>
@@ -62,5 +62,5 @@ export const useSignDesc = (params: SignDescParams) => {
     otherPlanets: getPlanetDescriptions("otherPlanets"),
   };
 
-  return { loading, signDesc };
+  return { loading, error, signDesc };
 };

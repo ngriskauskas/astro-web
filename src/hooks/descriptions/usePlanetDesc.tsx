@@ -30,7 +30,7 @@ export const usePlanetDesc = (params: PlanetDescParams) => {
     retrograde: params.planet.retrograde,
     stationary: params.planet.stationary,
   };
-  const { loading, descriptions } = useGeneratedDescriptions([
+  const { loading, descriptions, error } = useGeneratedDescriptions([
     { type: "placement", subject: { ...subject, house: null } },
     { type: "placement", subject: { ...subject, sign: null } },
     { type: "placement", subject },
@@ -45,5 +45,5 @@ export const usePlanetDesc = (params: PlanetDescParams) => {
   const [sign, house, combined, retrograde] = descriptions;
   const planetDesc: PlanetDesc = { sign, house, combined, retrograde };
 
-  return { loading, planetDesc };
+  return { loading, error, planetDesc };
 };

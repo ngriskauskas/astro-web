@@ -63,10 +63,10 @@ export const useAspectDesc = (params: AspectDescParams) => {
           },
         }
       : null;
-  const { loading, descriptions } = useGeneratedDescriptions([context]);
+  const { loading, descriptions, error } = useGeneratedDescriptions([context]);
   const aspectDesc: AspectDesc = { description: descriptions[0] ?? "" };
 
-  return { loading, aspectDesc };
+  return { loading, error, aspectDesc };
 };
 
 interface TimingAspectDescParams {
@@ -115,9 +115,9 @@ export const useTimingAspectDesc = (params: TimingAspectDescParams) => {
           },
         }
       : null;
-  const { loading, descriptions } = useGeneratedDescriptions([context]);
+  const { loading, descriptions, error } = useGeneratedDescriptions([context]);
 
-  return { loading, aspectDesc: { description: descriptions[0] ?? "" } };
+  return { loading, error, aspectDesc: { description: descriptions[0] ?? "" } };
 };
 
 export const asPointPlacement = (

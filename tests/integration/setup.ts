@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import toast from "react-hot-toast";
+import type { RequestHandler } from "msw";
 import { setupServer } from "msw/node";
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 
@@ -9,6 +10,21 @@ export const FIXED_NOW = new Date("2026-01-15T12:00:00Z");
 // Starts with no handlers: renderWithApp() installs a scenario, and a test adds
 // one-off overrides with server.use(...).
 export const server = setupServer();
+
+// One-off responses a test has asked for (see requests.tsx). They are remembered so
+// that renderWithApp can put them back in front of the scenario it installs: a test
+// may set them up before or after rendering.
+const overrides: RequestHandler[] = [];
+
+export const override = (...handlers: RequestHandler[]) => {
+  overrides.push(...handlers);
+  server.use(...handlers);
+};
+
+// The most recent override answers first, as with server.use().
+export const reapplyOverrides = () => {
+  if (overrides.length > 0) server.use(...[...overrides].reverse());
+};
 
 // The app catches some failed fetches, so an unmocked request is recorded here and
 // asserted after the test instead of relying on the rejected fetch to fail it.
@@ -50,6 +66,7 @@ afterEach(() => {
   // Toasts live in a module-level store and would otherwise show up in the next test.
   toast.remove();
   server.resetHandlers();
+  overrides.length = 0;
   localStorage.clear();
   vi.useRealTimers();
 
