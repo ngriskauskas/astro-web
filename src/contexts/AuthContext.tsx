@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const oauth = async (provider: string, id_token: string) => {
-    const res = await fetch(`${API_URL}/oauth`, {
+    const res = await fetch(`${API_URL}/auth/oauth`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ provider, id_token, platform: "web" }),
