@@ -7,7 +7,7 @@ interface StationDescParams {
 }
 
 export const useStationDesc = (params: StationDescParams) => {
-  const { loading, descriptions } = useGeneratedDescriptions([
+  const { loading, descriptions, error } = useGeneratedDescriptions([
     {
       type: "timing",
       timeScale: "LONG_TERM",
@@ -19,5 +19,5 @@ export const useStationDesc = (params: StationDescParams) => {
     },
   ]);
 
-  return { loading, description: descriptions[0] ?? "" };
+  return { loading, error, description: descriptions[0] ?? "" };
 };

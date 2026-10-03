@@ -1,5 +1,5 @@
 import type { Aspect } from "./aspect";
-import type { CuspType, Cusp, KeyAngle } from "./cusp";
+import type { CuspType, Cusp, KeyAngle, KeyType } from "./cusp";
 import type { PlanetName, Planet } from "./planet";
 
 export interface MultiChart {

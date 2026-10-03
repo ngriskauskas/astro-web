@@ -4,6 +4,8 @@ import { polarToCartesian } from "./Utils";
 import type { OwnerType } from "../../../contexts/MultiWheelContext";
 import { formatDegMin } from "../../../utils/funcs";
 import { useChartSettings } from "../../../contexts/ChartSettingsContext";
+import { useOwnerName } from "../../../hooks/chart/getNames";
+import { onActivate } from "./Utils";
 
 export interface PlanetAngle extends Planet {
   angle: number;
@@ -37,6 +39,7 @@ export const Planets = ({
   } = useChartSettings();
 
   const { open } = useDesc();
+  const ownerName = useOwnerName(owner);
 
   const innerRadius = radius - 10;
   const outerRadius = radius;
@@ -60,6 +63,10 @@ export const Planets = ({
 
         const isAspected = hoverAspectedPlanets.includes(name);
         const planetInfo = PlanetsData[name];
+        const label = [planetInfo.displayName, retrograde && "retrograde", ownerName]
+          .filter(Boolean)
+          .join(", ");
+        const openPlanet = () => open({ type: "planet", value: planet.name, owner });
         return (
           <g key={name}>
             <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="white" strokeWidth={1} />
@@ -69,12 +76,19 @@ export const Planets = ({
               origin-[50%_50%] hover:scale-101"
               onMouseEnter={() => onHoverPlanet(name)}
               onMouseLeave={onLeavePlanet}
-              onClick={() => open({ type: "planet", value: planet.name, owner })}
             >
+              {/* The circle is the button: it is larger than the glyph, so it is the
+                  part that can be tapped, and the glyph and labels let clicks through. */}
               <circle
+                role="button"
+                tabIndex={0}
+                aria-label={label}
+                data-highlighted={isAspected || undefined}
+                onClick={openPlanet}
+                onKeyDown={onActivate(openPlanet)}
                 cx={tx}
                 cy={ty - 2}
-                r={14}
+                r={17}
                 fill="transparent"
                 className={`transition-all duration-200 ease-in-out
                   ${isAspected ? "stroke-white" : ""} 
@@ -114,6 +128,7 @@ export const Planets = ({
                   textAnchor="middle"
                   dominantBaseline="middle"
                   pointerEvents="none"
+                  className="max-sm:hidden"
                 >
                   {formatDegMin(degMin)}
                 </text>

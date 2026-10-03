@@ -25,6 +25,12 @@ export const user: User = {
   timezone: "America/New_York",
 };
 
+// A user who has not entered a location yet: Moment, Daily and Transits send them to Profile.
+export const userWithoutLocation: User = {
+  ...user,
+  location: { ...user.location, address: "" },
+};
+
 export const mainBirthProfile: BirthProfile = {
   id: 1,
   name: "My Profile",
@@ -124,3 +130,22 @@ export const savedSettings: AstrologySettings = {
   objectOptions: { showChiron: true, showLilith: true },
   displayOptions: { tickMarks: false, angleLabels: true },
 };
+
+const LONG_NAMES: Record<number, string> = {
+  3: "Great-aunt Philippa Montgomery-Cholmondeley of Lower Slaughter",
+  9: "Maximilian Alexander Fitzwilliam-Robertson the Younger",
+  15: "Dr. Anastasia Konstantinopoulou-Vandersloot (work colleague)",
+};
+
+// Twenty profiles for other people, a few with long names, for long selector lists.
+export const manyBirthProfiles: BirthProfile[] = Array.from({ length: 20 }, (_, index) => ({
+  id: 10 + index,
+  name: LONG_NAMES[index] ?? `Friend ${index + 1}`,
+  isMain: false,
+  birthDate: `19${70 + index}-03-${String(index + 1).padStart(2, "0")}`,
+  birthTime: "12:00",
+  birthTimeUnknown: false,
+  location: "London, Ontario, Canada",
+  latitude: 42.9849,
+  longitude: -81.2453,
+}));

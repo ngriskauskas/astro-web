@@ -7,6 +7,8 @@ import { useChartSettings } from "../../contexts/ChartSettingsContext";
 import type { AspectPoint } from "../../types/aspect";
 import type { DailyTimingsType } from "../../types/timings";
 
+const NO_TIMINGS: DailyTimingsType = { aspects: [], angleTimings: [] };
+
 export const useDailyTimings = () => {
   const {
     settings: { profileId },
@@ -17,24 +19,34 @@ export const useDailyTimings = () => {
     settings: { aspectOptions },
   } = useChartSettings();
 
-  const [timings, setTimings] = useState<DailyTimingsType>({
-    aspects: [],
-    angleTimings: [],
-  });
+  const [timings, setTimings] = useState<DailyTimingsType>(NO_TIMINGS);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || (type !== "time" && type !== "transit")) return;
+    if (type === "transit" && profileId === undefined) {
+      setTimings(NO_TIMINGS);
+      return;
+    }
 
-    const fetchDailyTimings = async () => {
+    // Set when a newer request replaces this one, so a late answer is ignored.
+    let cancelled = false;
+    const fetchTimings = async () => {
       setLoading(true);
+      setError(false);
       try {
-        const res: DailyTimingsType = await apiFetch("/timing/daily", {
-          method: "POST",
-          body: JSON.stringify({
-            date: getLocalISODate(),
-          }),
-        });
+        const res: DailyTimingsType =
+          type === "time"
+            ? await apiFetch("/timing/daily", {
+                method: "POST",
+                body: JSON.stringify({ date: getLocalISODate() }),
+              })
+            : await apiFetch("/timing/daily-transit", {
+                method: "POST",
+                body: JSON.stringify({ date: getLocalISODate(), birthProfileId: profileId }),
+              });
+        if (cancelled) return;
         setTimings({
           ...res,
           aspects: res.aspects.filter(
@@ -44,49 +56,22 @@ export const useDailyTimings = () => {
           ),
         });
       } catch (err) {
+        if (cancelled) return;
         console.error("Failed to fetch daily timings", err);
-        setTimings({ aspects: [], angleTimings: [] });
+        setTimings(NO_TIMINGS);
+        setError(true);
       } finally {
-        setLoading(false);
-      }
-    };
-    const fetchDailyTransitTimings = async () => {
-      if (profileId === undefined) {
-        setTimings({ aspects: [], angleTimings: [] });
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const res: DailyTimingsType = await apiFetch("/timing/daily-transit", {
-          method: "POST",
-          body: JSON.stringify({
-            date: getLocalISODate(),
-            birthProfileId: profileId,
-          }),
-        });
-        setTimings({
-          ...res,
-          aspects: res.aspects.filter(
-            ({ aspect }) =>
-              aspect.type === "CONJUNCTION" &&
-              (isAscendant(aspect.point1) || isAscendant(aspect.point2)),
-          ),
-        });
-      } catch (err) {
-        console.error("Failed to fetch daily transit timings", err);
-        setTimings({ aspects: [], angleTimings: [] });
-      } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
-    if (!user) return;
-    if (type === "time") fetchDailyTimings();
-    else if (type === "transit") fetchDailyTransitTimings();
+    fetchTimings();
+    return () => {
+      cancelled = true;
+    };
   }, [aspectOptions, profileId, user, type]);
 
-  return { timings, loading };
+  return { timings, loading, error };
 };
 
 const isAscendant = (point: AspectPoint) => point.type === "Angle" && point.value.name === "ASC";

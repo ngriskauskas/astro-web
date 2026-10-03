@@ -1,23 +1,46 @@
 import { useDesc } from "../../contexts/DescContext";
 import { ZodiacData, type ZodiacSign } from "../../types/zodiac";
 
-export const SignChip = ({ sign }: { sign: ZodiacSign }) => {
+const CHIP =
+  "flex items-center gap-1 px-1.5 py-0.5 bg-white border rounded shadow-sm text-xs font-medium justify-center";
+
+export const SignChip = ({
+  sign,
+  interactive = true,
+}: {
+  sign: ZodiacSign;
+  interactive?: boolean;
+}) => {
   const { open } = useDesc();
   const signData = ZodiacData[sign];
   const color = signData.color;
-
-  return (
-    <div
-      className="flex items-center gap-1 px-1.5 py-0.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md transition-all justify-center"
-      onClick={() => open({ type: "sign", value: sign })}
-      style={{
-        backgroundColor: `${color}11`,
-        borderColor: `${color}55`,
-      }}
-    >
-      <img src={signData.glyph} alt={signData.displayName} className="w-4.5 h-6" />
+  const style = {
+    backgroundColor: `${color}11`,
+    borderColor: `${color}55`,
+  };
+  const content = (
+    <>
+      <img src={signData.glyph} alt="" className="w-4.5 h-6" />
       <span>{signData.displayName}</span>
-    </div>
+    </>
+  );
+
+  if (!interactive) {
+    return (
+      <span className={CHIP} style={style}>
+        {content}
+      </span>
+    );
+  }
+  return (
+    <button
+      type="button"
+      className={`${CHIP} cursor-pointer hover:shadow-md transition-all`}
+      onClick={() => open({ type: "sign", value: sign })}
+      style={style}
+    >
+      {content}
+    </button>
   );
 };
 

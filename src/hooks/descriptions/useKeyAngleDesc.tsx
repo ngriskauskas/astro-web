@@ -16,7 +16,7 @@ interface KeyAngleDescParams {
 
 export const useKeyAngleDesc = (params: KeyAngleDescParams) => {
   const { type } = useWheel();
-  const { loading, descriptions } = useGeneratedDescriptions([
+  const { loading, descriptions, error } = useGeneratedDescriptions([
     {
       type: "placement",
       subject: {
@@ -26,5 +26,5 @@ export const useKeyAngleDesc = (params: KeyAngleDescParams) => {
       },
     },
   ]);
-  return { loading, keyAngleDesc: { sign: descriptions[0] ?? "" } };
+  return { loading, error, keyAngleDesc: { sign: descriptions[0] ?? "" } };
 };

@@ -10,7 +10,7 @@ interface RetrogradeDescParams {
 }
 
 export const useRetrogradeDesc = (params: RetrogradeDescParams) => {
-  const { loading, descriptions } = useGeneratedDescriptions([
+  const { loading, descriptions, error } = useGeneratedDescriptions([
     {
       type: "timing",
       timeScale: "LONG_TERM",
@@ -22,5 +22,5 @@ export const useRetrogradeDesc = (params: RetrogradeDescParams) => {
   ]);
   const retrogradeDesc: RetrogradeDesc = { description: descriptions[0] ?? "" };
 
-  return { loading, retrogradeDesc };
+  return { loading, error, retrogradeDesc };
 };

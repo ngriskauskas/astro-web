@@ -6,16 +6,25 @@ import { AngleData } from "../../types/cusp";
 import { PLANET_ORDER, PlanetsData, type Planet } from "../../types/planet";
 import { useDesc } from "../../contexts/DescContext";
 import { useWheelData } from "../../hooks/chart/useWheelData";
+import { useChartSettings } from "../../contexts/ChartSettingsContext";
+import { hiddenPlanets } from "../../utils/hiddenPlanets";
+import { aspectName } from "../../utils/aspectName";
+import { LoadError } from "../utils/LoadError";
+import { MATRIX, MATRIX_CELL, MATRIX_TABLE } from "./matrixStyles";
 
 export const AspectMatrix = () => {
   const [hoveredPlanet, setHoveredPlanet] = useState<string | null>(null);
   const { open } = useDesc();
+  const {
+    settings: { objectOptions },
+  } = useChartSettings();
 
   const sortByPlanetOrder = (arr: Planet[]) =>
     [...arr].sort((a, b) => PLANET_ORDER.indexOf(a.name) - PLANET_ORDER.indexOf(b.name));
 
-  const { planetAngles, keyAngles } = useWheel() as SingleWheelContextType;
-  const planets = sortByPlanetOrder(planetAngles);
+  const { planetAngles, keyAngles, status } = useWheel() as SingleWheelContextType;
+  const hidden = hiddenPlanets(objectOptions);
+  const planets = sortByPlanetOrder(planetAngles).filter(({ name }) => !hidden.includes(name));
   const matrixKeyAngles = keyAngles.filter(({ name }) => name === "ASC" || name === "MC");
   const points: AspectPoint[] = [
     ...planets.map((value) => ({ type: "Planet" as const, value })),
@@ -23,23 +32,28 @@ export const AspectMatrix = () => {
   ];
   const aspects = useWheelData().getFilteredAspects();
 
+  if (status === "error") return <LoadError message="Could not load the chart." />;
+  if (points.length === 0) return null;
+
   return (
-    <div className="overflow-x-auto ml-4">
-      <table className="w-max table-fixed border border-gray-300 rounded-lg shadow-md overflow-hidden text-center">
-        <thead className="bg-gray-100 text-sm font-semibold">
+    <div className={MATRIX}>
+      <table className={MATRIX_TABLE}>
+        <thead className="bg-gray-100 font-semibold">
           <tr>
-            <th className="w-12 min-w-12 max-w-12 px-1 py-2 border border-gray-300"></th>
+            <th className="border border-gray-300 p-0">
+              <span className={MATRIX_CELL} />
+            </th>
             {points.map((point) => (
               <th
                 key={`${point.type}-${point.value.name}`}
-                className={`w-12 min-w-12 max-w-12 px-1 py-2 ${point.type === "Angle" ? "text-xs" : "text-xl"} border border-gray-300 cursor-pointer transition-colors ${
+                className={`border border-gray-300 p-0 transition-colors ${
                   hoveredPlanet === point.value.name ? "bg-yellow-100" : ""
                 }`}
                 title={getPointTitle(point)}
                 onMouseEnter={() => setHoveredPlanet(point.value.name)}
                 onMouseLeave={() => setHoveredPlanet(null)}
               >
-                {getPointLabel(point)}
+                <PointLabel point={point} />
               </th>
             ))}
           </tr>
@@ -48,40 +62,35 @@ export const AspectMatrix = () => {
           {points.map((rowPoint, rowIndex) => (
             <tr
               key={`${rowPoint.type}-${rowPoint.value.name}`}
-              className={`text-sm transition-colors ${
+              className={`transition-colors ${
                 hoveredPlanet === rowPoint.value.name ? "bg-yellow-50" : ""
               }`}
             >
-              <td
-                className={`w-12 min-w-12 max-w-12 px-1 py-2 ${rowPoint.type === "Angle" ? "text-xs" : "text-xl"} font-semibold border border-gray-300 bg-gray-50 cursor-pointer transition-colors ${
+              <th
+                scope="row"
+                className={`border border-gray-300 bg-gray-50 p-0 font-semibold transition-colors ${
                   hoveredPlanet === rowPoint.value.name ? "bg-yellow-100" : ""
                 }`}
                 title={getPointTitle(rowPoint)}
                 onMouseEnter={() => setHoveredPlanet(rowPoint.value.name)}
                 onMouseLeave={() => setHoveredPlanet(null)}
               >
-                {getPointLabel(rowPoint)}
-              </td>
+                <PointLabel point={rowPoint} />
+              </th>
 
               {points.map((colPoint, colIndex) => {
+                const key = `${colPoint.type}-${colPoint.value.name}`;
                 if (rowIndex === colIndex) {
                   return (
-                    <td
-                      key={`${colPoint.type}-${colPoint.value.name}`}
-                      className="w-12 min-w-12 max-w-12 px-1 py-2 text-gray-300 border border-gray-300"
-                    >
-                      –
+                    <td key={key} className="border border-gray-300 p-0 text-gray-300">
+                      <span className={MATRIX_CELL}>–</span>
                     </td>
                   );
                 }
 
                 if (colIndex > rowIndex) {
                   return (
-                    <td
-                      key={`${colPoint.type}-${colPoint.value.name}`}
-                      className="w-12 min-w-12 max-w-12 px-1 py-2 border border-gray-200 bg-gray-100"
-                      aria-hidden
-                    />
+                    <td key={key} className="border border-gray-200 bg-gray-100 p-0" aria-hidden />
                   );
                 }
 
@@ -92,41 +101,23 @@ export const AspectMatrix = () => {
                     (samePoint(candidate.point1, colPoint) &&
                       samePoint(candidate.point2, rowPoint)),
                 );
-
-                const color = aspect ? AspectData[aspect.type].color : undefined;
+                const highlighted =
+                  hoveredPlanet === rowPoint.value.name || hoveredPlanet === colPoint.value.name;
 
                 return (
                   <td
-                    key={`${colPoint.type}-${colPoint.value.name}`}
-                    className={`w-12 min-w-12 max-w-12 px-1 py-2 text-lg font-bold border border-gray-300 transition-all ${
-                      aspect ? "cursor-pointer" : ""
-                    } ${
-                      hoveredPlanet === rowPoint.value.name || hoveredPlanet === colPoint.value.name
-                        ? "ring-2 ring-yellow-300"
-                        : ""
+                    key={key}
+                    className={`border border-gray-300 p-0 font-bold transition-all ${
+                      highlighted ? "ring-2 ring-yellow-300" : ""
                     }`}
-                    style={{
-                      backgroundColor: color ? `${color}20` : undefined,
-                      color: color ?? undefined,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (aspect) {
-                        e.currentTarget.style.backgroundColor = color ? `${color}40` : "";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (aspect) {
-                        e.currentTarget.style.backgroundColor = color ? `${color}20` : "";
-                      }
-                    }}
-                    onClick={() => {
-                      if (aspect) {
-                        open({ type: "aspect", value: aspect });
-                      }
-                    }}
-                    title={aspect ? AspectData[aspect.type].name : ""}
                   >
-                    {aspect ? AspectData[aspect.type].glyph : ""}
+                    {aspect && (
+                      <AspectCell
+                        label={aspectName({ ...aspect, point1: rowPoint, point2: colPoint })}
+                        type={aspect.type}
+                        onClick={() => open({ type: "aspect", value: aspect })}
+                      />
+                    )}
                   </td>
                 );
               })}
@@ -138,11 +129,41 @@ export const AspectMatrix = () => {
   );
 };
 
+export const AspectCell = ({
+  label,
+  type,
+  onClick,
+}: {
+  label: string;
+  type: keyof typeof AspectData;
+  onClick: () => void;
+}) => {
+  const { color, glyph, name } = AspectData[type];
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={name}
+      className={`${MATRIX_CELL} cursor-pointer bg-(--tint) hover:bg-(--tint-hover)`}
+      style={
+        { color, "--tint": `${color}20`, "--tint-hover": `${color}40` } as React.CSSProperties
+      }
+      onClick={onClick}
+    >
+      {glyph}
+    </button>
+  );
+};
+
+// A planet's glyph, or the short name of an angle (ASC, MC) in smaller letters.
+export const PointLabel = ({ point }: { point: AspectPoint }) => (
+  <span className={`${MATRIX_CELL} ${point.type === "Angle" ? "text-[0.7em] tracking-tighter" : ""}`}>
+    {point.type === "Planet" ? PlanetsData[point.value.name].glyph : point.value.name}
+  </span>
+);
+
 const samePoint = (left: AspectPoint, right: AspectPoint) =>
   left.type === right.type && left.value.name === right.value.name;
-
-const getPointLabel = (point: AspectPoint) =>
-  point.type === "Planet" ? PlanetsData[point.value.name].glyph : point.value.name;
 
 const getPointTitle = (point: AspectPoint) =>
   point.type === "Planet"

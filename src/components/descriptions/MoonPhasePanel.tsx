@@ -1,4 +1,5 @@
 import { MoonPhasesData, type MoonPhaseDescriptionValue } from "../../types/moon";
+import { LoadError } from "../utils/LoadError";
 import { formatDegMin } from "../../utils/funcs";
 import { PlanetsData } from "../../types/planet";
 import { SignChip } from "../utils/SignChip";
@@ -11,7 +12,7 @@ export const MoonPhasePanel = ({ value }: { value: MoonPhaseDescriptionValue }) 
   const { phase, timing } = value;
   const phaseData = MoonPhasesData[phase];
   const displayName = phase.replace(/\b\w/g, (letter) => letter.toUpperCase());
-  const { loading, moonPhaseDesc } = useMoonPhaseDesc({ phase });
+  const { loading, error, moonPhaseDesc } = useMoonPhaseDesc({ phase });
 
   return (
     <div className="flex flex-col h-full">
@@ -27,7 +28,7 @@ export const MoonPhasePanel = ({ value }: { value: MoonPhaseDescriptionValue }) 
         <CloseButton />
       </div>
 
-      <div className="p-2 flex-1 overflow-y-auto">
+      <div className="p-3 flex-1 overflow-y-auto overscroll-contain">
         <Section title="Overview">
           <div className="p-3 bg-white border rounded shadow-sm text-sm mb-3">
             {phaseData.info.description}
@@ -61,6 +62,7 @@ export const MoonPhasePanel = ({ value }: { value: MoonPhaseDescriptionValue }) 
           ) : (
             <span className="text-gray-500">Placement details are unavailable.</span>
           )}
+          {error && <LoadError message="Could not load this description." />}
           {moonPhaseDesc.description && (
             <p className="text-sm text-gray-600 mt-3">{moonPhaseDesc.description}</p>
           )}

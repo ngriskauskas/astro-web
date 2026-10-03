@@ -1,4 +1,5 @@
 import { useBirthProfiles } from "../../contexts/BirthProfilesContext";
+import { LoadError } from "../utils/LoadError";
 import { useAspectDesc } from "../../hooks/descriptions/useAspectDesc";
 import { useWheel } from "../../hooks/useWheel";
 import {
@@ -25,7 +26,7 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
       ? "EXACT"
       : aspect.motion
     : undefined;
-  const { loading, aspectDesc } = useAspectDesc({
+  const { loading, error, aspectDesc } = useAspectDesc({
     aspect: aspect.type,
     point1: aspect.point1,
     point2: aspect.point2,
@@ -66,7 +67,7 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
         </h2>
         <CloseButton />
       </div>
-      <div className="p-4 flex-1 overflow-y-auto">
+      <div className="p-3 flex-1 overflow-y-auto overscroll-contain">
         <Section title="Overview">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-lg">{aspectInfo.glyph}</span>
@@ -128,6 +129,7 @@ export const AspectPanel = ({ aspect }: { aspect: AspectDisplay }) => {
               <SignChip sign={aspect.point2.value.sign} />
             </div>
           )}
+          {error && <LoadError message="Could not load this description." />}
           {aspectDesc && (
             <div className="text-xs text-gray-600 mt-2 pl-2">{aspectDesc.description}</div>
           )}

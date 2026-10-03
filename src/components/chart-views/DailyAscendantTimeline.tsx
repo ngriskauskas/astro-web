@@ -9,6 +9,7 @@ import type { AngleTiming, AspectTiming } from "../../types/timings";
 import { PlanetsData } from "../../types/planet";
 import { formatDegMin } from "../../utils/funcs";
 import { Spinner } from "../utils/Spinner";
+import { LoadError } from "../utils/LoadError";
 
 const TRACK_HEIGHT = 2160;
 
@@ -28,7 +29,7 @@ export const DailyAscendantTimeline = () => {
   const keyAngles = isMulti(wheel)
     ? (wheel as MultiWheelContextType).otherKeyAngles
     : (wheel as SingleWheelContextType).keyAngles;
-  const { timings, loading } = useDailyTimings();
+  const { timings, loading, error } = useDailyTimings();
   const { open } = useDesc();
   const scrollRef = useRef<HTMLDivElement>(null);
   const now = new Date();
@@ -53,16 +54,40 @@ export const DailyAscendantTimeline = () => {
     : [];
   const conjunctions = getConjunctionEvents(timings.aspects, dayStart.getTime(), dayEnd.getTime());
 
+  // Bring the current time into view once, when the timeline first appears. Doing it
+  // again as the time moves on would undo the user's own scrolling.
+  const ready = !loading && !error && ascendant !== undefined;
   useEffect(() => {
-    if (!scrollRef.current) return;
+    if (!ready || !scrollRef.current) return;
     scrollRef.current.scrollTop =
       (nowPosition / 100) * TRACK_HEIGHT - scrollRef.current.clientHeight / 2;
-  }, [nowPosition]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
 
-  if (loading || !ascendant) return <Spinner />;
+  const heading = (
+    <h2 id="ascendant-heading" className="mb-2 text-lg font-semibold text-gray-900">
+      Ascendant Today
+    </h2>
+  );
+
+  if (!ready) {
+    return (
+      <section aria-labelledby="ascendant-heading" className="w-full border-t border-gray-200 py-3">
+        {heading}
+        {error ? (
+          <LoadError message="Could not load today's timings." />
+        ) : wheel.status === "error" ? (
+          <LoadError message="Could not load the chart." />
+        ) : (
+          <Spinner />
+        )}
+      </section>
+    );
+  }
 
   return (
-    <section className="w-full border-t border-gray-200 py-3">
+    <section aria-labelledby="ascendant-heading" className="w-full border-t border-gray-200 py-3">
+      {heading}
       <div className="mb-3 flex items-center gap-2 text-sm">
         <span className="text-[10px] font-semibold uppercase text-gray-500">ASC</span>
         <img src={ZodiacData[ascendant.sign].glyph} alt="" className="h-4 w-4" />
@@ -72,10 +97,10 @@ export const DailyAscendantTimeline = () => {
 
       <div
         ref={scrollRef}
-        className="max-h-[460px] overflow-y-auto overscroll-contain border-y border-gray-200"
+        className="max-h-[460px] overflow-y-auto border-y border-gray-200"
       >
         <div
-          className="relative grid grid-cols-[3.5rem_6.5rem_minmax(0,1fr)]"
+          className="relative grid grid-cols-[3rem_4.5rem_minmax(0,1fr)] sm:grid-cols-[3.5rem_6.5rem_minmax(0,1fr)]"
           style={{ height: TRACK_HEIGHT }}
         >
           <div className="relative text-[10px] text-gray-500">
@@ -143,7 +168,7 @@ export const DailyAscendantTimeline = () => {
                   <span className="h-px w-2 shrink-0 bg-rose-400" />
                   <button
                     type="button"
-                    className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-xl shadow-sm transition hover:border-rose-400 hover:shadow-md"
+                    className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-xl shadow-sm transition hover:border-rose-400 hover:shadow-md"
                     title={`${ZodiacData[planet.sign].displayName} ${PlanetsData[planet.name].displayName} conjuncts ASC`}
                     aria-label={`${PlanetsData[planet.name].displayName} conjuncts ASC at ${formatTime(new Date(dateTime).getTime())}`}
                     onClick={() => open({ type: "dailyAspectTiming", value: timing })}

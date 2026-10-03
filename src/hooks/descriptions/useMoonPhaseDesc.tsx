@@ -10,7 +10,7 @@ interface MoonPhaseDescParams {
 }
 
 export const useMoonPhaseDesc = (params: MoonPhaseDescParams) => {
-  const { loading, descriptions } = useGeneratedDescriptions([
+  const { loading, descriptions, error } = useGeneratedDescriptions([
     {
       type: "timing",
       timeScale: "DAILY",
@@ -22,5 +22,5 @@ export const useMoonPhaseDesc = (params: MoonPhaseDescParams) => {
   ]);
   const moonPhaseDesc: MoonPhaseDesc = { description: descriptions[0] ?? "" };
 
-  return { loading, moonPhaseDesc };
+  return { loading, error, moonPhaseDesc };
 };

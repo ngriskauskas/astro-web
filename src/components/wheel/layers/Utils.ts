@@ -60,3 +60,10 @@ export const polarToCartesian = (
     y: center - radius * Math.sin(rad),
   };
 };
+
+// Lets Enter and Space activate an SVG element that has role="button".
+export const onActivate = (action: () => void) => (event: { key: string; preventDefault: () => void }) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  event.preventDefault();
+  action();
+};

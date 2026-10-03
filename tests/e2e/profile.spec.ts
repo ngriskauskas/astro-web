@@ -39,7 +39,7 @@ test("profile is updated section by section", async ({ page, requests }) => {
   const birth = page.getByRole("region", { name: "My Birth Info" });
   await birth.getByLabel("Birth Date").fill("1991-06-16");
   await birth.getByRole("button", { name: "Save Changes" }).click();
-  await expect(page.getByText("Profile updated")).toBeVisible();
+  await expect(page.getByText("Profile updated", { exact: true })).toBeVisible();
 
   const updatedProfile = requests.to("PUT", `/birth-profiles/${mainBirthProfile.id}`);
   expect(updatedProfile).toHaveLength(1);

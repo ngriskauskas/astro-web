@@ -8,10 +8,19 @@ import { type CuspAngle, type KeyAngleAngle } from "../components/wheel/layers/H
 import { type SignAngle } from "../components/wheel/layers/Signs";
 import type { Aspect } from "../types/aspect";
 import type { Planet } from "../types/planet";
-import { getLocalISODate, getLocalISODateTime, getLocalISOTime } from "../utils/funcs";
+import {
+  getLocalISODate,
+  getLocalISODateTime,
+  getLocalISOTime,
+  isDateAndTime,
+} from "../utils/funcs";
 import { useSearchParams } from "react-router-dom";
 import type { SingleChart } from "../types/chart";
 import { useChartSettings } from "./ChartSettingsContext";
+
+// "loading" until the first chart arrives; "error" when the chart asked for could not
+// be loaded. A chart already on screen stays there while a newer one is loading.
+export type WheelStatus = "loading" | "ready" | "error";
 
 export interface SingleWheelContextType {
   settings: ZodiacWheelOptions;
@@ -22,6 +31,7 @@ export interface SingleWheelContextType {
   keyAngles: KeyAngleAngle[];
   aspects: Aspect[];
   chartAspects: Aspect[];
+  status: WheelStatus;
   type: "natal" | "time" | "moment";
 }
 
@@ -36,6 +46,7 @@ export const SingleWheelProvider = ({
 }) => {
   const [searchParams] = useSearchParams();
   const [chart, setChart] = useState<SingleChart | undefined>();
+  const [status, setStatus] = useState<WheelStatus>("loading");
   const { getNatalChart, getCurrentChart } = useCharts();
   const { mainProfile } = useBirthProfiles();
   const {
@@ -51,28 +62,6 @@ export const SingleWheelProvider = ({
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
     profileId: mainProfile?.id,
   });
-
-  const fetchNatalChart = async () => {
-    const data = await getNatalChart({
-      birthProfileId: settings.profileId!,
-    });
-    setChart(data);
-  };
-
-  const fetchCurrentChart = async () => {
-    const data = await getCurrentChart({
-      datetime: getLocalISODateTime(),
-    });
-    setChart(data);
-  };
-
-  const fetchMomentChart = async () => {
-    if (!settings.datetimeOptions?.date || !settings.datetimeOptions?.time) return;
-    const data = await getCurrentChart({
-      datetime: `${settings.datetimeOptions.date}T${settings.datetimeOptions.time}`,
-    });
-    setChart(data);
-  };
 
   useEffect(() => {
     if (type !== "moment") return;
@@ -90,17 +79,41 @@ export const SingleWheelProvider = ({
   }, [searchParams]);
 
   useEffect(() => {
-    let interval: number;
-    if (type === "natal") fetchNatalChart();
-    else if (type === "moment") fetchMomentChart();
-    else if (type === "time") {
-      fetchCurrentChart();
-      interval = setInterval(() => {
-        fetchCurrentChart();
-      }, 60 * 1000);
+    // Set when the settings change or the page is left, so that a response to an
+    // earlier request never replaces the chart for a later one.
+    let cancelled = false;
+    let loaded = false;
+
+    const load = async (request: () => Promise<SingleChart>, isRefresh = false) => {
+      if (!isRefresh) setStatus("loading");
+      try {
+        const data = await request();
+        if (cancelled) return;
+        loaded = true;
+        setChart(data);
+        setStatus("ready");
+      } catch {
+        // A failed refresh keeps the chart that is already on screen.
+        if (cancelled || (isRefresh && loaded)) return;
+        setStatus("error");
+      }
+    };
+
+    let interval: number | undefined;
+    if (type === "natal") {
+      const birthProfileId = settings.profileId;
+      if (birthProfileId !== undefined) load(() => getNatalChart({ birthProfileId }));
+    } else if (type === "moment") {
+      const { date, time } = settings.datetimeOptions ?? {};
+      if (isDateAndTime(date, time)) load(() => getCurrentChart({ datetime: `${date}T${time}` }));
+    } else {
+      const current = () => getCurrentChart({ datetime: getLocalISODateTime() });
+      load(current);
+      interval = window.setInterval(() => load(current, true), 60 * 1000);
     }
 
     return () => {
+      cancelled = true;
       if (interval) clearInterval(interval);
     };
   }, [aspectOptions, settings.profileId, settings.datetimeOptions]);
@@ -214,6 +227,7 @@ export const SingleWheelProvider = ({
         keyAngles,
         aspects,
         chartAspects,
+        status,
         type,
       }}
     >

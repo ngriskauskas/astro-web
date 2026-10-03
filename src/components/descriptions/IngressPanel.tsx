@@ -1,4 +1,5 @@
 import { Section } from "../utils/Section";
+import { LoadError } from "../utils/LoadError";
 import { BackButton, CloseButton } from "./Helpers";
 import { DateTimeChip } from "../utils/DateChip";
 import { useDesc } from "../../contexts/DescContext";
@@ -15,7 +16,7 @@ export const IngressTimingPanel = ({ ingress }: { ingress: IngressEvent }) => {
   const ingressData = ingress.data;
   const planet = ingressData.planet.name;
   const sign = ingressData.endPlanet.planet.sign;
-  const { loading, ingressDesc } = useIngressDesc({
+  const { loading, error, ingressDesc } = useIngressDesc({
     planet,
     fromSign: ingressData.startPlanet.planet.sign,
     toSign: sign,
@@ -32,14 +33,14 @@ export const IngressTimingPanel = ({ ingress }: { ingress: IngressEvent }) => {
               <span>{PlanetsData[planet].displayName}</span>
             </div>
             <span className="text-gray-500">→</span>
-            <img src={ZodiacData[sign].glyph} width={22} height={22} />
-            <h2 className="text-xl font-semibold">{ZodiacData[sign].displayName}</h2>
+            <img src={ZodiacData[sign].glyph} alt="" width={22} height={22} />
+            <span>{ZodiacData[sign].displayName}</span>
           </div>
         </h2>
         <CloseButton />
       </div>
 
-      <div className="p-4 flex-1 overflow-y-auto">
+      <div className="p-3 flex-1 overflow-y-auto overscroll-contain">
         <Section title="Overview">
           <div className="flex items-center gap-2 mb-2"></div>
           <div className="p-2 bg-white border rounded shadow-sm text-sm">
@@ -64,6 +65,7 @@ export const IngressTimingPanel = ({ ingress }: { ingress: IngressEvent }) => {
               <span className="text-gray-500 text-sm tracking-wide font-semibold">enters</span>
               <SignChip sign={sign} />
             </div>
+            {error && <LoadError message="Could not load this description." />}
             {ingressDesc && (
               <div className="text-xs text-gray-600 mt-2 pl-2">{ingressDesc.description}</div>
             )}
@@ -80,15 +82,15 @@ export const IngressPreview = ({ ingress }: { ingress: IngressEvent }) => {
   const planet = ingressData.planet.name;
   const sign = ingressData.endPlanet.planet.sign;
   return (
-    <div
-      className="flex items-center gap-1 p-1 rounded-md border cursor-pointer"
+    <button
+      type="button"
+      aria-label={`${PlanetsData[planet].displayName} enters ${ZodiacData[sign].displayName}`}
+      className="flex items-center gap-3 p-1 rounded-md border cursor-pointer"
       onClick={() => open({ type: "ingressTiming", value: ingress })}
     >
-      <div className="flex items-center gap-3">
-        <PlanetChip planet={planet} />
-        <span className="text-gray-500">→</span>
-        <SignCircle sign={sign} />
-      </div>
-    </div>
+      <PlanetChip planet={planet} interactive={false} />
+      <span className="text-gray-500">→</span>
+      <SignCircle sign={sign} />
+    </button>
   );
 };

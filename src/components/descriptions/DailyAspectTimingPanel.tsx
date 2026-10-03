@@ -1,4 +1,5 @@
 import { Section } from "../utils/Section";
+import { LoadError } from "../utils/LoadError";
 import { BackButton, CloseButton } from "./Helpers";
 import { AspectChip } from "../utils/AspectChip";
 import type { AspectTiming } from "../../types/timings";
@@ -15,7 +16,11 @@ export const DailyAspectTimingPanel = ({ timing }: { timing: AspectTiming }) => 
   const aspectInfo = AspectData[timing.aspect.type];
   const wheel = useWheel();
   const isTransitDailyTiming = wheel.type === "transit";
-  const { loading: descriptionLoading, aspectDesc } = useTimingAspectDesc({
+  const {
+    loading: descriptionLoading,
+    error: descriptionError,
+    aspectDesc,
+  } = useTimingAspectDesc({
     aspect: timing.aspect,
     timeScale: "DAILY",
     relationship: isTransitDailyTiming ? "CURRENT" : undefined,
@@ -50,7 +55,7 @@ export const DailyAspectTimingPanel = ({ timing }: { timing: AspectTiming }) => 
         </h2>
         <CloseButton />
       </div>
-      <div className="p-4 flex-1 overflow-y-auto">
+      <div className="p-3 flex-1 overflow-y-auto overscroll-contain">
         <Section title="Overview">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-lg">{aspectInfo.glyph}</span>
@@ -86,6 +91,7 @@ export const DailyAspectTimingPanel = ({ timing }: { timing: AspectTiming }) => 
           <p className="text-sm text-gray-600">
             {timing.aspect.motion.toLowerCase()}, orb {timing.aspect.orb.toFixed(2)}°
           </p>
+          {descriptionError && <LoadError message="Could not load this description." />}
           {aspectDesc.description && (
             <p className="text-sm text-gray-600 mt-2">{aspectDesc.description}</p>
           )}
@@ -229,13 +235,14 @@ export const DailyAspectEventPreview = ({
   });
 
   return (
-    <div
+    <button
+      type="button"
       className="flex items-center gap-1 px-1 py-0.5 rounded-md border border-green-300 bg-green-50/30 shadow-sm text-[10px] cursor-pointer transition-all duration-150 hover:shadow-md hover:border-green-400"
       onClick={() => open({ type: "dailyAspectTiming", value: timing })}
     >
       <span className="text-gray-700 font-mono text-xs">{time}</span>
-      <AspectChip aspect={timing.aspect} showSign showPlanetName={false} />
+      <AspectChip aspect={timing.aspect} showSign showPlanetName={false} interactive={false} />
       <span className="text-gray-500 capitalize">{eventType}</span>
-    </div>
+    </button>
   );
 };

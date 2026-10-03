@@ -8,10 +8,11 @@ import { type SignAngle } from "../components/wheel/layers/Signs";
 import { ZodiacSigns, type ZodiacSign } from "../types/zodiac";
 import type { Aspect } from "../types/aspect";
 import type { Planet } from "../types/planet";
-import { getLocalISODate, getLocalISOTime } from "../utils/funcs";
+import { getLocalISODate, getLocalISOTime, isDateAndTime } from "../utils/funcs";
 import { useSearchParams } from "react-router-dom";
 import type { MultiChart } from "../types/chart";
 import { useChartSettings } from "./ChartSettingsContext";
+import type { WheelStatus } from "./SingleWheelContext";
 
 export type OwnerType = "main" | "other";
 
@@ -27,6 +28,7 @@ export interface MultiWheelContextType {
   signAngles: SignAngle[];
   aspects: Aspect[];
   chartAspects: Aspect[];
+  status: WheelStatus;
   type: "synastry" | "transit";
 }
 
@@ -41,6 +43,7 @@ export const MultiWheelProvider = ({
 }) => {
   const [searchParams] = useSearchParams();
   const [chart, setChart] = useState<MultiChart | undefined>();
+  const [status, setStatus] = useState<WheelStatus>("loading");
   const { getSynastryChart, getTransitChart } = useCharts();
   const { mainProfile, profiles } = useBirthProfiles();
   const {
@@ -57,7 +60,7 @@ export const MultiWheelProvider = ({
 
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
     profileId: mainProfile?.id,
-    otherProfileId: type === "synastry" ? profiles[1].id : undefined,
+    otherProfileId: type === "synastry" ? profiles.find((x) => !x.isMain)?.id : undefined,
     datetimeOptions:
       type === "synastry"
         ? undefined
@@ -66,22 +69,6 @@ export const MultiWheelProvider = ({
             time: getLocalISOTime(),
           },
   });
-
-  const fetchSynastryChart = async () => {
-    const data = await getSynastryChart({
-      mainBirthProfileId: settings.profileId!,
-      otherBirthProfileId: settings.otherProfileId!,
-    });
-    setChart(data);
-  };
-
-  const fetchCurrentChart = async () => {
-    const data = await getTransitChart({
-      birthProfileId: settings.profileId!,
-      datetime: `${settings.datetimeOptions!.date}T${settings.datetimeOptions!.time}`,
-    });
-    setChart(data);
-  };
 
   useEffect(() => {
     if (type !== "transit") return;
@@ -98,8 +85,46 @@ export const MultiWheelProvider = ({
   }, [searchParams]);
 
   useEffect(() => {
-    if (type === "synastry") fetchSynastryChart();
-    else if (type === "transit") fetchCurrentChart();
+    // Set when the settings change or the page is left, so that a response to an
+    // earlier request never replaces the chart for a later one.
+    let cancelled = false;
+
+    const load = async (request: () => Promise<MultiChart>) => {
+      setStatus("loading");
+      try {
+        const data = await request();
+        if (cancelled) return;
+        setChart(data);
+        setStatus("ready");
+      } catch {
+        if (!cancelled) setStatus("error");
+      }
+    };
+
+    const { profileId, otherProfileId, datetimeOptions } = settings;
+    if (profileId !== undefined) {
+      if (type === "synastry") {
+        if (otherProfileId !== undefined) {
+          load(() =>
+            getSynastryChart({
+              mainBirthProfileId: profileId,
+              otherBirthProfileId: otherProfileId,
+            }),
+          );
+        }
+      } else if (isDateAndTime(datetimeOptions?.date, datetimeOptions?.time)) {
+        load(() =>
+          getTransitChart({
+            birthProfileId: profileId,
+            datetime: `${datetimeOptions!.date}T${datetimeOptions!.time}`,
+          }),
+        );
+      }
+    }
+
+    return () => {
+      cancelled = true;
+    };
   }, [aspectOptions, settings.profileId, settings.otherProfileId, settings.datetimeOptions]);
 
   const round = (num: number): number => {
@@ -252,6 +277,7 @@ export const MultiWheelProvider = ({
         signAngles,
         aspects,
         chartAspects: chart?.aspects ?? [],
+        status,
         type,
       }}
     >

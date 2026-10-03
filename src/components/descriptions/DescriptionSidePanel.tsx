@@ -34,7 +34,7 @@ export const DescriptionSidePanel = () => {
       case "house":
         return <HousePanel houseName={active.value as CuspType} owner={active.owner} />;
       case "angle":
-        return <AnglePanel angle={active.value as KeyType} />;
+        return <AnglePanel angle={active.value as KeyType} owner={active.owner} />;
       case "keyAngleTiming":
         return <KeyAngleTimingPanel timing={active.value as AngleTiming} />;
       case "dailyAspectTiming":
@@ -63,12 +63,13 @@ export const DescriptionSidePanel = () => {
         return null;
     }
   };
+  // Covers the screen on a phone; a panel on the right from tablet width up.
   return (
-    <div
-      className="fixed top-0 right-0 h-full w-100 bg-white shadow-2xl border-l 
-        border-gray-200 z-50 flex flex-col"
+    <aside
+      aria-label="Description"
+      className="fixed inset-0 z-50 flex flex-col bg-white shadow-2xl md:left-auto md:w-100 md:max-w-full md:border-l md:border-gray-200"
     >
       {renderPanel()}
-    </div>
+    </aside>
   );
 };

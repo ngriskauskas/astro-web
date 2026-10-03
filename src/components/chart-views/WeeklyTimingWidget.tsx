@@ -10,9 +10,11 @@ export const WeeklyTimingWidget = () => {
   const timingResult = useCurrentTimings({ filterKeyAngleAspects: true });
 
   return (
-    <section className="border-t border-gray-200 py-5">
+    <section aria-labelledby="weekly-heading" className="border-t border-gray-200 py-5">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-gray-900">Weekly Timings</h2>
+        <h2 id="weekly-heading" className="text-lg font-semibold text-gray-900">
+          Weekly Timings
+        </h2>
         <div
           className="inline-flex rounded-md border border-gray-300 bg-white p-0.5"
           role="group"
