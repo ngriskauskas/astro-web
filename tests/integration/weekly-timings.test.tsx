@@ -1,7 +1,7 @@
 import { within } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
 import { emptyWeeklyTimings, weeklyTimingsFor } from "../mocks";
-import { drawer, findWidget, renderChartPage, widget } from "./charts";
+import { drawer, findWidget, renderChartPage, showWholeWeek, widget } from "./charts";
 import { capture, hold, reject } from "./requests";
 
 // Weekly Timings, on the Daily page. The clock is frozen on Thursday 15 January 2026,
@@ -47,7 +47,8 @@ const eventNames = (scope: ReturnType<typeof within>) =>
     );
 
 test("starts on the By day view, listing the seven days of this week with their rulers", async () => {
-  await renderChartPage("daily");
+  const { user } = await renderChartPage("daily");
+  await showWholeWeek(user);
   const region = await weekly();
 
   expect(region.getByRole("button", { name: "By day" })).toHaveAttribute("aria-pressed", "true");
@@ -61,6 +62,7 @@ test("starts on the By day view, listing the seven days of this week with their 
 
 test("selecting a weekday ruler opens its planetary description", async () => {
   const { user } = await renderChartPage("daily");
+  await showWholeWeek(user);
   const region = await weekly();
 
   await user.click(region.getByRole("button", { name: "View Sun day details" }));
@@ -69,7 +71,8 @@ test("selecting a weekday ruler opens its planetary description", async () => {
 });
 
 test("lists each event under its day, and says so for a day with none", async () => {
-  await renderChartPage("daily");
+  const { user } = await renderChartPage("daily");
+  await showWholeWeek(user);
   const region = await weekly();
 
   for (const [date, events] of Object.entries(EVENTS_BY_DAY)) {
@@ -144,6 +147,7 @@ test("a week with no events says so in both views", async () => {
   const { user } = await renderChartPage("daily", {
     handlers: weeklyTimingsFor(emptyWeeklyTimings),
   });
+  await showWholeWeek(user);
   const region = await weekly();
 
   expect(region.getAllByText("No timing events")).toHaveLength(7);
@@ -181,7 +185,8 @@ test.each([
   ["just after the week begins", "2026-01-11T05:10:00Z"],
 ])("the week is still Sunday 11 to Saturday 17 January %s", async (_when, instant) => {
   vi.setSystemTime(new Date(instant));
-  await renderChartPage("daily");
+  const { user } = await renderChartPage("daily");
+  await showWholeWeek(user);
   const region = await weekly();
 
   expect(dayRow(region, "Jan 11").getByText("Sun day")).toBeInTheDocument();

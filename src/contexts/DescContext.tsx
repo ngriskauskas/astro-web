@@ -8,6 +8,9 @@ import type { AngleTiming, AspectTiming, TimingEvent } from "../types/timings";
 import type { MoonPhaseDescriptionValue } from "../types/moon";
 import type { PlanetaryHourDescriptionValue } from "../types/planetaryHours";
 import { useWheel } from "../hooks/useWheel";
+import type { ElementKey } from "../types/element";
+import type { ModalityKey } from "../types/modality";
+import type { QuadrantKey } from "../types/hemisphere";
 
 export type ActiveType =
   | "planet"
@@ -22,7 +25,10 @@ export type ActiveType =
   | "retrogradeTiming"
   | "stationTiming"
   | "moonphase"
-  | "planetaryHour";
+  | "planetaryHour"
+  | "element"
+  | "modality"
+  | "quadrant";
 
 export interface Active {
   type: ActiveType;
@@ -37,7 +43,10 @@ export interface Active {
     | AspectTiming
     | TimingEvent
     | MoonPhaseDescriptionValue
-    | PlanetaryHourDescriptionValue;
+    | PlanetaryHourDescriptionValue
+    | ElementKey
+    | QuadrantKey
+    | ModalityKey;
   owner?: OwnerType;
 }
 

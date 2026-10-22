@@ -21,6 +21,8 @@ const WEEKDAY_RULERS: readonly PlanetName[] = [
 
 interface WeeklyPlanetaryTimingsProps {
   embedded?: boolean;
+  // Show only today and this many days after it. Undefined shows the whole week.
+  upcomingDays?: number;
   loading: boolean;
   error?: boolean;
   timings: CurrentTimingsType | TransitTimingsType;
@@ -28,6 +30,7 @@ interface WeeklyPlanetaryTimingsProps {
 
 export const WeeklyPlanetaryTimings = ({
   embedded = false,
+  upcomingDays,
   loading,
   error = false,
   timings,
@@ -58,6 +61,9 @@ export const WeeklyPlanetaryTimings = ({
     };
   });
 
+  const visibleDays =
+    upcomingDays === undefined ? days : days.slice(today.getDay(), today.getDay() + upcomingDays);
+
   return (
     <div className={embedded ? "" : "border-t border-gray-200 py-5"}>
       {!embedded && (
@@ -69,7 +75,7 @@ export const WeeklyPlanetaryTimings = ({
         </div>
       )}
       <div className="divide-y divide-gray-200 border-y border-gray-200">
-        {days.map(({ date, ruler, events: dayEvents }) => {
+        {visibleDays.map(({ date, ruler, events: dayEvents }) => {
           const planetInfo = PlanetsData[ruler];
           return (
             <div

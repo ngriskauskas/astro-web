@@ -29,6 +29,8 @@ interface WidgetShellProps extends WidgetProps {
   eyebrow?: ReactNode;
   subtitle?: ReactNode;
   headingLevel?: 1 | 2 | 3;
+  // Keeps the title for screen readers while hiding it, for widgets that need no heading.
+  hideTitle?: boolean;
   tone?: WidgetTone;
   // "narrow" caps the card at a width suited to tall, single-column content.
   size?: "full" | "narrow";
@@ -45,6 +47,7 @@ export const Widget = ({
   eyebrow,
   subtitle,
   headingLevel = 2,
+  hideTitle = false,
   tone = "plain",
   size = "full",
   actions,
@@ -63,8 +66,8 @@ export const Widget = ({
         size === "narrow" ? "w-full max-w-[400px]" : ""
       } ${className}`}
     >
-      <header className="mb-3 flex min-h-7 flex-wrap items-center justify-between gap-x-3 gap-y-2">
-        <div className="min-w-0">
+      <header className={`${hideTitle && !actions && !link ? "sr-only" : "mb-3"} flex min-h-7 flex-wrap items-center justify-between gap-x-3 gap-y-2`}>
+        <div className={`min-w-0 ${hideTitle ? "sr-only" : ""}`}>
           {eyebrow && <p className="text-sm font-semibold text-indigo-700">{eyebrow}</p>}
           <Heading id={headingId} className="text-lg font-semibold text-gray-900">
             {title}
@@ -127,4 +130,30 @@ export const WidgetViewSwitch = <T extends string>({
       </button>
     ))}
   </div>
+);
+
+// The control that shows more of a widget, or folds it back. It names the region it
+// controls, so a screen reader can say what it changes.
+export const WidgetDisclosure = ({
+  expanded,
+  onToggle,
+  controls,
+  collapsedLabel,
+  expandedLabel,
+}: {
+  expanded: boolean;
+  onToggle: () => void;
+  controls: string;
+  collapsedLabel: string;
+  expandedLabel: string;
+}) => (
+  <button
+    type="button"
+    aria-expanded={expanded}
+    aria-controls={controls}
+    onClick={onToggle}
+    className="mt-3 inline-flex min-h-10 cursor-pointer items-center rounded-lg px-3 text-sm font-medium text-indigo-700 hover:bg-indigo-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+  >
+    {expanded ? expandedLabel : collapsedLabel}
+  </button>
 );

@@ -1,3 +1,4 @@
+import { fireEvent } from "@testing-library/react";
 import { expect, test } from "vitest";
 import { within } from "@testing-library/react";
 import { drawer, findWidget, renderChartPage } from "./charts";
@@ -11,9 +12,16 @@ const moon = async () => {
   return region;
 };
 
+// On the Daily page the moon shows the next four phases until asked for the rest.
+const showAllPhases = (region: Awaited<ReturnType<typeof moon>>) => {
+  const more = region.queryByRole("button", { name: "More phases" });
+  if (more) fireEvent.click(more);
+};
+
 test("shows the Moon's current sign and degree", async () => {
   await renderChartPage("daily");
   const region = await moon();
+  showAllPhases(region);
 
   expect(region.getByLabelText("Current Moon placement: Sagittarius 10° 0′")).toBeInTheDocument();
 });
@@ -21,6 +29,7 @@ test("shows the Moon's current sign and degree", async () => {
 test("selecting the current Moon placement opens its description", async () => {
   const { user } = await renderChartPage("daily");
   const region = await moon();
+  showAllPhases(region);
 
   await user.click(region.getByRole("button", { name: "Current Moon placement: Sagittarius 10° 0′" }));
 
@@ -30,6 +39,7 @@ test("selecting the current Moon placement opens its description", async () => {
 test("lists the eight phases in date order, each with its date, time and sign", async () => {
   await renderChartPage("daily");
   const region = await moon();
+  showAllPhases(region);
 
   const phases = region
     .getAllByRole("button")
@@ -50,12 +60,15 @@ test("lists the eight phases in date order, each with its date, time and sign", 
   );
   expect(phases[1]).toHaveTextContent("Jan 18, 2:52 PM");
   expect(phases[1]).toHaveTextContent("Capricorn");
+  // The "Since" line sits in the centre of the orbit view.
+  fireEvent.click(region.getByRole("button", { name: "Orbit" }));
   expect(region.getByText("Since Jan 13")).toBeInTheDocument();
 });
 
 test("marks the current phase", async () => {
   await renderChartPage("daily");
   const region = await moon();
+  showAllPhases(region);
 
   const current = region
     .getAllByRole("button")
@@ -69,6 +82,7 @@ test("marks the current phase", async () => {
 test("a phase with no usable time says its timing is unavailable", async () => {
   await renderChartPage("daily");
   const region = await moon();
+  showAllPhases(region);
 
   expect(region.getByRole("button", { name: "View Waning Gibbous details" })).toHaveTextContent(
     "Timing unavailable",
@@ -78,6 +92,7 @@ test("a phase with no usable time says its timing is unavailable", async () => {
 test("selecting a phase opens the drawer for it", async () => {
   const { user } = await renderChartPage("daily");
   const region = await moon();
+  showAllPhases(region);
 
   await user.click(region.getByRole("button", { name: "View Full Moon details" }));
 
@@ -87,9 +102,11 @@ test("selecting a phase opens the drawer for it", async () => {
 test("offers orbit, timeline, and phase-grid views without changing phase detail access", async () => {
   const { user } = await renderChartPage("daily");
   const region = await moon();
+  showAllPhases(region);
   const views = region.getByRole("group", { name: "Moon timing view" });
 
-  expect(within(views).getByRole("button", { name: "Orbit" })).toHaveAttribute("aria-pressed", "true");
+  // The Daily page opens on the phases list.
+  expect(within(views).getByRole("button", { name: "Phases" })).toHaveAttribute("aria-pressed", "true");
   await user.click(within(views).getByRole("button", { name: "Timeline" }));
   expect(within(views).getByRole("button", { name: "Timeline" })).toHaveAttribute("aria-pressed", "true");
   expect(region.getByRole("button", { name: "View New Moon details" })).toHaveTextContent(

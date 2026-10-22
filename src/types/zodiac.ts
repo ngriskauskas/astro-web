@@ -160,7 +160,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       polarity: PolarityData["masculine"],
       house: 5,
       rulers: ["SUN"],
-      exalted: ["NEPTUNE", "SUN"],
+      exalted: ["NEPTUNE"],
       detriment: ["SATURN"],
       fall: ["URANUS"],
     },
@@ -180,7 +180,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       rulers: ["MERCURY"],
       exalted: ["MERCURY"],
       detriment: ["JUPITER"],
-      fall: [],
+      fall: ["VENUS"],
     },
   },
   LIBRA: {
@@ -234,7 +234,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       rulers: ["JUPITER"],
       exalted: ["MOON"],
       detriment: ["MERCURY"],
-      fall: ["VENUS"],
+      fall: [],
     },
   },
   CAPRICORN: {
@@ -270,7 +270,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       rulers: ["SATURN", "URANUS"],
       exalted: [],
       detriment: ["SUN"],
-      fall: ["MERCURY"],
+      fall: [],
     },
   },
   PISCES: {
@@ -288,7 +288,7 @@ export const ZodiacData: Record<ZodiacSign, ZodiacInfo> = {
       rulers: ["JUPITER", "NEPTUNE"],
       exalted: ["VENUS"],
       detriment: ["MERCURY"],
-      fall: ["MARS"],
+      fall: ["MERCURY"],
     },
   },
 };

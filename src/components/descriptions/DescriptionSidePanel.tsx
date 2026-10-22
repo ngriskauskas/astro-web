@@ -18,8 +18,12 @@ import { RetrogradeTimingPanel } from "./RetrogradeTimingPanel";
 import { StationTimingPanel } from "./StationTimingPanel";
 import { MoonPhasePanel } from "./MoonPhasePanel";
 import type { MoonPhaseDescriptionValue } from "../../types/moon";
+import type { ElementKey } from "../../types/element";
+import type { ModalityKey } from "../../types/modality";
+import { DistributionPanel } from "./DistributionPanel";
 import type { PlanetaryHourDescriptionValue } from "../../types/planetaryHours";
 import { PlanetaryHourPanel } from "./PlanetaryHourPanel";
+import type { QuadrantKey } from "../../types/hemisphere";
 
 export const DescriptionSidePanel = () => {
   const { active, close } = useDesc();
@@ -79,6 +83,12 @@ export const DescriptionSidePanel = () => {
         return (
           <StationTimingPanel station={active.value as Extract<TimingEvent, { type: "station" }>} />
         );
+      case "element":
+        return <DistributionPanel kind="element" value={active.value as ElementKey} />;
+      case "modality":
+        return <DistributionPanel kind="modality" value={active.value as ModalityKey} />;
+      case "quadrant":
+        return <DistributionPanel kind="quadrant" value={active.value as QuadrantKey} />;
       case "moonphase":
         return <MoonPhasePanel value={active.value as MoonPhaseDescriptionValue} />;
       case "planetaryHour":

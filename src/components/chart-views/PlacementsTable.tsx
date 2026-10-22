@@ -1,14 +1,16 @@
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { useWheel } from "../../hooks/useWheel";
 import { formatDegMin } from "../../utils/funcs";
+import type { PlanetName } from "../../types/planet";
 import { HouseChip } from "../utils/HouseChip";
 import { LoadError } from "../utils/LoadError";
 import { PlanetChip } from "../utils/PlanetChip";
 import { SignChip } from "../utils/SignChip";
 import { BirthTimeNotice } from "../utils/BirthTimeNotice";
 
-export const PlacementsTable = () => {
-  const { planetAngles, status, timeUnknown } = useWheel() as SingleWheelContextType;
+export const PlacementsTable = ({ planets }: { planets?: readonly PlanetName[] } = {}) => {
+  const { planetAngles: allPlanets, status, timeUnknown } = useWheel() as SingleWheelContextType;
+  const planetAngles = planets ? allPlanets.filter((planet) => planets.includes(planet.name)) : allPlanets;
 
   if (status === "error") return <LoadError message="Could not load the chart." />;
   if (planetAngles.length === 0) return null;

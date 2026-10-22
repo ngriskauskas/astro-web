@@ -137,6 +137,9 @@ export const describeContext = (context: any): string => {
     return `Description for placement ${describePoint(context.subject)}`;
   }
   if (context.type === "aspect") return `Description for aspect ${describeAspect(context.details)}`;
+  if (context.type === "distribution") {
+    return `Description for ${context.kind.toLowerCase()} ${context.value} ${context.count} of ${context.total}`;
+  }
 
   const { event, timeScale } = context;
   const detail =

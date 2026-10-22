@@ -12,6 +12,10 @@ const REGIONS = [
   "Zodiac Wheel",
   "Planetary Hour",
   "Ascendant Today",
+  "Summary",
+  "Chart ruler",
+  "Dignities",
+  "Hemispheres and quadrants",
   "Moon Timings",
   "Weekly Timings",
   "Aspect Matrix",
@@ -24,16 +28,28 @@ const moonRow = async () => {
   return within(moon.closest("tr")!);
 };
 
-test("shows its seven widgets and no settings", async () => {
+test("shows its widgets and no settings", async () => {
   await renderChartPage("daily");
 
   for (const name of REGIONS) {
     expect(await screen.findByRole("region", { name })).toBeInTheDocument();
   }
-  expect(screen.getAllByRole("region")).toHaveLength(REGIONS.length);
+  // The chart summary holds three sections of its own, so the page has three more regions.
+  expect(screen.getAllByRole("region")).toHaveLength(REGIONS.length + 3);
   expect(screen.queryByLabelText("Profile")).not.toBeInTheDocument();
   expect(screen.queryByLabelText("Date")).not.toBeInTheDocument();
   expect(screen.queryByLabelText("Time")).not.toBeInTheDocument();
+});
+
+test("the Explore shape tab holds the chart ruler, dignities and hemispheres", async () => {
+  const { user } = await renderChartPage("daily");
+  await user.click(screen.getByRole("button", { name: "Explore" }));
+  await user.click(screen.getByRole("tab", { name: "Shape" }));
+
+  const panel = await screen.findByRole("tabpanel");
+  expect(within(panel).getByRole("region", { name: "Chart ruler" })).toBeInTheDocument();
+  expect(within(panel).getByRole("region", { name: "Dignities" })).toBeInTheDocument();
+  expect(within(panel).getByRole("region", { name: "Hemispheres and quadrants" })).toBeInTheDocument();
 });
 
 test("the Explore glance opens descriptions for its placements", async () => {

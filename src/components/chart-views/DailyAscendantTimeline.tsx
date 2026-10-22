@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useDailyTimings } from "../../hooks/timings/useDailyTimings";
 import { isMulti, useWheel } from "../../hooks/useWheel";
 import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
@@ -12,7 +12,8 @@ import { formatDegMin, formatTime } from "../../utils/funcs";
 import { planetaryHourBlocks } from "../../utils/planetaryHours";
 import { Spinner } from "../utils/Spinner";
 import { LoadError } from "../utils/LoadError";
-import { Widget, type WidgetProps } from "../widgets/Widget";
+import { Widget, WidgetViewSwitch, type WidgetProps } from "../widgets/Widget";
+import { ASCENDANT_LOOKS, ASCENDANT_STYLES, type AscendantLook } from "./ascendantStyles";
 
 const TRACK_HEIGHT = 2160;
 const MARKER_HEIGHT = 44;
@@ -47,6 +48,8 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
     : (wheel as SingleWheelContextType).keyAngles;
   const { timings, loading, error } = useDailyTimings();
   const { open } = useDesc();
+  const [look, setLook] = useState<AscendantLook>("light");
+  const style = ASCENDANT_STYLES[look];
   const scrollRef = useRef<HTMLDivElement>(null);
   const planetaryHours = usePlanetaryHours();
   const { now } = planetaryHours;
@@ -102,7 +105,21 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
   }
 
   return (
-    <Widget id="ascendant" title="Ascendant Today" tone="ascendant" size="narrow" className={className}>
+    <Widget
+      id="ascendant"
+      title="Ascendant Today"
+      tone="ascendant"
+      size="narrow"
+      className={className}
+      actions={
+        <WidgetViewSwitch
+          label="Ascendant style"
+          value={look}
+          options={ASCENDANT_LOOKS}
+          onChange={setLook}
+        />
+      }
+    >
       <button
         type="button"
         aria-label="View Ascendant details"
@@ -118,13 +135,15 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
       <div
         ref={scrollRef}
         data-timeline-viewport
-        className="max-h-[460px] overflow-y-auto rounded-xl border border-gray-200 bg-gray-50/40 shadow-inner"
+        style={style.viewportStyle}
+        className={`max-h-[460px] overflow-y-auto rounded-xl border ${style.viewport}`}
       >
         <div
           className={`relative grid ${hourBlocks ? COLUMNS_WITH_HOURS : COLUMNS}`}
           style={{ height: TRACK_HEIGHT }}
         >
-          <div className="relative text-[10px] text-gray-500">
+          {style.ambient && <div aria-hidden="true" className="ascendant-aurora" data-look={look} />}
+          <div className={`relative text-[10px] ${style.time}`}>
             {signSegments.map((segment, index) => {
               const isFirst = index === 0;
               const top = isFirst
@@ -148,7 +167,7 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
             </span>
           </div>
 
-          <div className="relative overflow-hidden border-x border-gray-200 bg-gray-50/70">
+          <div className={`relative overflow-hidden ${style.signColumn}`}>
             {signSegments.map((segment) => {
               const signInfo = ZodiacData[segment.sign];
               const top = ((segment.start - dayStart.getTime()) / dayDuration) * 100;
@@ -160,20 +179,19 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
                   aria-label={`View ${ZodiacData[segment.sign].displayName} sign details`}
                   title={`${ZodiacData[segment.sign].displayName} from ${formatTime(segment.start)}`}
                   onClick={() => open({ type: "sign", value: segment.sign })}
-                  className="absolute inset-x-0 flex cursor-pointer flex-col items-center justify-center gap-1 overflow-hidden border-b border-white/90 px-1 text-center shadow-sm transition-[filter,transform] duration-300 ease-out hover:z-10 hover:scale-[1.015] hover:brightness-110 hover:saturate-125 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-gray-600"
+                  className={`absolute inset-x-0 flex cursor-pointer flex-col items-center justify-center gap-1 overflow-hidden px-1 text-center ${style.sign}`}
                   style={{
+                    ...style.signStyle(signInfo.color),
                     top: `${top}%`,
                     height: `${height}%`,
-                    background: `linear-gradient(145deg, ${signInfo.color}52, ${signInfo.color}24)`,
-                    borderLeft: `3px solid ${signInfo.color}`,
                   }}
                 >
                   <img
                     src={signInfo.glyph}
                     alt=""
-                    className="h-6 w-6 shrink-0 drop-shadow-sm transition-[transform,filter] duration-300 ease-out hover:scale-125 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.9)]"
+                    className={style.signGlyph}
                   />
-                  <span className="text-[10px] font-semibold leading-tight text-gray-800 transition-colors duration-300 hover:text-gray-950">
+                  <span className={style.signLabel}>
                     {ZodiacData[segment.sign].displayName}
                   </span>
                 </button>
@@ -185,7 +203,7 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
             <div
               role="list"
               aria-label="Planetary hours"
-              className="relative border-r border-gray-200"
+              className={`relative ${style.hourColumn}`}
             >
               {hourBlocks.map(({ hour, start, end, top, bottom }) => {
                 const planet = PlanetsData[hour.ruler];
@@ -199,13 +217,13 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
                     aria-label={name}
                     aria-current={isCurrent ? "time" : undefined}
                     title={name}
-                    className={`absolute inset-x-0 flex flex-col items-center overflow-hidden border-t border-white ${
-                      isCurrent ? "z-[1] shadow-sm" : ""
+                    className={`absolute inset-x-0 flex flex-col items-center overflow-hidden ${style.hour} ${
+                      isCurrent ? "z-[1]" : ""
                     }`}
                     style={{
+                      ...style.hourStyle(planet.color, isDay, isCurrent),
                       top: `${((top - dayStart.getTime()) / dayDuration) * 100}%`,
                       height: `${((bottom - top) / dayDuration) * 100}%`,
-                      background: `linear-gradient(180deg, ${planet.color}${isCurrent ? "45" : "22"}, ${isDay ? "#fffdf9" : "#e8edf5"}cc)`,
                     }}
                   >
                     <button
@@ -217,29 +235,29 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
                           value: { hour, end: new Date(end) },
                         })
                       }
-                      className="absolute inset-0 flex cursor-pointer flex-col items-center overflow-hidden transition-[filter,transform] duration-300 ease-out hover:z-10 hover:scale-[1.015] hover:brightness-110 hover:saturate-125 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-gray-700"
+                      className="absolute inset-0 flex cursor-pointer flex-col items-center overflow-hidden transition-[filter,transform] duration-300 ease-out hover:z-10 hover:scale-[1.02] hover:brightness-110 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-gray-700"
                     >
                       {/* The line at the top of a block is where its hour starts. An hour that
                           began before midnight has no line of its own on this day. */}
                       {top === start && (
                         <time
                           dateTime={hour.dateTime}
-                          className="mt-0.5 whitespace-nowrap text-[7px] font-medium leading-none tabular-nums text-gray-600 sm:text-[8px]"
+                          className={`mt-0.5 whitespace-nowrap text-[7px] font-medium leading-none tabular-nums sm:text-[8px] ${style.hourText}`}
                         >
                           {formatTime(start)}
                         </time>
                       )}
                       {/* Hours 1 and 13 begin at sunrise and sunset. */}
                       {(hour.hour === 1 || hour.hour === 13) && (
-                        <span className="mt-0.5 text-[7px] font-semibold uppercase leading-none text-gray-600 sm:text-[8px]">
+                        <span className={`mt-0.5 text-[7px] font-semibold uppercase leading-none sm:text-[8px] ${style.hourText}`}>
                           {isDay ? "Sunrise" : "Sunset"}
                         </span>
                       )}
                       <span
-                        className={`flex min-h-0 flex-1 items-center justify-center text-base font-semibold leading-none transition-[transform,filter] duration-300 ease-out hover:scale-125 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.9)] sm:text-lg ${
+                        className={`flex min-h-0 flex-1 items-center justify-center font-semibold leading-none transition-transform duration-300 ease-out hover:scale-125 ${style.hourGlyph} ${
                           isCurrent ? "scale-110" : ""
                         }`}
-                        style={{ color: planet.color }}
+                        style={style.hourGlyphStyle(planet.color, isCurrent)}
                         aria-hidden="true"
                       >
                         {planet.glyph}
@@ -252,7 +270,7 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
           )}
 
           <div className="relative min-w-0">
-            <div className="absolute inset-y-0 left-2 border-l border-dashed border-gray-300" />
+            <div className={`absolute inset-y-0 left-2 border-l border-dashed ${style.rail}`} />
             {positionedConjunctions.map(({ timing, dateTime, exactPosition, displayPosition }) => {
               const planet = getConjunctingPlanet(timing);
               if (!planet) return null;
@@ -269,7 +287,7 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
                   {connectorHeight > 0 && (
                     <span
                       aria-hidden="true"
-                      className="absolute left-2 z-0 w-px bg-rose-300"
+                      className={`absolute left-2 z-0 w-px ${style.connector}`}
                       style={{
                         top: `${(connectorTop / TRACK_HEIGHT) * 100}%`,
                         height: `${(connectorHeight / TRACK_HEIGHT) * 100}%`,
@@ -277,7 +295,7 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
                     />
                   )}
                   <span
-                    className="absolute left-2 z-[1] h-px w-2 bg-rose-400"
+                    className={`absolute left-2 z-[1] h-px w-2 ${style.tick}`}
                     style={{ top: exactTop }}
                   />
                   <div
@@ -287,18 +305,15 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
                   >
                     <button
                       type="button"
-                      className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-rose-200 bg-white text-lg shadow-sm transition hover:border-rose-400 hover:shadow-md sm:h-9 sm:w-9"
+                      className={`flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center sm:h-9 sm:w-9 ${style.marker}`}
                       title={`${ZodiacData[planet.sign].displayName} ${PlanetsData[planet.name].displayName} conjuncts ASC`}
                       aria-label={`${PlanetsData[planet.name].displayName} conjuncts ASC at ${formatTime(new Date(dateTime).getTime())}`}
                       onClick={() => open({ type: "dailyAspectTiming", value: timing })}
-                      style={{
-                        color: planetInfo.color,
-                        background: `linear-gradient(145deg, white, ${planetInfo.color}18)`,
-                      }}
+                      style={style.markerStyle(planetInfo.color)}
                     >
                       {planetInfo.glyph}
                     </button>
-                    <span className="ml-1 whitespace-nowrap rounded-full border border-gray-200 bg-white/90 px-1 py-0.5 text-[8px] font-semibold tabular-nums text-gray-700 shadow-sm sm:px-1.5 sm:text-[9px]">
+                    <span className={`ml-1 whitespace-nowrap rounded-full border px-1 py-0.5 text-[8px] font-semibold tabular-nums shadow-sm sm:px-1.5 sm:text-[9px] ${style.chip}`}>
                       {formatTime(new Date(dateTime).getTime())}
                     </span>
                   </div>
@@ -306,7 +321,7 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
               );
             })}
             {conjunctions.length === 0 && (
-              <p className="absolute left-6 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+              <p className={`absolute left-6 top-1/2 -translate-y-1/2 text-xs ${style.empty}`}>
                 No exact ASC conjunctions today
               </p>
             )}
@@ -317,8 +332,8 @@ export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
             style={{ top: `${nowPosition}%` }}
             aria-label={`Current ascendant: ${ZodiacData[ascendant.sign].displayName}`}
           >
-            <div className="border-t-2 border-rose-500" />
-            <span className="absolute left-1 top-0 -translate-y-1/2 rounded-sm bg-rose-600 px-1.5 py-0.5 text-[9px] font-semibold text-white shadow-sm">
+            <div className={`border-t-2 ${style.nowLine}`} />
+            <span className={`absolute left-1 top-0 -translate-y-1/2 rounded-sm px-1.5 py-0.5 text-[9px] font-semibold shadow-sm ${style.nowLabel}`}>
               NOW
             </span>
           </div>

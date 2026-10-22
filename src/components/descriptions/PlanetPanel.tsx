@@ -8,6 +8,9 @@ import { formatDegMin } from "../../utils/funcs";
 import { AspectChip } from "../utils/AspectChip";
 import { HouseChip } from "../utils/HouseChip";
 import { Section, DescSection } from "../utils/Section";
+import { PlanetInChart } from "../chart-views/PlanetInChart";
+import { PlanetReturns } from "../chart-views/PlanetReturns";
+import { PlanetCycles } from "../chart-views/PlanetCycles";
 import { SignGroup, SignChip } from "../utils/SignChip";
 import { BackButton, CloseButton } from "./Helpers";
 
@@ -70,6 +73,15 @@ export const PlanetPanel = ({
               <HouseChip house={planet.house} owner={owner} />
             </DescSection>
           </div>
+        </Section>
+        <Section title="In this chart">
+          <PlanetInChart planetName={planetName} owner={owner} />
+        </Section>
+        <Section title="Returns" startOpen={false}>
+          <PlanetReturns planet={planetName} />
+        </Section>
+        <Section title="Cycles" startOpen={false}>
+          <PlanetCycles planet={planetName} />
         </Section>
         <Section title="Aspects">
           <div className="flex flex-col gap-1">

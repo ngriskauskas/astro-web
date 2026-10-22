@@ -6,7 +6,13 @@ import {
   AscendantTodayWidget,
   AspectKeyWidget,
   AspectMatrixWidget,
+  KeyAspectsWidget,
+  WidgetDisclosure,
   AtAGlanceWidget,
+  ChartRulerWidget,
+  ChartSummaryWidget,
+  DignitiesWidget,
+  HemispheresWidget,
   HoursTodayWidget,
   MoonTimingsWidget,
   PlacementsWidget,
@@ -29,7 +35,19 @@ import {
 } from "./dailyLayouts";
 
 // Tailwind only generates class names it finds written out in full, so the steps are listed here.
-const ORDER = ["order-1", "order-2", "order-3", "order-4", "order-5", "order-6", "order-7"];
+const ORDER = [
+  "order-1",
+  "order-2",
+  "order-3",
+  "order-4",
+  "order-5",
+  "order-6",
+  "order-7",
+  "order-8",
+  "order-9",
+  "order-10",
+  "order-11",
+];
 
 export const Daily = () => {
   const [layout, chooseLayout] = useDailyLayout();
@@ -127,6 +145,34 @@ const DailyCards = ({ layout }: { layout: DailyLayoutId }) => {
   );
 };
 
+// The aspects tab leads with the tightest aspects and the key. The full matrix is one step
+// further, so the tab stays short until someone asks for the detail.
+const AspectsPanel = () => {
+  const [showMatrix, setShowMatrix] = useState(false);
+  return (
+    <WidgetRow>
+      <div className="flex min-w-0 flex-col gap-6">
+        <KeyAspectsWidget />
+        <AspectKeyWidget />
+      </div>
+      <div className="flex min-w-0 flex-col">
+        <WidgetDisclosure
+          expanded={showMatrix}
+          onToggle={() => setShowMatrix(!showMatrix)}
+          controls="full-matrix"
+          collapsedLabel="Show the full aspect matrix"
+          expandedLabel="Hide the full aspect matrix"
+        />
+        {showMatrix && (
+          <div id="full-matrix">
+            <AspectMatrixWidget />
+          </div>
+        )}
+      </div>
+    </WidgetRow>
+  );
+};
+
 const TAB_KEY = "astro-daily-tab";
 const TAB_IDS = EXPLORE_TABS.map((tab) => tab.id);
 
@@ -161,12 +207,16 @@ const ExploreTabs = () => {
             {renderCard("placements")}
           </WidgetRow>
         ),
-        aspects: (
-          <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
-            {renderCard("matrix", "xl:col-span-9")}
-            <AspectKeyWidget className="xl:col-span-3" />
-          </div>
+        shape: (
+          <WidgetRow>
+            <div className="flex min-w-0 flex-col gap-6">
+              {renderCard("ruler")}
+              {renderCard("dignities")}
+            </div>
+            {renderCard("hemispheres")}
+          </WidgetRow>
         ),
+        aspects: <AspectsPanel />,
       }}
     />
   );
@@ -179,14 +229,22 @@ const renderCard = (id: DailyCard, className = "") => {
     case "timeline":
       return <AscendantTodayWidget className={className} />;
     case "moon":
-      return <MoonTimingsWidget className={className} />;
+      return <MoonTimingsWidget className={className} summary />;
+    case "summary":
+      return <ChartSummaryWidget className={className} />;
+    case "ruler":
+      return <ChartRulerWidget className={className} />;
+    case "dignities":
+      return <DignitiesWidget className={className} />;
+    case "hemispheres":
+      return <HemispheresWidget className={className} />;
     case "weekly":
-      return <WeeklyTimingsWidget className={className} />;
+      return <WeeklyTimingsWidget className={className} summary />;
     case "wheel":
       return <ZodiacWheelWidget className={className} />;
     case "matrix":
       return <AspectMatrixWidget className={className} />;
     case "placements":
-      return <PlacementsWidget className={className} />;
+      return <PlacementsWidget className={className} summary />;
   }
 };

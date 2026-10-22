@@ -15,7 +15,7 @@ import { useWheel } from "../../hooks/useWheel";
 import { formatDegMin } from "../../utils/funcs";
 import { Spinner } from "../utils/Spinner";
 import { LoadError } from "../utils/LoadError";
-import { Widget, WidgetViewSwitch, type WidgetProps } from "../widgets/Widget";
+import { Widget, WidgetDisclosure, WidgetViewSwitch, type WidgetProps } from "../widgets/Widget";
 
 type MoonView = "orbit" | "path" | "phases";
 
@@ -28,13 +28,17 @@ const MOON_VIEWS = [
 const displayPhase = (phase: MoonPhase) =>
   phase.replace(/\b\w/g, (letter) => letter.toUpperCase());
 
-export const MoonTimings = ({ className }: WidgetProps) => {
+// Phases shown first when the moon is summarised: the next four from now.
+const NEXT_PHASES = 4;
+
+export const MoonTimings = ({ className, summary = false }: WidgetProps & { summary?: boolean }) => {
   const { loading, timings, error } = useMoonTimings();
   const { open } = useDesc();
   const { planetAngles } = useWheel() as SingleWheelContextType;
   const currentMoon = planetAngles.find((planet) => planet.name === "MOON");
   const currentPhase = timings ? getMoonPhase(timings.currentPhase.phase) : undefined;
-  const [view, setView] = useState<MoonView>("orbit");
+  const [view, setView] = useState<MoonView>(summary ? "phases" : "orbit");
+  const [expanded, setExpanded] = useState(false);
   const phaseTimings = new Map<MoonPhase, MoonPhaseTiming>();
   const orderedPhaseTimings = [...(timings?.phaseLoop ?? [])]
     .filter((timing) => Number.isFinite(new Date(timing.dateTime).getTime()))
@@ -110,10 +114,21 @@ export const MoonTimings = ({ className }: WidgetProps) => {
               currentPhase={currentPhase}
             />
           ) : (
-            <PhaseGrid
-              phases={phasesByTime}
-              phaseTimings={phaseTimings}
-              currentPhase={currentPhase}
+            <div id="moon-phases">
+              <PhaseGrid
+                phases={summary && !expanded ? nextPhases(phasesByTime, phaseTimings) : phasesByTime}
+                phaseTimings={phaseTimings}
+                currentPhase={currentPhase}
+              />
+            </div>
+          )}
+          {summary && view === "phases" && (
+            <WidgetDisclosure
+              expanded={expanded}
+              onToggle={() => setExpanded(!expanded)}
+              controls="moon-phases"
+              collapsedLabel="More phases"
+              expandedLabel="Fewer phases"
             />
           )}
         </div>
@@ -122,6 +137,16 @@ export const MoonTimings = ({ className }: WidgetProps) => {
       )}
     </Widget>
   );
+};
+
+// The phases still to come, soonest first; if none are left, the last few.
+const nextPhases = (phases: MoonPhase[], timings: Map<MoonPhase, MoonPhaseTiming>) => {
+  const now = Date.now();
+  const upcoming = phases.filter((phase) => {
+    const time = timings.get(phase)?.dateTime;
+    return time !== undefined && new Date(time).getTime() >= now;
+  });
+  return (upcoming.length > 0 ? upcoming : phases).slice(0, NEXT_PHASES);
 };
 
 type PhaseViewProps = {

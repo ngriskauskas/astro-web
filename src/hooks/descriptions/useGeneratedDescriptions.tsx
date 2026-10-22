@@ -7,7 +7,13 @@ import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { apiFetch } from "../../utils/api";
 
-export type ChartSource = "NATAL" | "CURRENT" | "TRANSIT" | "PRIMARY_NATAL" | "SECONDARY_NATAL";
+export type ChartSource =
+  | "NATAL"
+  | "CURRENT"
+  | "MOMENT"
+  | "TRANSIT"
+  | "PRIMARY_NATAL"
+  | "SECONDARY_NATAL";
 
 export type WheelType = SingleWheelContextType["type"] | MultiWheelContextType["type"];
 
@@ -32,6 +38,7 @@ export type DescriptionMoonPhase =
 
 export type DescriptionContext =
   | { type: "placement"; subject: PointPlacementContext }
+  | DistributionContext
   | {
       type: "aspect";
       details: {
@@ -76,9 +83,21 @@ export type DescriptionContext =
 
 export type AspectRelationship = "NATAL" | "CURRENT" | "TRANSIT_TO_NATAL" | "SYNASTRY";
 
+// How the core planets spread across the elements or the modalities of one chart.
+export type DistributionContext = {
+  type: "distribution";
+  chart: ChartSource;
+  kind: "ELEMENT" | "MODALITY" | "QUADRANT";
+  value: string;
+  count: number;
+  total: number;
+  contributors: PointPlacementContext[];
+};
+
 export const getChartSource = (type: WheelType, owner: "main" | "other" = "main"): ChartSource => {
   if (type === "natal") return "NATAL";
-  if (type === "time" || type === "moment") return "CURRENT";
+  if (type === "moment") return "MOMENT";
+  if (type === "time") return "CURRENT";
   if (type === "transit") return owner === "main" ? "PRIMARY_NATAL" : "TRANSIT";
   if (type === "synastry") return owner === "main" ? "PRIMARY_NATAL" : "SECONDARY_NATAL";
   return "CURRENT";
