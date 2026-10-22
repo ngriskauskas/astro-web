@@ -2,7 +2,16 @@ import type { PlanetName } from "./planet";
 import type { ZodiacSign } from "./zodiac";
 
 // The shapes planets make together in one chart, as the server sends them.
-export type AspectPatternType = "GRAND_TRINE" | "T_SQUARE" | "STELLIUM" | "YOD" | "CONJUNCTION_CLUSTER";
+export type AspectPatternType =
+  | "GRAND_TRINE"
+  | "T_SQUARE"
+  | "YOD"
+  | "KITE"
+  | "GRAND_CROSS"
+  | "MYSTIC_RECTANGLE"
+  | "GRAND_SEXTILE"
+  | "STELLIUM"
+  | "CONJUNCTION_CLUSTER";
 
 export interface AspectPattern {
   type: AspectPatternType;
@@ -45,6 +54,30 @@ export const AspectPatternData: Record<AspectPatternType, AspectPatternInfo> = {
     color: "#14B8A6",
     description:
       "Two planets in sextile are both quincunx a third. The quincunxes ask for an adjustment, and the focal planet is where that adjustment is asked of you.",
+  },
+  KITE: {
+    name: "Kite",
+    color: "#22C55E",
+    description:
+      "A grand trine with a fourth planet opposite one of its corners and sextile the other two. The opposing planet is the focus: it gives the trine a point to work through.",
+  },
+  GRAND_CROSS: {
+    name: "Grand cross",
+    color: "#EF4444",
+    description:
+      "Four planets in two crossing oppositions, each squaring its neighbours. Tension runs in every direction at once, so the shape asks for balance between competing demands.",
+  },
+  MYSTIC_RECTANGLE: {
+    name: "Mystic rectangle",
+    color: "#6366F1",
+    description:
+      "Two oppositions joined round by sextiles and trines. The easy trines and the sextile openings sit alongside the oppositions, so the tension is held and worked with.",
+  },
+  GRAND_SEXTILE: {
+    name: "Grand sextile",
+    color: "#EAB308",
+    description:
+      "Six planets in a hexagon of sextiles, trines and oppositions. Each planet is linked to the others, so the chart's energies are woven together rather than sorted into separate groups.",
   },
   CONJUNCTION_CLUSTER: {
     name: "Conjunction cluster",
