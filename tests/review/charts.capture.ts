@@ -29,6 +29,7 @@ const captureDrawer = async (page: Page, capture: Capture, item: ReturnType<Page
   await item.click();
   await expect(drawer(page)).toBeVisible();
   await expect(drawer(page).getByRole("status", { name: "Loading" })).toHaveCount(0);
+  await page.waitForTimeout(300);
   await capture(state, { fullPage: false });
   await drawer(page).getByRole("button", { name: "Close" }).click();
   await expect(drawer(page)).toBeHidden();
@@ -41,6 +42,33 @@ for (const [name, viewport] of Object.entries(reviewSizes)) {
 
     const dir = path.join(OUTPUT, name as ReviewSize);
     const widthsFile = path.join(dir, "charts-widths.json");
+
+    test(`home at ${viewport.width}px`, async ({ page }) => {
+      const capture = capturer(page);
+      await page.goto("/");
+      await expect(page.getByText("A personal sky, updated throughout the day")).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Start with what you're curious about." })).toBeVisible();
+      await expect(page.getByLabel("Home layout")).toHaveCount(0);
+      await expect(page.getByRole("heading", { name: "Your sky" })).toHaveCount(0);
+      const destinations = page.getByRole("navigation", { name: "Choose a destination" });
+      for (const label of ["Today", "My chart", "A moment", "Transits", "Synastry", "Profiles"]) {
+        await expect(destinations.getByRole("link", { name: new RegExp(label) })).toBeVisible();
+      }
+      const todayLink = destinations.getByRole("link", { name: "Today" });
+      await todayLink.hover();
+      await expect(todayLink).toHaveCSS("cursor", "pointer");
+      await expect(region(page, "At a glance")).toBeVisible();
+      await expect(page.getByRole("button", { name: "View natal Sun details" })).toBeVisible();
+      const weeklyTimeline = region(page, "Weekly Timings").getByRole("button", { name: "Timeline" });
+      await weeklyTimeline.hover();
+      await expect(weeklyTimeline).toHaveCSS("cursor", "pointer");
+      for (const name of ["Planetary Hour", "Moon Timings", "Ascendant Today", "Weekly Timings"]) {
+        await expect(region(page, name)).toHaveClass(/\bwidget\b/);
+      }
+      await expect(region(page, "Planetary Hour")).toHaveCSS("animation-name", "widget-enter");
+      await page.waitForTimeout(650);
+      await capture("home-01-sky-at-a-glance");
+    });
 
     // Page width next to screen width per state: a page wider than the screen scrolls
     // sideways, which a full-page screenshot alone does not make obvious.
@@ -129,12 +157,81 @@ for (const [name, viewport] of Object.entries(reviewSizes)) {
       await expect(
         region(page, "Ascendant Today").getByRole("list", { name: "Planetary hours" }),
       ).toBeVisible();
+      const timeline = region(page, "Ascendant Today").locator("[data-timeline-viewport]");
+      const timelineCard = region(page, "Ascendant Today");
+      await expect
+        .poll(() => timelineCard.evaluate((element) => element.getBoundingClientRect().width))
+        .toBeLessThanOrEqual(400);
+      await expect
+        .poll(() => timeline.evaluate((element) => element.scrollWidth - element.clientWidth))
+        .toBe(0);
+      if (!touch) {
+        const signBlock = region(page, "Ascendant Today")
+          .getByRole("button", { name: /sign details/ })
+          .first();
+        await signBlock.locator("img").hover();
+        await expect
+          .poll(() => signBlock.evaluate((element) => getComputedStyle(element).filter))
+          .not.toBe("none");
+        await expect
+          .poll(() =>
+            signBlock.locator("img").evaluate((element) => getComputedStyle(element).scale),
+          )
+          .toBe("1.25");
+        await page.waitForTimeout(350);
+        await capture("daily-09a-ascendant-sign-hover", { fullPage: false });
+        const planetaryHourBlock = region(page, "Ascendant Today")
+          .getByRole("list", { name: "Planetary hours" })
+          .getByRole("button")
+          .first();
+        await planetaryHourBlock.locator('[aria-hidden="true"]').hover();
+        await expect
+          .poll(() => planetaryHourBlock.evaluate((element) => getComputedStyle(element).filter))
+          .not.toBe("none");
+        await expect
+          .poll(() =>
+            planetaryHourBlock
+              .locator('[aria-hidden="true"]')
+              .evaluate((element) => getComputedStyle(element).scale),
+          )
+          .toBe("1.25");
+        await page.waitForTimeout(350);
+        await capture("daily-09b-planetary-hour-hover", { fullPage: false });
+        await page.mouse.move(0, 0);
+      }
       await expect(region(page, "Weekly Timings").getByText("Jupiter day")).toBeVisible();
       await expect(
         region(page, "Moon Timings").getByRole("button", { name: "View New Moon details" }),
       ).toBeVisible();
       await capture("daily-01-top", { fullPage: false });
+      const moonViews = region(page, "Moon Timings").getByRole("group", { name: "Moon timing view" });
+      const moonWidget = region(page, "Moon Timings");
+      await moonWidget.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(350);
+      await capture("daily-01-orbit", { fullPage: false });
+      await moonViews.scrollIntoViewIfNeeded();
+      await page.evaluate(() => window.scrollBy(0, -80));
+      await moonViews.getByRole("button", { name: "Timeline" }).click({ force: touch });
+      await moonWidget.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(400);
+      await capture("daily-01a-moon-timeline", { fullPage: false });
+      await moonViews.scrollIntoViewIfNeeded();
+      await page.evaluate(() => window.scrollBy(0, -80));
+      await moonViews.getByRole("button", { name: "Phases" }).click({ force: touch });
+      await moonWidget.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(400);
+      await capture("daily-01b-moon-phases", { fullPage: false });
+      await moonViews.scrollIntoViewIfNeeded();
+      await page.evaluate(() => window.scrollBy(0, -80));
+      await moonViews.getByRole("button", { name: "Orbit" }).click({ force: touch });
+      await page.evaluate(() => window.scrollTo(0, 0));
       await capture("daily-02-full");
+      await captureDrawer(
+        page,
+        capture,
+        region(page, "Planetary Hour").getByRole("button", { name: "Hour ruler: Saturn" }),
+        "daily-02a-drawer-planetary-hour",
+      );
       await captureDrawer(page, capture, wheel(page).getByRole("button", { name: "Moon" }), "daily-03-drawer-planet");
       await captureDrawer(
         page,

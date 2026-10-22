@@ -18,6 +18,8 @@ import { RetrogradeTimingPanel } from "./RetrogradeTimingPanel";
 import { StationTimingPanel } from "./StationTimingPanel";
 import { MoonPhasePanel } from "./MoonPhasePanel";
 import type { MoonPhaseDescriptionValue } from "../../types/moon";
+import type { PlanetaryHourDescriptionValue } from "../../types/planetaryHours";
+import { PlanetaryHourPanel } from "./PlanetaryHourPanel";
 
 export const DescriptionSidePanel = () => {
   const { active, close } = useDesc();
@@ -79,6 +81,8 @@ export const DescriptionSidePanel = () => {
         );
       case "moonphase":
         return <MoonPhasePanel value={active.value as MoonPhaseDescriptionValue} />;
+      case "planetaryHour":
+        return <PlanetaryHourPanel value={active.value as PlanetaryHourDescriptionValue} />;
       default:
         return null;
     }

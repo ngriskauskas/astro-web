@@ -39,7 +39,12 @@ const dayRow = (region: ReturnType<typeof within>, date: string) =>
   within(region.getByText(date).closest(".grid") as HTMLElement);
 
 const eventNames = (scope: ReturnType<typeof within>) =>
-  scope.queryAllByRole("button").map((button: HTMLElement) => button.getAttribute("aria-label"));
+  scope
+    .queryAllByRole("button")
+    .map((button: HTMLElement) => button.getAttribute("aria-label"))
+    .filter(
+      (label: string | null): label is string => label !== null && !label.startsWith("View "),
+    );
 
 test("starts on the By day view, listing the seven days of this week with their rulers", async () => {
   await renderChartPage("daily");
@@ -52,6 +57,15 @@ test("starts on the By day view, listing the seven days of this week with their 
     expect(row.getByText(weekday)).toBeInTheDocument();
     expect(row.getByText(ruler)).toBeInTheDocument();
   }
+});
+
+test("selecting a weekday ruler opens its planetary description", async () => {
+  const { user } = await renderChartPage("daily");
+  const region = await weekly();
+
+  await user.click(region.getByRole("button", { name: "View Sun day details" }));
+
+  expect(drawer.title()).toBe("Sun");
 });
 
 test("lists each event under its day, and says so for a day with none", async () => {

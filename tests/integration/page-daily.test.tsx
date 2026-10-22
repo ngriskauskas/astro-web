@@ -2,7 +2,7 @@ import { screen, within } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { expect, test, vi } from "vitest";
 import { API_URL, momentChart, refreshedMomentChart } from "../mocks";
-import { aMinutePasses, fakeTheMinuteTimer, findWidget, renderChartPage, wheel } from "./charts";
+import { aMinutePasses, drawer, fakeTheMinuteTimer, findWidget, renderChartPage, wheel } from "./charts";
 import { capture } from "./requests";
 
 // The Daily page: the sky now, refreshed every minute. The clock is frozen at 07:00
@@ -34,6 +34,16 @@ test("shows its seven widgets and no settings", async () => {
   expect(screen.queryByLabelText("Profile")).not.toBeInTheDocument();
   expect(screen.queryByLabelText("Date")).not.toBeInTheDocument();
   expect(screen.queryByLabelText("Time")).not.toBeInTheDocument();
+});
+
+test("the Explore glance opens descriptions for its placements", async () => {
+  const { user } = await renderChartPage("daily");
+  await user.click(screen.getByRole("button", { name: "Explore" }));
+  const glance = await findWidget("At a glance");
+
+  await user.click(glance.getByRole("button", { name: "View Sun details" }));
+
+  expect(drawer.title()).toBe("Sun");
 });
 
 test("requests the chart for the current moment", async () => {

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { useDailyTimings } from "../../hooks/timings/useDailyTimings";
 import { isMulti, useWheel } from "../../hooks/useWheel";
 import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
@@ -12,13 +12,17 @@ import { formatDegMin, formatTime } from "../../utils/funcs";
 import { planetaryHourBlocks } from "../../utils/planetaryHours";
 import { Spinner } from "../utils/Spinner";
 import { LoadError } from "../utils/LoadError";
+import { Widget, type WidgetProps } from "../widgets/Widget";
 
 const TRACK_HEIGHT = 2160;
+const MARKER_HEIGHT = 44;
+const MARKER_GAP = MARKER_HEIGHT + 12;
 
 // Time labels, signs, (planetary hours,) conjunction markers.
-const COLUMNS = "grid-cols-[3rem_4.5rem_minmax(0,1fr)] sm:grid-cols-[3.5rem_6.5rem_minmax(0,1fr)]";
+const COLUMNS =
+  "grid-cols-[2.75rem_minmax(4.5rem,1.4fr)_minmax(6.5rem,1fr)] sm:grid-cols-[3rem_minmax(6rem,1.4fr)_minmax(6rem,1fr)]";
 const COLUMNS_WITH_HOURS =
-  "grid-cols-[3rem_4.5rem_2.25rem_minmax(0,1fr)] sm:grid-cols-[3.5rem_6.5rem_3rem_minmax(0,1fr)]";
+  "grid-cols-[2.25rem_minmax(3.5rem,1fr)_minmax(3.5rem,1fr)_minmax(7rem,1.2fr)] sm:grid-cols-[3rem_minmax(4rem,1fr)_minmax(4rem,1fr)_minmax(7rem,1.2fr)]";
 
 interface SignSegment {
   sign: ZodiacSign;
@@ -31,7 +35,12 @@ interface ConjunctionEvent {
   dateTime: string;
 }
 
-export const DailyAscendantTimeline = () => {
+interface PositionedConjunction extends ConjunctionEvent {
+  exactPosition: number;
+  displayPosition: number;
+}
+
+export const DailyAscendantTimeline = ({ className }: WidgetProps) => {
   const wheel = useWheel();
   const keyAngles = isMulti(wheel)
     ? (wheel as MultiWheelContextType).otherKeyAngles
@@ -61,6 +70,7 @@ export const DailyAscendantTimeline = () => {
     ? buildSignSegments(ascendantTransitions, ascendant.sign, dayStart.getTime(), dayEnd.getTime())
     : [];
   const conjunctions = getConjunctionEvents(timings.aspects, dayStart.getTime(), dayEnd.getTime());
+  const positionedConjunctions = positionConjunctions(conjunctions, dayStart.getTime(), dayDuration);
   // Planetary hours are an addition: without them the timeline is shown as it always was.
   const hourBlocks =
     planetaryHours.status === "ready" && planetaryHours.data
@@ -77,16 +87,9 @@ export const DailyAscendantTimeline = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
-  const heading = (
-    <h2 id="ascendant-heading" className="mb-2 text-lg font-semibold text-gray-900">
-      Ascendant Today
-    </h2>
-  );
-
   if (!ready) {
     return (
-      <section aria-labelledby="ascendant-heading" className="w-full border-t border-gray-200 py-3">
-        {heading}
+      <Widget id="ascendant" title="Ascendant Today" tone="ascendant" size="narrow" className={className}>
         {error ? (
           <LoadError message="Could not load today's timings." />
         ) : wheel.status === "error" ? (
@@ -94,21 +97,29 @@ export const DailyAscendantTimeline = () => {
         ) : (
           <Spinner />
         )}
-      </section>
+      </Widget>
     );
   }
 
   return (
-    <section aria-labelledby="ascendant-heading" className="w-full border-t border-gray-200 py-3">
-      {heading}
-      <div className="mb-3 flex items-center gap-2 text-sm">
+    <Widget id="ascendant" title="Ascendant Today" tone="ascendant" size="narrow" className={className}>
+      <button
+        type="button"
+        aria-label="View Ascendant details"
+        onClick={() => open({ type: "angle", value: ascendant.name })}
+        className="mb-3 flex cursor-pointer items-center gap-2 rounded px-1 py-0.5 text-sm hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500"
+      >
         <span className="text-[10px] font-semibold uppercase text-gray-500">ASC</span>
         <img src={ZodiacData[ascendant.sign].glyph} alt="" className="h-4 w-4" />
         <span className="font-medium">{ZodiacData[ascendant.sign].displayName}</span>
         <span className="text-gray-500">{formatDegMin(ascendant.position.degMin)}</span>
-      </div>
+      </button>
 
-      <div ref={scrollRef} className="max-h-[460px] overflow-y-auto border-y border-gray-200">
+      <div
+        ref={scrollRef}
+        data-timeline-viewport
+        className="max-h-[460px] overflow-y-auto rounded-xl border border-gray-200 bg-gray-50/40 shadow-inner"
+      >
         <div
           className={`relative grid ${hourBlocks ? COLUMNS_WITH_HOURS : COLUMNS}`}
           style={{ height: TRACK_HEIGHT }}
@@ -137,27 +148,35 @@ export const DailyAscendantTimeline = () => {
             </span>
           </div>
 
-          <div className="relative border-x border-gray-200 bg-gray-50/70">
+          <div className="relative overflow-hidden border-x border-gray-200 bg-gray-50/70">
             {signSegments.map((segment) => {
               const signInfo = ZodiacData[segment.sign];
               const top = ((segment.start - dayStart.getTime()) / dayDuration) * 100;
               const height = ((segment.end - segment.start) / dayDuration) * 100;
               return (
-                <div
+                <button
+                  type="button"
                   key={`${segment.sign}-${segment.start}`}
-                  className="absolute inset-x-0 flex flex-col items-center justify-center gap-1 overflow-hidden border-b border-white/80 px-1 text-center"
+                  aria-label={`View ${ZodiacData[segment.sign].displayName} sign details`}
+                  title={`${ZodiacData[segment.sign].displayName} from ${formatTime(segment.start)}`}
+                  onClick={() => open({ type: "sign", value: segment.sign })}
+                  className="absolute inset-x-0 flex cursor-pointer flex-col items-center justify-center gap-1 overflow-hidden border-b border-white/90 px-1 text-center shadow-sm transition-[filter,transform] duration-300 ease-out hover:z-10 hover:scale-[1.015] hover:brightness-110 hover:saturate-125 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-gray-600"
                   style={{
                     top: `${top}%`,
                     height: `${height}%`,
-                    backgroundColor: `${signInfo.color}24`,
+                    background: `linear-gradient(145deg, ${signInfo.color}52, ${signInfo.color}24)`,
+                    borderLeft: `3px solid ${signInfo.color}`,
                   }}
-                  title={`${ZodiacData[segment.sign].displayName} from ${formatTime(segment.start)}`}
                 >
-                  <img src={signInfo.glyph} alt="" className="h-5 w-5 shrink-0" />
-                  <span className="text-[10px] font-medium leading-tight text-gray-700">
+                  <img
+                    src={signInfo.glyph}
+                    alt=""
+                    className="h-6 w-6 shrink-0 drop-shadow-sm transition-[transform,filter] duration-300 ease-out hover:scale-125 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.9)]"
+                  />
+                  <span className="text-[10px] font-semibold leading-tight text-gray-800 transition-colors duration-300 hover:text-gray-950">
                     {ZodiacData[segment.sign].displayName}
                   </span>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -180,36 +199,52 @@ export const DailyAscendantTimeline = () => {
                     aria-label={name}
                     aria-current={isCurrent ? "time" : undefined}
                     title={name}
-                    className={`absolute inset-x-0 flex flex-col items-center overflow-hidden border-t border-gray-400 ${
-                      isDay ? "bg-amber-50" : "bg-slate-200/70"
+                    className={`absolute inset-x-0 flex flex-col items-center overflow-hidden border-t border-white ${
+                      isCurrent ? "z-[1] shadow-sm" : ""
                     }`}
                     style={{
                       top: `${((top - dayStart.getTime()) / dayDuration) * 100}%`,
                       height: `${((bottom - top) / dayDuration) * 100}%`,
+                      background: `linear-gradient(180deg, ${planet.color}${isCurrent ? "45" : "22"}, ${isDay ? "#fffdf9" : "#e8edf5"}cc)`,
                     }}
                   >
-                    {/* The line at the top of a block is where its hour starts. An hour that
-                        began before midnight has no line of its own on this day. */}
-                    {top === start && (
-                      <time
-                        dateTime={hour.dateTime}
-                        className="mt-0.5 whitespace-nowrap text-[7px] leading-none tabular-nums text-gray-600 sm:text-[8px]"
-                      >
-                        {formatTime(start)}
-                      </time>
-                    )}
-                    {/* Hours 1 and 13 begin at sunrise and sunset. */}
-                    {(hour.hour === 1 || hour.hour === 13) && (
-                      <span className="mt-0.5 text-[7px] font-semibold uppercase leading-none text-gray-600 sm:text-[8px]">
-                        {isDay ? "Sunrise" : "Sunset"}
-                      </span>
-                    )}
-                    <span
-                      className="flex min-h-0 flex-1 items-center text-base font-semibold leading-none text-gray-900"
-                      aria-hidden="true"
+                    <button
+                      type="button"
+                      aria-label={`View ${name} details`}
+                      onClick={() =>
+                        open({
+                          type: "planetaryHour",
+                          value: { hour, end: new Date(end) },
+                        })
+                      }
+                      className="absolute inset-0 flex cursor-pointer flex-col items-center overflow-hidden transition-[filter,transform] duration-300 ease-out hover:z-10 hover:scale-[1.015] hover:brightness-110 hover:saturate-125 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-gray-700"
                     >
-                      {planet.glyph}
-                    </span>
+                      {/* The line at the top of a block is where its hour starts. An hour that
+                          began before midnight has no line of its own on this day. */}
+                      {top === start && (
+                        <time
+                          dateTime={hour.dateTime}
+                          className="mt-0.5 whitespace-nowrap text-[7px] font-medium leading-none tabular-nums text-gray-600 sm:text-[8px]"
+                        >
+                          {formatTime(start)}
+                        </time>
+                      )}
+                      {/* Hours 1 and 13 begin at sunrise and sunset. */}
+                      {(hour.hour === 1 || hour.hour === 13) && (
+                        <span className="mt-0.5 text-[7px] font-semibold uppercase leading-none text-gray-600 sm:text-[8px]">
+                          {isDay ? "Sunrise" : "Sunset"}
+                        </span>
+                      )}
+                      <span
+                        className={`flex min-h-0 flex-1 items-center justify-center text-base font-semibold leading-none transition-[transform,filter] duration-300 ease-out hover:scale-125 hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.9)] sm:text-lg ${
+                          isCurrent ? "scale-110" : ""
+                        }`}
+                        style={{ color: planet.color }}
+                        aria-hidden="true"
+                      >
+                        {planet.glyph}
+                      </span>
+                    </button>
                   </div>
                 );
               })}
@@ -217,32 +252,57 @@ export const DailyAscendantTimeline = () => {
           )}
 
           <div className="relative min-w-0">
-            <div className="absolute inset-y-0 left-3 border-l border-dashed border-gray-300" />
-            {conjunctions.map(({ timing, dateTime }) => {
-              const top = ((new Date(dateTime).getTime() - dayStart.getTime()) / dayDuration) * 100;
+            <div className="absolute inset-y-0 left-2 border-l border-dashed border-gray-300" />
+            {positionedConjunctions.map(({ timing, dateTime, exactPosition, displayPosition }) => {
               const planet = getConjunctingPlanet(timing);
               if (!planet) return null;
+              const planetInfo = PlanetsData[planet.name];
+              const exactTop = `${(exactPosition / TRACK_HEIGHT) * 100}%`;
+              const displayTop = `${(displayPosition / TRACK_HEIGHT) * 100}%`;
+              const connectorTop = Math.min(exactPosition, displayPosition);
+              const connectorHeight = Math.abs(displayPosition - exactPosition);
 
               return (
-                <div
+                <Fragment
                   key={`${dateTime}-${timing.aspect.point1.value.name}-${timing.aspect.point2.value.name}`}
-                  className="absolute left-3 right-1 z-10 flex -translate-y-1/2 items-center"
-                  style={{ top: `${top}%` }}
                 >
-                  <span className="h-px w-2 shrink-0 bg-rose-400" />
-                  <button
-                    type="button"
-                    className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white text-xl shadow-sm transition hover:border-rose-400 hover:shadow-md"
-                    title={`${ZodiacData[planet.sign].displayName} ${PlanetsData[planet.name].displayName} conjuncts ASC`}
-                    aria-label={`${PlanetsData[planet.name].displayName} conjuncts ASC at ${formatTime(new Date(dateTime).getTime())}`}
-                    onClick={() => open({ type: "dailyAspectTiming", value: timing })}
+                  {connectorHeight > 0 && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-2 z-0 w-px bg-rose-300"
+                      style={{
+                        top: `${(connectorTop / TRACK_HEIGHT) * 100}%`,
+                        height: `${(connectorHeight / TRACK_HEIGHT) * 100}%`,
+                      }}
+                    />
+                  )}
+                  <span
+                    className="absolute left-2 z-[1] h-px w-2 bg-rose-400"
+                    style={{ top: exactTop }}
+                  />
+                  <div
+                    data-conjunction-marker
+                    className="absolute left-4 right-1 z-10 flex -translate-y-1/2 items-center"
+                    style={{ top: displayTop }}
                   >
-                    {PlanetsData[planet.name].glyph}
-                  </button>
-                  <span className="ml-2 whitespace-nowrap text-[10px] font-medium tabular-nums text-gray-600">
-                    {formatTime(new Date(dateTime).getTime())}
-                  </span>
-                </div>
+                    <button
+                      type="button"
+                      className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-rose-200 bg-white text-lg shadow-sm transition hover:border-rose-400 hover:shadow-md sm:h-9 sm:w-9"
+                      title={`${ZodiacData[planet.sign].displayName} ${PlanetsData[planet.name].displayName} conjuncts ASC`}
+                      aria-label={`${PlanetsData[planet.name].displayName} conjuncts ASC at ${formatTime(new Date(dateTime).getTime())}`}
+                      onClick={() => open({ type: "dailyAspectTiming", value: timing })}
+                      style={{
+                        color: planetInfo.color,
+                        background: `linear-gradient(145deg, white, ${planetInfo.color}18)`,
+                      }}
+                    >
+                      {planetInfo.glyph}
+                    </button>
+                    <span className="ml-1 whitespace-nowrap rounded-full border border-gray-200 bg-white/90 px-1 py-0.5 text-[8px] font-semibold tabular-nums text-gray-700 shadow-sm sm:px-1.5 sm:text-[9px]">
+                      {formatTime(new Date(dateTime).getTime())}
+                    </span>
+                  </div>
+                </Fragment>
               );
             })}
             {conjunctions.length === 0 && (
@@ -264,7 +324,7 @@ export const DailyAscendantTimeline = () => {
           </div>
         </div>
       </div>
-    </section>
+    </Widget>
   );
 };
 
@@ -304,6 +364,45 @@ const getConjunctionEvents = (
       return time >= dayStart && time < dayEnd;
     })
     .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
+
+const positionConjunctions = (
+  events: ConjunctionEvent[],
+  dayStart: number,
+  dayDuration: number,
+): PositionedConjunction[] => {
+  if (events.length === 0) return [];
+  const minimum = MARKER_HEIGHT / 2 + 4;
+  const maximum = TRACK_HEIGHT - minimum;
+  const gap = Math.min(MARKER_GAP, (maximum - minimum) / Math.max(1, events.length - 1));
+  const positioned = events.map((event) => {
+    const exactPosition =
+      ((new Date(event.dateTime).getTime() - dayStart) / dayDuration) * TRACK_HEIGHT;
+    return {
+      ...event,
+      exactPosition,
+      displayPosition: Math.max(minimum, Math.min(maximum, exactPosition)),
+    };
+  });
+
+  for (let index = 1; index < positioned.length; index++) {
+    positioned[index].displayPosition = Math.max(
+      positioned[index].displayPosition,
+      positioned[index - 1].displayPosition + gap,
+    );
+  }
+  positioned[positioned.length - 1].displayPosition = Math.min(
+    positioned[positioned.length - 1].displayPosition,
+    maximum,
+  );
+  for (let index = positioned.length - 2; index >= 0; index--) {
+    positioned[index].displayPosition = Math.min(
+      positioned[index].displayPosition,
+      positioned[index + 1].displayPosition - gap,
+    );
+  }
+
+  return positioned;
+};
 
 const getConjunctingPlanet = (timing: AspectTiming) => {
   if (timing.aspect.point1.type === "Planet") return timing.aspect.point1.value;

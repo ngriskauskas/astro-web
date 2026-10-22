@@ -1,52 +1,44 @@
 import { useState } from "react";
 import { useCurrentTimings } from "../../hooks/timings/useTimings";
+import { Widget, WidgetViewSwitch, type WidgetProps } from "../widgets/Widget";
 import { WeeklyPlanetaryTimeline } from "./WeeklyPlanetaryTimeline";
 import { WeeklyPlanetaryTimings } from "./WeeklyPlanetaryTimings";
 
 type WeeklyTimingView = "grouped" | "timeline";
 
-export const WeeklyTimingWidget = () => {
+const VIEWS = [
+  { id: "grouped", label: "By day" },
+  { id: "timeline", label: "Timeline" },
+] as const;
+
+export const WeeklyTimingWidget = ({
+  className,
+  link,
+}: WidgetProps & { link?: { to: string; label: string } }) => {
   const [view, setView] = useState<WeeklyTimingView>("grouped");
   const timingResult = useCurrentTimings({ filterKeyAngleAspects: true });
 
   return (
-    <section aria-labelledby="weekly-heading" className="border-t border-gray-200 py-5">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h2 id="weekly-heading" className="text-lg font-semibold text-gray-900">
-          Weekly Timings
-        </h2>
-        <div
-          className="inline-flex rounded-md border border-gray-300 bg-white p-0.5"
-          role="group"
-          aria-label="Weekly timing view"
-        >
-          <button
-            type="button"
-            aria-pressed={view === "grouped"}
-            onClick={() => setView("grouped")}
-            className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
-              view === "grouped" ? "bg-indigo-600 text-white" : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            By day
-          </button>
-          <button
-            type="button"
-            aria-pressed={view === "timeline"}
-            onClick={() => setView("timeline")}
-            className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
-              view === "timeline" ? "bg-indigo-600 text-white" : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            Timeline
-          </button>
-        </div>
-      </div>
+    <Widget
+      id="weekly"
+      title="Weekly Timings"
+      tone="weekly"
+      className={className}
+      link={link}
+      actions={
+        <WidgetViewSwitch
+          label="Weekly timing view"
+          value={view}
+          options={VIEWS}
+          onChange={setView}
+        />
+      }
+    >
       {view === "grouped" ? (
         <WeeklyPlanetaryTimings {...timingResult} embedded />
       ) : (
         <WeeklyPlanetaryTimeline {...timingResult} embedded />
       )}
-    </section>
+    </Widget>
   );
 };

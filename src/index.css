@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+/* Keep the pointer visible across the full hover target, even when a child has its own
+   cursor style or another unlayered stylesheet overrides the utility classes. */
+:is(
+    a,
+    button:not(:disabled),
+    [role="button"]:not([aria-disabled="true"]),
+    [onclick]:not([aria-disabled="true"])
+  ):hover,
+:is(
+    a,
+    button:not(:disabled),
+    [role="button"]:not([aria-disabled="true"]),
+    [onclick]:not([aria-disabled="true"])
+  ):hover * {
+  cursor: pointer !important;
+}
+
 /* Themes. Pages use Tailwind's white and gray utilities, so a theme only re-points those
    colour tokens (and, for the dark themes, the indigo accent). Paper is the default. These
    rules are unlayered, so they win over Tailwind's theme layer. */
@@ -130,6 +147,96 @@ body {
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes moon-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.4rem) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes moon-row-in {
+  from {
+    opacity: 0;
+    transform: translateX(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes moon-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0.4rem rgb(199 210 254 / 0.28));
+    transform: translateY(0);
+  }
+  50% {
+    filter: drop-shadow(0 0 1rem rgb(199 210 254 / 0.58));
+    transform: translateY(-0.15rem);
+  }
+}
+
+@keyframes widget-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Every widget card shares this: the entrance and hover shadow live here so a
+   widget looks and behaves the same on any page. */
+.widget {
+  position: relative;
+  isolation: isolate;
+  animation: widget-enter 520ms cubic-bezier(0.2, 0.75, 0.25, 1) backwards;
+  animation-delay: var(--widget-delay, 0ms);
+  transition:
+    box-shadow 250ms ease,
+    border-color 250ms ease,
+    transform 250ms ease;
+}
+
+.widget[data-tone="hours"] {
+  --widget-delay: 80ms;
+}
+
+.widget[data-tone="moon"] {
+  --widget-delay: 150ms;
+}
+
+.widget[data-tone="ascendant"] {
+  --widget-delay: 220ms;
+}
+
+.widget[data-tone="weekly"] {
+  --widget-delay: 300ms;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .widget:hover {
+    border-color: var(--color-gray-300);
+    box-shadow:
+      0 12px 28px rgb(47 48 74 / 0.08),
+      0 2px 5px rgb(47 48 74 / 0.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .widget {
+    animation: none;
+    transition: none;
   }
 }
 

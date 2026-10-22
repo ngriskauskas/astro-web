@@ -6,6 +6,7 @@ import type { CuspType, KeyType } from "../types/cusp";
 import type { OwnerType } from "./MultiWheelContext";
 import type { AngleTiming, AspectTiming, TimingEvent } from "../types/timings";
 import type { MoonPhaseDescriptionValue } from "../types/moon";
+import type { PlanetaryHourDescriptionValue } from "../types/planetaryHours";
 import { useWheel } from "../hooks/useWheel";
 
 export type ActiveType =
@@ -20,7 +21,8 @@ export type ActiveType =
   | "ingressTiming"
   | "retrogradeTiming"
   | "stationTiming"
-  | "moonphase";
+  | "moonphase"
+  | "planetaryHour";
 
 export interface Active {
   type: ActiveType;
@@ -34,7 +36,8 @@ export interface Active {
     | AngleTiming
     | AspectTiming
     | TimingEvent
-    | MoonPhaseDescriptionValue;
+    | MoonPhaseDescriptionValue
+    | PlanetaryHourDescriptionValue;
   owner?: OwnerType;
 }
 

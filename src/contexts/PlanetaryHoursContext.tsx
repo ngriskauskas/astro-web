@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { apiFetch } from "../utils/api";
 import { getLocalISODateTime } from "../utils/funcs";
 import { useAuth } from "./AuthContext";
@@ -12,6 +12,9 @@ export const PlanetaryHoursProvider = ({ children }: { children: React.ReactNode
   const [status, setStatus] = useState<PlanetaryHoursStatus>("loading");
   const [data, setData] = useState<PlanetaryHoursType | null>(null);
   const [now, setNow] = useState(() => new Date());
+  // A page can host this for all of its widgets; the request is made only if one reads it.
+  const [wanted, setWanted] = useState(false);
+  const request = useCallback(() => setWanted(true), []);
   const date = getLocalISODateTime(now).slice(0, 10);
 
   useEffect(() => {
@@ -20,7 +23,7 @@ export const PlanetaryHoursProvider = ({ children }: { children: React.ReactNode
   }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !wanted) return;
 
     // Set when a newer request replaces this one, so a late answer is ignored.
     let cancelled = false;
@@ -50,10 +53,10 @@ export const PlanetaryHoursProvider = ({ children }: { children: React.ReactNode
     return () => {
       cancelled = true;
     };
-  }, [user, date]);
+  }, [user, date, wanted]);
 
   return (
-    <PlanetaryHoursContext.Provider value={{ status, data, now }}>
+    <PlanetaryHoursContext.Provider value={{ status, data, now, request }}>
       {children}
     </PlanetaryHoursContext.Provider>
   );

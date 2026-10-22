@@ -1,7 +1,8 @@
+import { within } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 import { currentPlanetaryHour, planetaryHourBlocks } from "../../src/utils/planetaryHours";
 import { planetaryHours, planetaryHoursFor, planetaryHoursUnavailable } from "../mocks";
-import { aMinutePasses, fakeTheMinuteTimer, findWidget, renderChartPage } from "./charts";
+import { aMinutePasses, drawer, fakeTheMinuteTimer, findWidget, renderChartPage } from "./charts";
 import { capture, hold, reject } from "./requests";
 
 // Planetary hours for Thursday 15 January 2026: sunrise at 07:12, sunset at 17:00. Times
@@ -147,6 +148,31 @@ describe("the Planetary Hour widget", () => {
     expect(region.getByText(/^Sunrise/)).toHaveTextContent("Sunrise 7:12 AM · Sunset 5:00 PM");
   });
 
+  test("selecting the current hour opens its specific description", async () => {
+    const { user } = await renderChartPage("daily");
+    const region = await planetaryHour();
+    const hour = region.getByRole("group", { name: "Hour ruler: Saturn" });
+
+    await user.click(within(hour).getByRole("button", { name: "Hour ruler: Saturn" }));
+
+    expect(drawer.title()).toBe("Saturn Hour");
+    expect(drawer.get().getByText("24 of 24 · Night")).toBeInTheDocument();
+    expect(drawer.get().getByText("6:01 AM")).toBeInTheDocument();
+    expect(drawer.get().getByText("7:12 AM")).toBeInTheDocument();
+  });
+
+  test("selecting the next hour opens its description", async () => {
+    const { user } = await renderChartPage("daily");
+    const region = await planetaryHour();
+
+    await user.click(region.getByRole("button", { name: "View Jupiter hour 1 details" }));
+
+    expect(drawer.title()).toBe("Jupiter Hour");
+    expect(drawer.get().getByText("1 of 24 · Day")).toBeInTheDocument();
+    expect(drawer.get().getByText("7:12 AM")).toBeInTheDocument();
+    expect(drawer.get().getByText("8:01 AM")).toBeInTheDocument();
+  });
+
   test("by day, shows the day's own ruler and the current day hour", async () => {
     vi.setSystemTime(new Date("2026-01-15T17:00:00Z"));
     await renderChartPage("daily");
@@ -265,10 +291,13 @@ describe("the Planetary Hour widget", () => {
     expect(region.queryByRole("group")).not.toBeInTheDocument();
   });
 
-  test("has nothing to select", async () => {
-    await renderChartPage("daily");
+  test("the day ruler opens its planetary description", async () => {
+    const { user } = await renderChartPage("daily");
     const region = await planetaryHour();
+    const day = region.getByRole("group", { name: "Day ruler: Mercury" });
 
-    expect(region.queryByRole("button")).not.toBeInTheDocument();
+    await user.click(within(day).getByRole("button", { name: "Day ruler: Mercury" }));
+
+    expect(drawer.title()).toBe("Mercury");
   });
 });

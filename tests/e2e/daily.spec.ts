@@ -43,6 +43,11 @@ test("today's sky and timings are read widget by widget", async ({ page }) => {
   });
   await expect(hourRuler).toBeVisible();
   await expect(hourRuler).toContainText("Hour 24 · Night");
+  await opensAndCloses(
+    page,
+    hourRuler.getByRole("button", { name: "Hour ruler: Saturn" }),
+    "Saturn Hour",
+  );
 
   // The Ascendant timeline opens scrolled to the current time, with the same planetary
   // hour beside the sign.

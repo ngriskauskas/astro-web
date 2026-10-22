@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+import { within } from "@testing-library/react";
 import { drawer, findWidget, renderChartPage } from "./charts";
 import { capture, hold, reject } from "./requests";
 
@@ -17,11 +18,22 @@ test("shows the Moon's current sign and degree", async () => {
   expect(region.getByLabelText("Current Moon placement: Sagittarius 10° 0′")).toBeInTheDocument();
 });
 
+test("selecting the current Moon placement opens its description", async () => {
+  const { user } = await renderChartPage("daily");
+  const region = await moon();
+
+  await user.click(region.getByRole("button", { name: "Current Moon placement: Sagittarius 10° 0′" }));
+
+  expect(drawer.title()).toBe("Moon");
+});
+
 test("lists the eight phases in date order, each with its date, time and sign", async () => {
   await renderChartPage("daily");
   const region = await moon();
 
-  const phases = region.getAllByRole("button");
+  const phases = region
+    .getAllByRole("button")
+    .filter((phase) => phase.getAttribute("aria-label")?.startsWith("View "));
 
   // The phase whose time cannot be read comes last.
   expect(phases.map((phase) => phase.getAttribute("aria-label"))).toEqual(
@@ -38,6 +50,7 @@ test("lists the eight phases in date order, each with its date, time and sign", 
   );
   expect(phases[1]).toHaveTextContent("Jan 18, 2:52 PM");
   expect(phases[1]).toHaveTextContent("Capricorn");
+  expect(region.getByText("Since Jan 13")).toBeInTheDocument();
 });
 
 test("marks the current phase", async () => {
@@ -68,6 +81,24 @@ test("selecting a phase opens the drawer for it", async () => {
 
   await user.click(region.getByRole("button", { name: "View Full Moon details" }));
 
+  expect(drawer.title()).toBe("Full Moon");
+});
+
+test("offers orbit, timeline, and phase-grid views without changing phase detail access", async () => {
+  const { user } = await renderChartPage("daily");
+  const region = await moon();
+  const views = region.getByRole("group", { name: "Moon timing view" });
+
+  expect(within(views).getByRole("button", { name: "Orbit" })).toHaveAttribute("aria-pressed", "true");
+  await user.click(within(views).getByRole("button", { name: "Timeline" }));
+  expect(within(views).getByRole("button", { name: "Timeline" })).toHaveAttribute("aria-pressed", "true");
+  expect(region.getByRole("button", { name: "View New Moon details" })).toHaveTextContent(
+    "Jan 18, 2:52 PM",
+  );
+
+  await user.click(within(views).getByRole("button", { name: "Phases" }));
+  expect(within(views).getByRole("button", { name: "Phases" })).toHaveAttribute("aria-pressed", "true");
+  await user.click(region.getByRole("button", { name: "View Full Moon details" }));
   expect(drawer.title()).toBe("Full Moon");
 });
 

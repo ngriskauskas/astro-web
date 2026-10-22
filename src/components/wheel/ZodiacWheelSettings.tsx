@@ -10,7 +10,9 @@ export interface ZodiacWheelOptions {
   };
 }
 
-export const ZodiacWheelSettings = () => {
+const DEFAULT_CLASS_NAME = "space-y-6 p-3 bg-white rounded-xl shadow-md text-xs border border-gray-400";
+
+export const ZodiacWheelSettings = ({ className = DEFAULT_CLASS_NAME }: { className?: string }) => {
   const {
     type,
     settings: { profileId, otherProfileId, datetimeOptions },
@@ -20,7 +22,7 @@ export const ZodiacWheelSettings = () => {
   const { profiles } = useBirthProfiles();
 
   return (
-    <div className="space-y-6 p-3 bg-white rounded-xl shadow-md text-xs border border-gray-400">
+    <div className={className}>
       {/* Profile selector */}
       {type !== "time" && type !== "moment" && profiles && (
         <div>

@@ -6,19 +6,17 @@ import { HouseChip } from "../utils/HouseChip";
 import { LoadError } from "../utils/LoadError";
 import { PlanetChip } from "../utils/PlanetChip";
 import { SignChip } from "../utils/SignChip";
+import { Widget, type WidgetProps } from "../widgets/Widget";
 
-export const TransitPlacements = ({ otherLabel = "Transits" }: { otherLabel?: string }) => {
+export const TransitPlacements = ({
+  otherLabel = "Transits",
+  className,
+}: WidgetProps & { otherLabel?: string }) => {
   const { mainPlanetAngles, otherPlanetAngles, status } = useWheel() as MultiWheelContextType;
   const { mainProfileName, otherProfileName } = useProfileNames();
 
   return (
-    <section
-      aria-labelledby="placements-heading"
-      className="border border-gray-200 bg-white p-2 sm:p-4"
-    >
-      <h2 id="placements-heading" className="mb-3 text-lg font-semibold text-gray-900">
-        Placements
-      </h2>
+    <Widget id="placements" title="Placements" className={className}>
       {status === "error" ? (
         <LoadError message="Could not load the chart." />
       ) : (
@@ -37,7 +35,7 @@ export const TransitPlacements = ({ otherLabel = "Transits" }: { otherLabel?: st
           </div>
         )
       )}
-    </section>
+    </Widget>
   );
 };
 
