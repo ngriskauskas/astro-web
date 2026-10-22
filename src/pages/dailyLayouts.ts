@@ -17,6 +17,7 @@ export type DailyCard =
   | "summary"
   | "ruler"
   | "dignities"
+  | "patterns"
   | "hemispheres"
   | "wheel"
   | "moon"
@@ -42,6 +43,7 @@ export const DAILY_ARRANGEMENT: Record<
       "summary",
       "ruler",
       "dignities",
+      "patterns",
       "moon",
       "weekly",
       "matrix",
@@ -49,7 +51,7 @@ export const DAILY_ARRANGEMENT: Record<
       "placements",
     ],
     left: ["wheel", "matrix", "hemispheres"],
-    right: ["hour", "timeline", "summary", "ruler", "dignities", "moon", "weekly", "placements"],
+    right: ["hour", "timeline", "summary", "ruler", "dignities", "patterns", "moon", "weekly", "placements"],
     bottom: [],
   },
   now: {
@@ -59,6 +61,7 @@ export const DAILY_ARRANGEMENT: Record<
       "summary",
       "ruler",
       "dignities",
+      "patterns",
       "wheel",
       "moon",
       "hemispheres",
@@ -67,7 +70,7 @@ export const DAILY_ARRANGEMENT: Record<
       "matrix",
     ],
     left: ["hour", "wheel", "moon", "hemispheres"],
-    right: ["timeline", "summary", "ruler", "dignities", "weekly", "placements"],
+    right: ["timeline", "summary", "ruler", "dignities", "patterns", "weekly", "placements"],
     bottom: ["matrix"],
   },
 };
@@ -78,7 +81,7 @@ export const EXPLORE_TABS = [
   { id: "today", label: "Today", cards: ["timeline", "moon"] },
   { id: "week", label: "This week", cards: ["weekly"] },
   { id: "chart", label: "Chart", cards: ["wheel", "placements"] },
-  { id: "shape", label: "Shape", cards: ["ruler", "dignities", "hemispheres"] },
+  { id: "shape", label: "Shape", cards: ["ruler", "dignities", "patterns", "hemispheres"] },
   { id: "aspects", label: "Aspects", cards: ["matrix"] },
 ] as const;
 
@@ -88,6 +91,7 @@ export const FOCUS_ORDER: DailyCard[] = [
   "summary",
   "ruler",
   "dignities",
+  "patterns",
   "wheel",
   "moon",
   "hemispheres",

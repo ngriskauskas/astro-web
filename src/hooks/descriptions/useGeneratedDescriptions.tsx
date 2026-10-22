@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { AspectMotion, AspectType } from "../../types/aspect";
 import type { CuspType, KeyType } from "../../types/cusp";
 import type { PlanetName } from "../../types/planet";
+import type { AspectPatternType } from "../../types/aspectPattern";
 import type { ZodiacSign } from "../../types/zodiac";
 import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
@@ -39,6 +40,7 @@ export type DescriptionMoonPhase =
 export type DescriptionContext =
   | { type: "placement"; subject: PointPlacementContext }
   | DistributionContext
+  | PatternContext
   | {
       type: "aspect";
       details: {
@@ -82,6 +84,16 @@ export type DescriptionContext =
     };
 
 export type AspectRelationship = "NATAL" | "CURRENT" | "TRANSIT_TO_NATAL" | "SYNASTRY";
+
+// The shape several planets make together in one chart, with the planets it points at.
+export type PatternContext = {
+  type: "pattern";
+  chart: ChartSource;
+  kind: AspectPatternType;
+  planets: PointPlacementContext[];
+  focus: PointPlacementContext[];
+  sign: ZodiacSign | null;
+};
 
 // How the core planets spread across the elements or the modalities of one chart.
 export type DistributionContext = {

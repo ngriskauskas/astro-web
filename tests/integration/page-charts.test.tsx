@@ -15,12 +15,13 @@ test("shows its widgets", async () => {
     "Aspect Matrix",
     "Houses",
     "Hemispheres and quadrants",
+    "Aspect patterns",
     "Placements",
   ]) {
     expect(screen.getByRole("region", { name })).toBeInTheDocument();
   }
   // The natal summary holds three sections of its own: elements, modalities and tightest aspects.
-  expect(screen.getAllByRole("region")).toHaveLength(12);
+  expect(screen.getAllByRole("region")).toHaveLength(13);
 });
 
 test("requests the natal chart for the user's own profile", async () => {

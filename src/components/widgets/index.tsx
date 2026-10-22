@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { AspectKey } from "../chart-views/AspectKey";
 import { AspectMatrix } from "../chart-views/AspectMatrix";
+import { AspectPatternsList } from "../chart-views/AspectPatterns";
 import { AtAGlance } from "../chart-views/AtAGlance";
 import { ChartRuler } from "../chart-views/ChartRuler";
 import { DignitiesBoard } from "../chart-views/Dignities";
@@ -166,6 +167,13 @@ export const PlanetInChartWidget = scoped(SINGLE_CHARTS, "natal")(
 export const ChartRulerWidget = scoped(SINGLE_CHARTS, "natal")(({ className }: WidgetProps) => (
   <Widget id="chart-ruler" title="Chart ruler" className={className}>
     <ChartRuler />
+  </Widget>
+));
+
+// The shapes the chart's planets make together. Each side of a two-chart view shows its own.
+export const AspectPatternsWidget = scoped(ANY_CHART, "natal")(({ className }: WidgetProps) => (
+  <Widget id="aspect-patterns" title="Aspect patterns" className={className}>
+    <AspectPatternsList />
   </Widget>
 ));
 

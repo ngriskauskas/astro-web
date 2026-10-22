@@ -140,6 +140,9 @@ export const describeContext = (context: any): string => {
   if (context.type === "distribution") {
     return `Description for ${context.kind.toLowerCase()} ${context.value} ${context.count} of ${context.total}`;
   }
+  if (context.type === "pattern") {
+    return `Description for pattern ${context.kind} of ${context.planets.length} planets`;
+  }
 
   const { event, timeScale } = context;
   const detail =

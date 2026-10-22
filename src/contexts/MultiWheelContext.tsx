@@ -7,6 +7,7 @@ import { type CuspAngle, type KeyAngleAngle } from "../components/wheel/layers/H
 import { type SignAngle } from "../components/wheel/layers/Signs";
 import { ZodiacSigns, type ZodiacSign } from "../types/zodiac";
 import type { Aspect } from "../types/aspect";
+import type { AspectPattern } from "../types/aspectPattern";
 import type { Planet } from "../types/planet";
 import { getLocalISODate, getLocalISOTime, isDateAndTime } from "../utils/funcs";
 import { useSearchParams } from "react-router-dom";
@@ -28,6 +29,9 @@ export interface MultiWheelContextType {
   signAngles: SignAngle[];
   aspects: Aspect[];
   chartAspects: Aspect[];
+  // The shapes each chart's own planets make together, for each side of the two-chart view.
+  mainPatterns: AspectPattern[];
+  otherPatterns: AspectPattern[];
   status: WheelStatus;
   type: "synastry" | "transit";
 }
@@ -277,6 +281,8 @@ export const MultiWheelProvider = ({
         signAngles,
         aspects,
         chartAspects: chart?.aspects ?? [],
+        mainPatterns: chart?.main.patterns ?? [],
+        otherPatterns: chart?.other.patterns ?? [],
         status,
         type,
       }}

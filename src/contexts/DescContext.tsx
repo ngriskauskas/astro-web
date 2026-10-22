@@ -11,6 +11,7 @@ import { useWheel } from "../hooks/useWheel";
 import type { ElementKey } from "../types/element";
 import type { ModalityKey } from "../types/modality";
 import type { QuadrantKey } from "../types/hemisphere";
+import type { AspectPatternDescriptionValue } from "../types/aspectPattern";
 
 export type ActiveType =
   | "planet"
@@ -28,7 +29,8 @@ export type ActiveType =
   | "planetaryHour"
   | "element"
   | "modality"
-  | "quadrant";
+  | "quadrant"
+  | "aspectPattern";
 
 export interface Active {
   type: ActiveType;
@@ -46,6 +48,7 @@ export interface Active {
     | PlanetaryHourDescriptionValue
     | ElementKey
     | QuadrantKey
+    | AspectPatternDescriptionValue
     | ModalityKey;
   owner?: OwnerType;
 }

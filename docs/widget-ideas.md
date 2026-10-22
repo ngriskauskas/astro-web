@@ -37,6 +37,7 @@ Rules every widget follows:
 | `PlanetReturnsWidget` | none (planet prop) | Previous and next return of a planet |
 | `ChartRulerWidget` | any single chart | The Ascendant's sign, its ruler and that planet's card |
 | `DignitiesWidget` | any single chart | Core planets as sign or house dignities, with a By sign / By house toggle |
+| `AspectPatternsWidget` | any chart | Grand trines, T-squares, yods and stelliums, per side on two-chart views |
 | `HemispheresWidget` | any single chart | One circle of four named quarters (Personal, Private, Relational, Collective), shaded by planet count, each opening its own description |
 | `TwoChartWheelWidget`, `TwoChartMatrixWidget`, `TwoChartPlacementsWidget` | transit, synastry | Two-chart views |
 | `ChartSettingsWidget` | any | Profile, date and time controls |
@@ -54,13 +55,13 @@ Rules every widget follows:
 - **Chart ruler** — the Ascendant's sign and ruler, with the ruler's sign, house, dignity and aspects to the angles. On Natal, Moment and Daily (Daily has it in the Shape tab).
 - **Dignities** — the core planets as one chip each ("Saturn in Capricorn"), grouped as At home, Exalted, Detriment and Fall. A By house toggle groups them as Angular, Succedent or Cadent, with an "in joy" marker for planets in their house of joy. On Natal, Moment and Daily.
 - **Hemispheres and quadrants** — the ten planets as one circle: four quarters named Personal, Private, Relational and Collective, each shaded by its planet count and clickable to open its description with an AI reading. Planet glyphs open their drawers, the centre shows the total, and the quarters grow in with a count-up on entry (motion is off for reduced-motion users). A sentence under the circle names the quarter with most planets. On Natal, Moment and Daily.
+- **Aspect patterns** — grand trines, T-squares, yods, kites, grand crosses, mystic rectangles, grand sextiles, stelliums and conjunction clusters. A shape's corners are conjunction clusters, so a shape can hold more planets than its usual count. A shape that sits inside a larger one (a grand trine inside a kite, or a T-square inside a grand cross) is not listed on its own. Two shapes that share corners but are not nested are two shapes. Stelliums are three or more personal planets (Sun to Mars) in one sign. Conjunction clusters are three or more planets joined by conjunctions, of any kind. Shapes use the chart's aspect orbs; yod quincunxes are measured from positions with a fixed 2° orb. Each shape opens a drawer with a generated reading. On Natal, Moment, Daily (Shape tab), Transits and Synastry, where each side is shown under its name.
 - **Planet drawer sections** — Overview, Details, In this chart, Returns, Cycles (retrograde and station history for the planets that retrograde, with the last and next period) and Aspects.
 - **Element and modality drawers** — the Summary tiles open a drawer with the general description, the placements in that element or modality, and an AI reading of the emphasis.
 
 ### Proposals
 
 - **Your chart through the houses** — a guided modal walkthrough that follows the twelve houses as one continuous loop, tailored to this chart's placements. See the detailed proposal below.
-- **Aspect patterns** — grand trines, T-squares, stelliums and yods found from the returned aspects, each listing its planets.
 - **Planet strip** — a compact row of all planets with sign glyph and degree, a denser alternative to the table.
 - **Retrograde at birth** — which natal planets were retrograde.
 - **Angles and points** — ASC, MC, nodes, Lilith and Chiron grouped with short descriptions.
@@ -127,7 +128,7 @@ Rules every widget follows:
 ### Built
 
 - **Moment chart wheel**, **Chart settings** (compact date and time), **Summary**, **Placements**, **Aspect matrix**.
-- **Chart ruler**, **Dignities** and **Hemispheres and quadrants**, placed beside the Summary and Placements.
+- **Chart ruler**, **Dignities**, **Aspect patterns** and **Hemispheres and quadrants**, placed beside the Summary and Placements.
 
 ### Proposals
 
@@ -142,7 +143,7 @@ Rules every widget follows:
 
 ### Built
 
-- **Transit wheel**, **Transit placements**, **Aspect matrix**, **Ascendant today**, **Weekly timings**, **Chart settings**.
+- **Transit wheel**, **Transit placements**, **Aspect matrix**, **Ascendant today**, **Weekly timings**, **Chart settings**, **Aspect patterns** for the natal chart and the transiting sky.
 
 ### Proposals
 
@@ -158,7 +159,7 @@ Rules every widget follows:
 
 ### Built
 
-- **Two-chart wheel**, **Synastry aspects**, **Comparative placements**, **Profile selectors** (in Chart settings).
+- **Two-chart wheel**, **Synastry aspects**, **Comparative placements**, **Profile selectors** (in Chart settings), **Aspect patterns** for each person's chart.
 
 ### Proposals
 

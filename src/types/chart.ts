@@ -1,4 +1,5 @@
 import type { Aspect } from "./aspect";
+import type { AspectPattern } from "./aspectPattern";
 import type { CuspType, Cusp, KeyAngle, KeyType } from "./cusp";
 import type { PlanetName, Planet } from "./planet";
 
@@ -7,11 +8,13 @@ export interface MultiChart {
     planets: Record<PlanetName, Planet>;
     houses: Record<CuspType, Cusp>;
     keyAngles: Record<KeyType, KeyAngle>;
+    patterns: AspectPattern[];
   };
   other: {
     planets: Record<PlanetName, Planet>;
     houses: Record<CuspType, Cusp>;
     keyAngles: Record<KeyType, KeyAngle>;
+    patterns: AspectPattern[];
   };
   aspects: Aspect[];
 }
@@ -21,4 +24,5 @@ export interface SingleChart {
   houses: Record<CuspType, Cusp>;
   keyAngles: Record<KeyType, KeyAngle>;
   aspects: Aspect[];
+  patterns: AspectPattern[];
 }
