@@ -27,7 +27,7 @@ export const Synastry = () => {
           </p>
           <Link
             to="/profile"
-            className="inline-flex min-h-11 items-center rounded bg-gray-900 px-4 text-sm font-medium text-white hover:bg-gray-700"
+            className="inline-flex min-h-11 items-center rounded bg-indigo-600 px-4 text-sm font-medium text-white hover:bg-indigo-700"
           >
             Go to Profile
           </Link>

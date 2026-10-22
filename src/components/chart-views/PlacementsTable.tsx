@@ -5,14 +5,17 @@ import { HouseChip } from "../utils/HouseChip";
 import { LoadError } from "../utils/LoadError";
 import { PlanetChip } from "../utils/PlanetChip";
 import { SignChip } from "../utils/SignChip";
+import { BirthTimeNotice } from "../utils/BirthTimeNotice";
 
 export const PlacementsTable = () => {
-  const { planetAngles, status } = useWheel() as SingleWheelContextType;
+  const { planetAngles, status, timeUnknown } = useWheel() as SingleWheelContextType;
 
   if (status === "error") return <LoadError message="Could not load the chart." />;
   if (planetAngles.length === 0) return null;
 
   return (
+    <>
+    {timeUnknown && <BirthTimeNotice />}
     <div className="scroll-hint-x overflow-x-auto">
       <table className="w-full border border-gray-200 rounded-lg shadow-sm overflow-hidden">
         <thead>
@@ -42,7 +45,11 @@ export const PlacementsTable = () => {
                 </td>
                 <td className="px-2 py-2 align-middle whitespace-nowrap sm:px-3">
                   <div className="w-fit">
-                    <HouseChip house={planet.house} />
+                    {timeUnknown ? (
+                      <span className="text-sm text-gray-500" aria-label="House not shown">—</span>
+                    ) : (
+                      <HouseChip house={planet.house} />
+                    )}
                   </div>
                 </td>
                 <td className="px-2 py-2 align-middle whitespace-nowrap text-xs font-mono sm:px-3">
@@ -54,5 +61,6 @@ export const PlacementsTable = () => {
         </tbody>
       </table>
     </div>
+    </>
   );
 };

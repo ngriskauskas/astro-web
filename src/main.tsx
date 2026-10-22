@@ -21,6 +21,10 @@ import { ProtectedUserLocation } from "./components/ProtectedUserLocation.tsx";
 import { Moment } from "./pages/Moment.tsx";
 import { ChartSettingsProvider } from "./contexts/ChartSettingsContext.tsx";
 import { Daily } from "./pages/Daily.tsx";
+import { applyTheme, readStoredTheme } from "./theme/themes.ts";
+
+// Before the first render, so the page never flashes in the wrong theme.
+applyTheme(readStoredTheme());
 
 const clientid = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 createRoot(document.getElementById("root")!).render(

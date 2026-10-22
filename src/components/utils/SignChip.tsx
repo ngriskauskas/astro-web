@@ -1,8 +1,6 @@
 import { useDesc } from "../../contexts/DescContext";
 import { ZodiacData, type ZodiacSign } from "../../types/zodiac";
-
-const CHIP =
-  "flex items-center gap-1 px-1.5 py-0.5 bg-white border rounded shadow-sm text-xs font-medium justify-center";
+import { CHIP_BASE, CHIP_INTERACTIVE, chipTint } from "./chipStyles";
 
 export const SignChip = ({
   sign,
@@ -13,21 +11,17 @@ export const SignChip = ({
 }) => {
   const { open } = useDesc();
   const signData = ZodiacData[sign];
-  const color = signData.color;
-  const style = {
-    backgroundColor: `${color}11`,
-    borderColor: `${color}55`,
-  };
+  const style = chipTint(signData.color);
   const content = (
     <>
-      <img src={signData.glyph} alt="" className="w-4.5 h-6" />
+      <img src={signData.glyph} alt="" className="h-4 w-3.5 shrink-0 object-contain" />
       <span>{signData.displayName}</span>
     </>
   );
 
   if (!interactive) {
     return (
-      <span className={CHIP} style={style}>
+      <span className={CHIP_BASE} style={style}>
         {content}
       </span>
     );
@@ -35,7 +29,7 @@ export const SignChip = ({
   return (
     <button
       type="button"
-      className={`${CHIP} cursor-pointer hover:shadow-md transition-all`}
+      className={`${CHIP_BASE} ${CHIP_INTERACTIVE}`}
       onClick={() => open({ type: "sign", value: sign })}
       style={style}
     >
@@ -45,12 +39,12 @@ export const SignChip = ({
 };
 
 export const SignGroup = ({ title, signs }: { title: string; signs: ZodiacSign[] }) => (
-  <div className="flex flex-col gap-1">
-    <span className="text-gray-500 text-xs uppercase tracking-wide">{title}</span>
+  <div className="flex flex-col gap-1.5">
+    <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">{title}</span>
 
-    <div className="flex flex-wrap gap-1">
+    <div className="flex flex-wrap gap-1.5">
       {signs.length === 0 ? (
-        <span className="text-gray-500">—</span>
+        <span className="text-sm text-gray-500">—</span>
       ) : (
         signs.map((sign) => <SignChip key={sign} sign={sign} />)
       )}
@@ -58,27 +52,17 @@ export const SignGroup = ({ title, signs }: { title: string; signs: ZodiacSign[]
   </div>
 );
 
-export const SignCircle = ({ sign, size = 10 }: { sign: ZodiacSign; size?: number }) => {
+// A small round sign glyph, for use beside other text or inside another chip.
+export const SignCircle = ({ sign }: { sign: ZodiacSign }) => {
   const signData = ZodiacData[sign];
-  const color = signData.color;
-
-  const sizeClass = `w-${size} h-${size}`;
 
   return (
-    <div
+    <span
       title={signData.displayName}
-      className={`
-        ${sizeClass} 
-        flex items-center justify-center 
-        rounded-full border 
-      `}
-      style={{
-        borderColor: `${color}55`,
-        backgroundColor: `${color}33`,
-        borderWidth: 1,
-      }}
+      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border"
+      style={chipTint(signData.color)}
     >
-      <img src={signData.glyph} alt={signData.displayName} className="w-1/2 h-1/2 object-contain" />
-    </div>
+      <img src={signData.glyph} alt={signData.displayName} className="h-2.5 w-2.5 object-contain" />
+    </span>
   );
 };

@@ -1,9 +1,7 @@
 import { useDesc } from "../../contexts/DescContext";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
 import { PlanetsData, type PlanetName } from "../../types/planet";
-
-const CHIP =
-  "flex items-center gap-1 px-1.5 py-0.5 bg-white border rounded shadow-sm text-xs font-medium justify-center";
+import { CHIP_BASE, CHIP_INTERACTIVE, chipTint } from "./chipStyles";
 
 // `interactive={false}` draws the chip without making it a button, for use inside
 // something that is already one.
@@ -18,14 +16,10 @@ export const PlanetChip = ({
 }) => {
   const { open } = useDesc();
   const planetInfo = PlanetsData[planet];
-  const color = planetInfo.color;
-  const style = {
-    backgroundColor: `${color}11`, // color with low opacity
-    borderColor: `${color}55`,
-  };
+  const style = chipTint(planetInfo.color);
   const content = (
     <>
-      <span className="text-base" aria-hidden="true">
+      <span className="text-sm leading-none" aria-hidden="true">
         {planetInfo.glyph}
       </span>
       <span>{planetInfo.displayName}</span>
@@ -34,7 +28,7 @@ export const PlanetChip = ({
 
   if (!interactive) {
     return (
-      <span className={CHIP} style={style}>
+      <span className={CHIP_BASE} style={style}>
         {content}
       </span>
     );
@@ -42,7 +36,7 @@ export const PlanetChip = ({
   return (
     <button
       type="button"
-      className={`${CHIP} cursor-pointer hover:shadow-md transition-all`}
+      className={`${CHIP_BASE} ${CHIP_INTERACTIVE}`}
       onClick={() => open({ type: "planet", value: planet, owner })}
       style={style}
     >
@@ -60,12 +54,12 @@ export const PlanetGroup = ({
   planets: PlanetName[];
   owner?: "main" | "other";
 }) => (
-  <div className="flex flex-col gap-1">
-    <span className="text-gray-500 text-xs uppercase tracking-wide">{title}</span>
+  <div className="flex flex-col gap-1.5">
+    <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">{title}</span>
 
-    <div className="flex flex-wrap gap-1">
+    <div className="flex flex-wrap gap-1.5">
       {planets.length === 0 ? (
-        <span className="text-gray-500">—</span>
+        <span className="text-sm text-gray-500">—</span>
       ) : (
         planets.map((planet) => <PlanetChip key={planet} planet={planet} owner={owner} />)
       )}

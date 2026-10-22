@@ -15,11 +15,11 @@ export const Section = ({
 }) => {
   const [isOpen, setIsOpen] = useState(startOpen);
   return (
-    <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 shadow-sm">
-      <h3 className="text-sm font-medium text-gray-600">
+    <div className="mb-3 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+      <h3 className="text-sm font-semibold text-gray-900">
         <button
           type="button"
-          className="flex w-full items-center justify-between p-3 cursor-pointer"
+          className="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-gray-50 cursor-pointer"
           aria-expanded={isOpen}
           onClick={() => setIsOpen(!isOpen)}
         >
@@ -31,7 +31,7 @@ export const Section = ({
         (loading ? (
           <Spinner />
         ) : (
-          <div className="p-3 text-sm text-gray-800 leading-relaxed">{children}</div>
+          <div className="motion-fade-up p-3 text-sm text-gray-800 leading-relaxed">{children}</div>
         ))}
     </div>
   );
@@ -52,11 +52,11 @@ export const SectionSmall = ({
 }) => {
   const [isOpen, setIsOpen] = useState(startOpen);
   return (
-    <div className="rounded-md border border-gray-200 shadow-xs bg-gray-50">
-      <h3 className="text-sm font-medium text-gray-600">
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xs">
+      <h3 className="text-sm font-semibold text-gray-900">
         <button
           type="button"
-          className="flex w-full items-center justify-between p-2 cursor-pointer"
+          className="flex w-full items-center justify-between p-2 text-left transition-colors hover:bg-gray-50 cursor-pointer"
           aria-expanded={isOpen}
           onClick={() => {
             setIsOpen(!isOpen);
@@ -71,7 +71,7 @@ export const SectionSmall = ({
         (loading ? (
           <Spinner />
         ) : (
-          <div className="p-2 text-sm text-gray-800 leading-relaxed">{children}</div>
+          <div className="motion-fade-up p-2 text-sm text-gray-800 leading-relaxed">{children}</div>
         ))}
     </div>
   );
@@ -101,7 +101,7 @@ export const DescSection = ({
           aria-expanded={isOpen}
           onClick={() => setIsOpen(!isOpen)}
         >
-          <span className="text-gray-500 text-xs uppercase tracking-wide">{title}</span>
+          <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">{title}</span>
           {chevron}
         </button>
       )}
@@ -121,7 +121,11 @@ export const DescSection = ({
           )}
         </div>
       )}
-      {isOpen && <div className="text-xs text-gray-600 mt-1 pl-2">{desc}</div>}
+      {isOpen && (
+        <div className="motion-fade-up mt-2 border-l-2 border-indigo-500/40 pl-3 text-[13px] leading-relaxed text-gray-700">
+          {desc}
+        </div>
+      )}
     </div>
   );
 };

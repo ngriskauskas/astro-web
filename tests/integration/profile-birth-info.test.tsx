@@ -66,7 +66,7 @@ test("marking the time unknown clears and locks it, and saves it as unknown", as
   await user.click(card.getByRole("button", { name: "Save Changes" }));
 
   expect(await screen.findByText("Profile updated")).toBeInTheDocument();
-  expect(sent[0].body).toMatchObject({ birthTimeUnknown: true, birthTime: "" });
+  expect(sent[0].body).toMatchObject({ birthTimeUnknown: true, birthTime: null });
 });
 
 test("shows an error and keeps the entered values when saving fails", async () => {

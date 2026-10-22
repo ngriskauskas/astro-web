@@ -33,6 +33,9 @@ export interface SingleWheelContextType {
   chartAspects: Aspect[];
   status: WheelStatus;
   type: "natal" | "time" | "moment";
+  // True for a natal chart whose birth time is unknown. Its houses and angles are not
+  // shown, because they depend on the exact time.
+  timeUnknown: boolean;
 }
 
 export const SingleWheelContext = createContext<SingleWheelContextType | undefined>(undefined);
@@ -49,6 +52,7 @@ export const SingleWheelProvider = ({
   const [status, setStatus] = useState<WheelStatus>("loading");
   const { getNatalChart, getCurrentChart } = useCharts();
   const { mainProfile } = useBirthProfiles();
+  const timeUnknown = type === "natal" && mainProfile?.birthTimeUnknown === true;
   const {
     settings: { aspectOptions },
   } = useChartSettings();
@@ -223,12 +227,13 @@ export const SingleWheelProvider = ({
         setSettings,
         planetAngles,
         signAngles,
-        cuspAngles,
-        keyAngles,
+        cuspAngles: timeUnknown ? [] : cuspAngles,
+        keyAngles: timeUnknown ? [] : keyAngles,
         aspects,
         chartAspects,
         status,
         type,
+        timeUnknown,
       }}
     >
       {children}

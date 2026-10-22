@@ -1,6 +1,7 @@
-import { expect, test } from "vitest";
-import { dailyTimingsFor, emptyDailyTimings } from "../mocks";
-import { drawer, findWidget, renderChartPage } from "./charts";
+import { within } from "@testing-library/react";
+import { expect, test, vi } from "vitest";
+import { dailyTimingsFor, emptyDailyTimings, planetaryHoursUnavailable } from "../mocks";
+import { drawer, findWidget, renderChartPage, widget } from "./charts";
 import { capture, hold, reject } from "./requests";
 
 // The Ascendant timeline, on the Daily page. The clock is frozen at 07:00.
@@ -108,4 +109,156 @@ test("on Transits, asks for today's timings for the chosen profile", async () =>
   await timeline();
 
   expect(sent[sent.length - 1].body).toEqual({ date: "2026-01-15", birthProfileId: 1 });
+});
+
+// The planetary hour column, beside the signs. Sunrise is at 07:12 and sunset at 17:00,
+// so at the frozen 07:00 it is still the last night hour of the day before.
+
+const HOURS_ENDPOINT = "/timing/planetary-hours";
+const CURRENT_HOUR = "Saturn hour, 24 of 24, night, 6:01 AM to 7:12 AM";
+
+const hourColumn = async () => {
+  const region = await timeline();
+  return within(await region.findByRole("list", { name: "Planetary hours" }));
+};
+
+const hourNames = (column: Awaited<ReturnType<typeof hourColumn>>) =>
+  column.getAllByRole("listitem").map((item) => item.getAttribute("aria-label"));
+
+// What the timeline showed before it had planetary hours.
+const expectTheTimelineAsBefore = (region: Awaited<ReturnType<typeof timeline>>) => {
+  expect(region.getAllByTitle(/ from /)).toHaveLength(13);
+  expect(region.getAllByRole("button").map((button) => button.getAttribute("aria-label"))).toEqual(
+    MARKERS,
+  );
+  expect(region.getByText("NOW")).toBeInTheDocument();
+};
+
+test("shows every planetary hour of the day beside the signs, each with its ruler and times", async () => {
+  await renderChartPage("daily");
+  const column = await hourColumn();
+  const names = hourNames(column);
+
+  expect(names).toHaveLength(25);
+  // The first and last hours cross midnight; they keep their own start and end.
+  expect(names[0]).toBe("Jupiter hour, 18 of 24, night, 10:55 PM to 12:06 AM");
+  expect(names[6]).toBe(CURRENT_HOUR);
+  expect(names[7]).toBe("Jupiter hour, 1 of 24, day, 7:12 AM to 8:01 AM");
+  expect(names[19]).toBe("Moon hour, 13 of 24, night, 5:00 PM to 6:11 PM");
+  expect(names[24]).toBe("Venus hour, 18 of 24, night, 10:55 PM to 12:06 AM");
+  for (const item of column.getAllByRole("listitem")) {
+    expect(item).toHaveAttribute("title", item.getAttribute("aria-label"));
+  }
+});
+
+test("each planetary hour is marked with the time it starts, except one that began before midnight", async () => {
+  await renderChartPage("daily");
+  const column = await hourColumn();
+  const [beforeMidnight, ...rest] = column.getAllByRole("listitem");
+
+  expect(within(beforeMidnight).queryByText(/[AP]M/)).not.toBeInTheDocument();
+  expect(within(rest[0]).getByText("12:06 AM")).toBeInTheDocument();
+  expect(within(rest[5]).getByText("6:01 AM")).toBeInTheDocument();
+  expect(within(rest[6]).getByText("7:12 AM")).toBeInTheDocument();
+  expect(within(rest[23]).getByText("10:55 PM")).toBeInTheDocument();
+  expect(column.getAllByText(/[AP]M/)).toHaveLength(24);
+});
+
+test("marks sunrise and sunset in the planetary hour column", async () => {
+  await renderChartPage("daily");
+  const column = await hourColumn();
+
+  expect(column.getByText("Sunrise").closest("[role=listitem]")).toHaveAttribute(
+    "aria-label",
+    "Jupiter hour, 1 of 24, day, 7:12 AM to 8:01 AM",
+  );
+  expect(column.getByText("Sunset").closest("[role=listitem]")).toHaveAttribute(
+    "aria-label",
+    "Moon hour, 13 of 24, night, 5:00 PM to 6:11 PM",
+  );
+});
+
+test("the current planetary hour is the one the Planetary Hour widget shows", async () => {
+  await renderChartPage("daily");
+  const column = await hourColumn();
+
+  const current = column
+    .getAllByRole("listitem")
+    .filter((item) => item.hasAttribute("aria-current"));
+  expect(current).toHaveLength(1);
+  expect(current[0]).toHaveAttribute("aria-current", "time");
+  expect(current[0]).toHaveAttribute("aria-label", CURRENT_HOUR);
+  expect(
+    widget("Planetary Hour").getByRole("group", { name: "Hour ruler: Saturn" }),
+  ).toBeInTheDocument();
+});
+
+test("at midday the current planetary hour is a day hour", async () => {
+  vi.setSystemTime(new Date("2026-01-15T17:00:00Z"));
+  await renderChartPage("daily");
+  const column = await hourColumn();
+
+  const current = column
+    .getAllByRole("listitem")
+    .filter((item) => item.hasAttribute("aria-current"));
+  expect(current.map((item) => item.getAttribute("aria-label"))).toEqual([
+    "Moon hour, 6 of 24, day, 11:17 AM to 12:06 PM",
+  ]);
+  expect(
+    widget("Planetary Hour").getByRole("group", { name: "Hour ruler: Moon" }),
+  ).toBeInTheDocument();
+});
+
+test("planetary hours are nothing to select", async () => {
+  await renderChartPage("daily");
+  const column = await hourColumn();
+
+  expect(column.queryByRole("button")).not.toBeInTheDocument();
+});
+
+test("without a sunrise or sunset, the timeline is shown as before, with no planetary hours", async () => {
+  await renderChartPage("daily", { handlers: [planetaryHoursUnavailable()] });
+  await widget("Planetary Hour").findByRole("alert");
+  const region = await timeline();
+
+  expect(region.queryByRole("list", { name: "Planetary hours" })).not.toBeInTheDocument();
+  expect(region.queryByRole("alert")).not.toBeInTheDocument();
+  expectTheTimelineAsBefore(region);
+});
+
+test("when planetary hours cannot be loaded, the timeline is shown as before", async () => {
+  reject("post", HOURS_ENDPOINT);
+  await renderChartPage("daily");
+  await widget("Planetary Hour").findByRole("alert");
+  const region = await timeline();
+
+  expect(region.queryByRole("list", { name: "Planetary hours" })).not.toBeInTheDocument();
+  expect(region.queryByRole("alert")).not.toBeInTheDocument();
+  expectTheTimelineAsBefore(region);
+});
+
+test("the timeline does not wait for planetary hours; they join it when they arrive", async () => {
+  const held = hold("post", HOURS_ENDPOINT);
+  await renderChartPage("daily");
+  const region = await timeline();
+
+  expect(region.queryByRole("list", { name: "Planetary hours" })).not.toBeInTheDocument();
+  expectTheTimelineAsBefore(region);
+  held.release();
+
+  expect(await region.findByRole("list", { name: "Planetary hours" })).toBeInTheDocument();
+  expectTheTimelineAsBefore(region);
+});
+
+test("on Transits, the timeline has the planetary hours too, asked for once", async () => {
+  const sent = capture("post", HOURS_ENDPOINT);
+  await renderChartPage("transits");
+  const column = await hourColumn();
+
+  expect(hourNames(column)).toHaveLength(25);
+  expect(column.getByRole("listitem", { current: "time" })).toHaveAttribute(
+    "aria-label",
+    CURRENT_HOUR,
+  );
+  expect(sent.map(({ body }) => body)).toEqual([{ date: "2026-01-15" }]);
 });

@@ -3,6 +3,11 @@ import type { KeyAngle, KeyType } from "../../src/types/cusp";
 import type { MoonPhaseTiming, MoonTimingsType } from "../../src/types/moon";
 import type { Planet, PlanetName } from "../../src/types/planet";
 import type {
+  ClassicalPlanet,
+  PlanetaryHour,
+  PlanetaryHoursType,
+} from "../../src/types/planetaryHours";
+import type {
   AngleTiming,
   AspectTiming,
   CurrentTimingsType,
@@ -193,5 +198,65 @@ export const moonTimings: MoonTimingsType = {
     // A time the app cannot read: the phase is shown as "Timing unavailable".
     moonPhase("WANING_GIBBOUS", "not-a-date", 180),
     moonPhase("LAST_QUARTER", "2026-02-09T07:43:00", 231),
+  ],
+};
+
+// Planetary hours: twelve equal hours from sunrise to sunset and twelve from sunset to
+// the next sunrise, ruled in turn in the Chaldean order starting from the day's ruler.
+const CHALDEAN_ORDER: ClassicalPlanet[] = [
+  "SATURN",
+  "JUPITER",
+  "MARS",
+  "SUN",
+  "VENUS",
+  "MERCURY",
+  "MOON",
+];
+
+const localDateTime = (time: number) => {
+  const date = new Date(time);
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return (
+    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
+    `T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+  );
+};
+
+const planetaryDay = (
+  dayRuler: ClassicalPlanet,
+  sunrise: string,
+  sunset: string,
+  nextSunrise: string,
+): PlanetaryHour[] => {
+  const [rise, set, end] = [sunrise, sunset, nextSunrise].map((time) => new Date(time).getTime());
+  const first = CHALDEAN_ORDER.indexOf(dayRuler);
+  return Array.from({ length: 24 }, (_, index) => ({
+    hour: index + 1,
+    ruler: CHALDEAN_ORDER[(first + index) % 7],
+    dayRuler,
+    period: index < 12 ? "DAY" : "NIGHT",
+    dateTime: localDateTime(
+      index < 12 ? rise + (index * (set - rise)) / 12 : set + ((index - 12) * (end - set)) / 12,
+    ),
+  }));
+};
+
+// Thursday 15 January: day hours last 49 minutes and night hours 71. The list starts
+// with Wednesday's hour 18, which is in progress at midnight. At the frozen 07:00 it is
+// still Wednesday's last hour: Saturn's, in Mercury's day.
+export const planetaryHours: PlanetaryHoursType = {
+  date: "2026-01-15",
+  dayRuler: "JUPITER",
+  sunrise: "2026-01-15T07:12:00",
+  sunset: "2026-01-15T17:00:00",
+  dayEnd: "2026-01-16T07:12:00",
+  hours: [
+    ...planetaryDay(
+      "MERCURY",
+      "2026-01-14T07:12:00",
+      "2026-01-14T17:00:00",
+      "2026-01-15T07:12:00",
+    ).slice(17),
+    ...planetaryDay("JUPITER", "2026-01-15T07:12:00", "2026-01-15T17:00:00", "2026-01-16T07:12:00"),
   ],
 };

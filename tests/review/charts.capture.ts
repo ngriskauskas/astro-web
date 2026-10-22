@@ -2,7 +2,13 @@ import type { Page } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
 import { http, HttpResponse } from "msw";
-import { API_URL, getBirthProfiles, mainBirthProfile, manyBirthProfiles } from "../mocks";
+import {
+  API_URL,
+  getBirthProfiles,
+  mainBirthProfile,
+  manyBirthProfiles,
+  planetaryHoursUnavailable,
+} from "../mocks";
 import { expect, test } from "../e2e/fixtures";
 import { reviewSizes, TOUCH_BELOW, type ReviewSize } from "./sizes";
 
@@ -117,6 +123,12 @@ for (const [name, viewport] of Object.entries(reviewSizes)) {
       await page.goto("/daily");
       await expect(wheel(page).getByRole("button", { name: "Sun" })).toBeVisible();
       await expect(region(page, "Ascendant Today").getByText("NOW")).toBeVisible();
+      await expect(
+        region(page, "Planetary Hour").getByRole("group", { name: "Hour ruler: Saturn" }),
+      ).toBeVisible();
+      await expect(
+        region(page, "Ascendant Today").getByRole("list", { name: "Planetary hours" }),
+      ).toBeVisible();
       await expect(region(page, "Weekly Timings").getByText("Jupiter day")).toBeVisible();
       await expect(
         region(page, "Moon Timings").getByRole("button", { name: "View New Moon details" }),
@@ -167,6 +179,20 @@ for (const [name, viewport] of Object.entries(reviewSizes)) {
       await page.waitForTimeout(300); // the toggle's colour transition
       await weekly.scrollIntoViewIfNeeded();
       await capture("daily-12-weekly-timeline", { fullPage: false });
+      await region(page, "Planetary Hour").scrollIntoViewIfNeeded();
+      await capture("daily-13-planetary-hour-in-view", { fullPage: false });
+    });
+
+    test(`daily, planetary hours unavailable, at ${viewport.width}px`, async ({ page, network }) => {
+      network.use(planetaryHoursUnavailable());
+      const capture = capturer(page);
+      await page.goto("/daily");
+      await expect(region(page, "Planetary Hour").getByRole("alert")).toBeVisible();
+      await expect(region(page, "Ascendant Today").getByText("NOW")).toBeVisible();
+      await region(page, "Planetary Hour").scrollIntoViewIfNeeded();
+      await capture("daily-14-planetary-hours-unavailable", { fullPage: false });
+      await region(page, "Ascendant Today").scrollIntoViewIfNeeded();
+      await capture("daily-15-ascendant-without-planetary-hours", { fullPage: false });
     });
 
     test(`transits at ${viewport.width}px`, async ({ page }) => {
@@ -174,6 +200,9 @@ for (const [name, viewport] of Object.entries(reviewSizes)) {
       await page.goto("/transit");
       await expect(wheel(page).getByRole("button", { name: "Sun, My Profile" })).toBeVisible();
       await expect(region(page, "Ascendant Today").getByText("NOW")).toBeVisible();
+      await expect(
+        region(page, "Ascendant Today").getByRole("list", { name: "Planetary hours" }),
+      ).toBeVisible();
       await expect(region(page, "Weekly Timings").getByText("Jupiter day")).toBeVisible();
       await capture("transits-01-top", { fullPage: false });
       await capture("transits-02-full");
@@ -193,6 +222,8 @@ for (const [name, viewport] of Object.entries(reviewSizes)) {
       await capture("transits-05-matrix-in-view", { fullPage: false });
       await region(page, "Placements").scrollIntoViewIfNeeded();
       await capture("transits-06-placements-in-view", { fullPage: false });
+      await region(page, "Ascendant Today").scrollIntoViewIfNeeded();
+      await capture("transits-07-ascendant-in-view", { fullPage: false });
     });
 
     test(`synastry at ${viewport.width}px`, async ({ page }) => {

@@ -1,6 +1,7 @@
 import { useDesc } from "../../contexts/DescContext";
 import { HouseData, type CuspType } from "../../types/cusp";
 import type { OwnerType } from "../../contexts/MultiWheelContext";
+import { CHIP_BASE, CHIP_INTERACTIVE, chipTint } from "./chipStyles";
 
 export const HouseChip = ({
   house,
@@ -11,19 +12,15 @@ export const HouseChip = ({
 }) => {
   const { open } = useDesc();
   const houseInfo = HouseData[house];
-  const color = houseInfo.color;
 
   return (
     <button
       type="button"
-      className="flex items-center gap-1 px-1 py-1.5 bg-white border rounded shadow-sm text-xs font-medium cursor-pointer hover:shadow-md transition-all justify-center"
+      className={`${CHIP_BASE} ${CHIP_INTERACTIVE}`}
       onClick={() => open({ type: "house", value: house, owner })}
-      style={{
-        backgroundColor: `${color}11`,
-        borderColor: `${color}55`,
-      }}
+      style={chipTint(houseInfo.color)}
     >
-      <span className="font-xs">{houseInfo.name}</span>
+      <span>{houseInfo.name}</span>
     </button>
   );
 };

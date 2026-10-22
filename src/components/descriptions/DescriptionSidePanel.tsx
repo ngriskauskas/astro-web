@@ -67,7 +67,7 @@ export const DescriptionSidePanel = () => {
   return (
     <aside
       aria-label="Description"
-      className="fixed inset-0 z-50 flex flex-col bg-white shadow-2xl md:left-auto md:w-100 md:max-w-full md:border-l md:border-gray-200"
+      className="motion-panel fixed inset-0 z-50 flex flex-col bg-white shadow-2xl md:left-auto md:w-[26rem] md:max-w-full md:border-l md:border-gray-200"
     >
       {renderPanel()}
     </aside>

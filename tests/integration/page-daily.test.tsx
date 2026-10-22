@@ -1,16 +1,16 @@
-import { act, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { expect, test, vi } from "vitest";
 import { API_URL, momentChart, refreshedMomentChart } from "../mocks";
-import { findWidget, renderChartPage, wheel } from "./charts";
+import { aMinutePasses, fakeTheMinuteTimer, findWidget, renderChartPage, wheel } from "./charts";
 import { capture } from "./requests";
-import { FIXED_NOW } from "./setup";
 
 // The Daily page: the sky now, refreshed every minute. The clock is frozen at 07:00
 // on 15 January 2026.
 
 const REGIONS = [
   "Zodiac Wheel",
+  "Planetary Hour",
   "Ascendant Today",
   "Moon Timings",
   "Weekly Timings",
@@ -18,25 +18,13 @@ const REGIONS = [
   "Placements",
 ];
 
-// Lets a test run the page's one-minute refresh by hand.
-const fakeTheMinuteTimer = () => {
-  vi.useRealTimers();
-  vi.useFakeTimers({ toFake: ["Date", "setInterval", "clearInterval"] });
-  vi.setSystemTime(FIXED_NOW);
-};
-
-const aMinutePasses = () =>
-  act(async () => {
-    vi.advanceTimersByTime(60 * 1000);
-  });
-
 // The Moon's row in the placements table.
 const moonRow = async () => {
   const moon = await (await findWidget("Placements")).findByRole("button", { name: "Moon" });
   return within(moon.closest("tr")!);
 };
 
-test("shows its six widgets and no settings", async () => {
+test("shows its seven widgets and no settings", async () => {
   await renderChartPage("daily");
 
   for (const name of REGIONS) {

@@ -33,3 +33,6 @@ export const getLocalISODateTime = (date: Date = new Date()): string => {
 // True when both parts are filled in the way date and time inputs produce them.
 export const isDateAndTime = (date?: string, time?: string) =>
   /^\d{4}-\d{2}-\d{2}$/.test(date ?? "") && /^\d{2}:\d{2}(:\d{2})?$/.test(time ?? "");
+
+export const formatTime = (time: number) =>
+  new Date(time).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
