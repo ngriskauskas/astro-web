@@ -2,7 +2,7 @@ import { act } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { expect, test, vi } from "vitest";
 import { API_URL, momentChart, refreshedMomentChart } from "../mocks";
-import { drawer, findWidget, renderChartPage, wheel } from "./charts";
+import { drawer, findWidget, renderChartPage, wheel, showWholeWeek } from "./charts";
 import { FIXED_NOW } from "./setup";
 
 // The drawer opened from timing widgets, on the Daily page.
@@ -37,6 +37,7 @@ test("a moon phase opens with its date and the Moon's sign", async () => {
 
 test("each kind of weekly event opens its own explanation", async () => {
   const { user } = await renderChartPage("daily");
+  await showWholeWeek(user);
   const weekly = await findWidget("Weekly Timings");
 
   await user.click(await weekly.findByRole("button", { name: "Mercury Trine Jupiter starts" }));
@@ -65,6 +66,7 @@ test("each kind of weekly event opens its own explanation", async () => {
 
 test("one click on a weekly event opens that event only", async () => {
   const { user } = await renderChartPage("daily");
+  await showWholeWeek(user);
   const weekly = await findWidget("Weekly Timings");
 
   await user.click(await weekly.findByRole("button", { name: "Mercury Trine Jupiter starts" }));

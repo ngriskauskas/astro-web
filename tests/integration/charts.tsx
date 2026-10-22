@@ -108,3 +108,10 @@ export const aMinutePasses = () =>
   act(async () => {
     vi.advanceTimersByTime(60 * 1000);
   });
+
+// The Daily page shows today and two days of the week until the reader asks for the rest.
+// Tests that look at the whole week open it first.
+export const showWholeWeek = async (user: { click: (element: Element) => Promise<void> }) => {
+  const control = screen.queryByRole("button", { name: "Show the whole week" });
+  if (control) await user.click(control);
+};

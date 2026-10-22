@@ -3,13 +3,24 @@ import { expect, test } from "vitest";
 import { renderChartPage, widget } from "./charts";
 import { capture } from "./requests";
 
-test("shows its four widgets", async () => {
+test("shows its widgets", async () => {
   await renderChartPage("charts");
 
-  for (const name of ["Natal Chart", "Chart Settings", "Aspect Matrix", "Placements"]) {
+  for (const name of [
+    "Natal Chart",
+    "Chart Settings",
+    "Summary",
+    "Chart ruler",
+    "Dignities",
+    "Aspect Matrix",
+    "Houses",
+    "Hemispheres and quadrants",
+    "Placements",
+  ]) {
     expect(screen.getByRole("region", { name })).toBeInTheDocument();
   }
-  expect(screen.getAllByRole("region")).toHaveLength(4);
+  // The natal summary holds three sections of its own: elements, modalities and tightest aspects.
+  expect(screen.getAllByRole("region")).toHaveLength(12);
 });
 
 test("requests the natal chart for the user's own profile", async () => {

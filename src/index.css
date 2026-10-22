@@ -240,6 +240,77 @@ body {
   }
 }
 
+/* Drifting northern-lights glow and twinkling stars behind the dark Ascendant timeline. */
+.ascendant-aurora,
+.ascendant-aurora::before,
+.ascendant-aurora::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ascendant-aurora {
+  overflow: hidden;
+}
+
+.ascendant-aurora::before {
+  inset: 0 -30%;
+  background:
+    radial-gradient(150px 120px at 35% 90px, rgb(52 211 153 / 0.38), transparent),
+    radial-gradient(170px 130px at 65% 300px, rgb(129 140 248 / 0.45), transparent),
+    radial-gradient(140px 110px at 40% 520px, rgb(217 70 239 / 0.34), transparent);
+  background-size: 100% 720px;
+  filter: blur(10px);
+  content: "";
+  animation:
+    aurora-flow 48s linear infinite,
+    aurora-sway 9s ease-in-out infinite alternate;
+}
+
+.ascendant-aurora::after {
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 15%, white, transparent),
+    radial-gradient(1.5px 1.5px at 75% 40%, white, transparent),
+    radial-gradient(1.2px 1.2px at 45% 75%, white, transparent),
+    radial-gradient(1.5px 1.5px at 88% 92%, white, transparent);
+  background-size: 100% 360px;
+  content: "";
+  animation: aurora-twinkle 4.5s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-flow {
+  to {
+    background-position: 0 720px;
+  }
+}
+
+@keyframes aurora-sway {
+  from {
+    transform: translateX(-9%);
+    opacity: 0.65;
+  }
+  to {
+    transform: translateX(9%);
+    opacity: 1;
+  }
+}
+
+@keyframes aurora-twinkle {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ascendant-aurora::before,
+  .ascendant-aurora::after {
+    animation: none;
+  }
+}
+
 .motion-fade-up {
   animation: motion-fade-up 260ms ease-out both;
 }
@@ -257,6 +328,72 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .motion-fade-up,
   .motion-panel {
+    animation: none;
+  }
+}
+
+/* The hemisphere wheel: quarters grow in, planets pop in and then drift, and hover lifts the
+   quarter. Each has its own timing in the component; motion is off when asked for. */
+@keyframes hemi-grow {
+  from {
+    transform: scale(0.55);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes hemi-pop {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes hemi-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.hemi-quarter {
+  animation: hemi-grow 900ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  transition: transform 250ms ease;
+}
+
+.hemi-quarter:hover,
+.hemi-quarter:focus-visible {
+  transform: scale(1.03);
+}
+
+.hemi-glyph {
+  animation: hemi-pop 550ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  transition: transform 200ms ease;
+}
+
+.hemi-glyph:hover,
+.hemi-glyph:focus-visible {
+  transform: scale(1.18);
+}
+
+.hemi-glyph-float {
+  animation: hemi-float 4.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hemi-quarter,
+  .hemi-glyph,
+  .hemi-glyph-float {
     animation: none;
   }
 }

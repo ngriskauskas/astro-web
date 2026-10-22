@@ -11,7 +11,18 @@ export const DAILY_LAYOUTS = [
 ] as const;
 
 export type DailyLayoutId = (typeof DAILY_LAYOUTS)[number]["id"];
-export type DailyCard = "hour" | "timeline" | "wheel" | "moon" | "weekly" | "matrix" | "placements";
+export type DailyCard =
+  | "hour"
+  | "timeline"
+  | "summary"
+  | "ruler"
+  | "dignities"
+  | "hemispheres"
+  | "wheel"
+  | "moon"
+  | "weekly"
+  | "matrix"
+  | "placements";
 
 const LAYOUT_IDS: readonly DailyLayoutId[] = DAILY_LAYOUTS.map((layout) => layout.id);
 const LAYOUT_KEY = "astro-daily-layout";
@@ -24,15 +35,39 @@ export const DAILY_ARRANGEMENT: Record<
   { mobile: DailyCard[]; left: DailyCard[]; right: DailyCard[]; bottom: DailyCard[] }
 > = {
   classic: {
-    mobile: ["wheel", "hour", "timeline", "moon", "weekly", "matrix", "placements"],
-    left: ["wheel", "matrix"],
-    right: ["hour", "timeline", "moon", "weekly", "placements"],
+    mobile: [
+      "wheel",
+      "hour",
+      "timeline",
+      "summary",
+      "ruler",
+      "dignities",
+      "moon",
+      "weekly",
+      "matrix",
+      "hemispheres",
+      "placements",
+    ],
+    left: ["wheel", "matrix", "hemispheres"],
+    right: ["hour", "timeline", "summary", "ruler", "dignities", "moon", "weekly", "placements"],
     bottom: [],
   },
   now: {
-    mobile: ["hour", "timeline", "wheel", "moon", "weekly", "placements", "matrix"],
-    left: ["hour", "wheel", "moon"],
-    right: ["timeline", "weekly", "placements"],
+    mobile: [
+      "hour",
+      "timeline",
+      "summary",
+      "ruler",
+      "dignities",
+      "wheel",
+      "moon",
+      "hemispheres",
+      "weekly",
+      "placements",
+      "matrix",
+    ],
+    left: ["hour", "wheel", "moon", "hemispheres"],
+    right: ["timeline", "summary", "ruler", "dignities", "weekly", "placements"],
     bottom: ["matrix"],
   },
 };
@@ -43,14 +78,19 @@ export const EXPLORE_TABS = [
   { id: "today", label: "Today", cards: ["timeline", "moon"] },
   { id: "week", label: "This week", cards: ["weekly"] },
   { id: "chart", label: "Chart", cards: ["wheel", "placements"] },
+  { id: "shape", label: "Shape", cards: ["ruler", "dignities", "hemispheres"] },
   { id: "aspects", label: "Aspects", cards: ["matrix"] },
 ] as const;
 
 export const FOCUS_ORDER: DailyCard[] = [
   "hour",
   "timeline",
+  "summary",
+  "ruler",
+  "dignities",
   "wheel",
   "moon",
+  "hemispheres",
   "weekly",
   "matrix",
   "placements",

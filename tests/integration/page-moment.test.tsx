@@ -10,13 +10,23 @@ const lastBody = (sent: { body: unknown }[]) => sent[sent.length - 1].body;
 const date = () => widget("Chart Settings").getByLabelText("Date");
 const time = () => widget("Chart Settings").getByLabelText("Time");
 
-test("shows its four widgets, with date and time settings and no profile choice", async () => {
+test("shows its widgets, with date and time settings and no profile choice", async () => {
   await renderChartPage("moment");
 
-  for (const name of ["Moment Chart", "Chart Settings", "Aspect Matrix", "Placements"]) {
+  for (const name of [
+    "Moment Chart",
+    "Chart Settings",
+    "Summary",
+    "Chart ruler",
+    "Dignities",
+    "Aspect Matrix",
+    "Hemispheres and quadrants",
+    "Placements",
+  ]) {
     expect(screen.getByRole("region", { name })).toBeInTheDocument();
   }
-  expect(screen.getAllByRole("region")).toHaveLength(4);
+  // The chart summary holds three sections of its own: elements, modalities and tightest aspects.
+  expect(screen.getAllByRole("region")).toHaveLength(11);
   expect(widget("Chart Settings").queryByLabelText("Profile")).not.toBeInTheDocument();
 });
 
