@@ -24,6 +24,8 @@ import { DistributionPanel } from "./DistributionPanel";
 import type { PlanetaryHourDescriptionValue } from "../../types/planetaryHours";
 import { PlanetaryHourPanel } from "./PlanetaryHourPanel";
 import type { QuadrantKey } from "../../types/hemisphere";
+import type { AspectPatternDescriptionValue } from "../../types/aspectPattern";
+import { AspectPatternPanel } from "./AspectPatternPanel";
 
 export const DescriptionSidePanel = () => {
   const { active, close } = useDesc();
@@ -89,6 +91,8 @@ export const DescriptionSidePanel = () => {
         return <DistributionPanel kind="modality" value={active.value as ModalityKey} />;
       case "quadrant":
         return <DistributionPanel kind="quadrant" value={active.value as QuadrantKey} />;
+      case "aspectPattern":
+        return <AspectPatternPanel value={active.value as AspectPatternDescriptionValue} />;
       case "moonphase":
         return <MoonPhasePanel value={active.value as MoonPhaseDescriptionValue} />;
       case "planetaryHour":

@@ -2,13 +2,14 @@ import type { PlanetName } from "./planet";
 import type { ZodiacSign } from "./zodiac";
 
 // The shapes planets make together in one chart, as the server sends them.
-export type AspectPatternType = "GRAND_TRINE" | "T_SQUARE" | "STELLIUM" | "YOD";
+export type AspectPatternType = "GRAND_TRINE" | "T_SQUARE" | "STELLIUM" | "YOD" | "CONJUNCTION_CLUSTER";
 
 export interface AspectPattern {
   type: AspectPatternType;
+  // Every planet in the shape.
   planets: PlanetName[];
-  // The planet a T-square or yod points at, where the other planets push towards.
-  focus: PlanetName | null;
+  // The planets a T-square or yod points at, where the other planets push towards. Empty otherwise.
+  focus: PlanetName[];
   // The sign a stellium sits in.
   sign: ZodiacSign | null;
 }
@@ -45,4 +46,16 @@ export const AspectPatternData: Record<AspectPatternType, AspectPatternInfo> = {
     description:
       "Two planets in sextile are both quincunx a third. The quincunxes ask for an adjustment, and the focal planet is where that adjustment is asked of you.",
   },
+  CONJUNCTION_CLUSTER: {
+    name: "Conjunction cluster",
+    color: "#EC4899",
+    description:
+      "Three or more planets joined by conjunctions gather into one concentrated point. Their themes are fused, so they are read together rather than one at a time.",
+  },
 };
+
+// What the drawer for one shape needs: the shape, and which side of a two-chart view it is on.
+export interface AspectPatternDescriptionValue {
+  pattern: AspectPattern;
+  owner?: "main" | "other";
+}

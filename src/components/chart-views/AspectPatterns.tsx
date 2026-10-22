@@ -1,7 +1,7 @@
-import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
+import type { MultiWheelContextType, OwnerType } from "../../contexts/MultiWheelContext";
+import { useDesc } from "../../contexts/DescContext";
 import { useProfileNames } from "../../hooks/chart/getNames";
 import { isMulti, useWheel } from "../../hooks/useWheel";
-import type { OwnerType } from "../../contexts/MultiWheelContext";
 import { AspectPatternData, type AspectPattern } from "../../types/aspectPattern";
 import { PlanetsData } from "../../types/planet";
 import { ZodiacData } from "../../types/zodiac";
@@ -58,10 +58,13 @@ const Side = ({
 );
 
 // One shape: its name and where it sits, a short reading of it, and the planets that make it up.
-// The focal planet of a T-square or yod is marked, since that is where the shape points.
+// The focus planets of a T-square or yod are marked, since that is where the shape points. The
+// name opens the shape's drawer.
 const PatternCard = ({ pattern, owner }: { pattern: AspectPattern; owner?: OwnerType }) => {
+  const { open } = useDesc();
   const info = AspectPatternData[pattern.type];
   const headline = pattern.sign ? `${info.name} in ${ZodiacData[pattern.sign].displayName}` : info.name;
+  const focusNames = pattern.focus.map((planet) => PlanetsData[planet].displayName);
   return (
     <li
       className="rounded-xl border p-3"
@@ -70,18 +73,28 @@ const PatternCard = ({ pattern, owner }: { pattern: AspectPattern; owner?: Owner
         background: `linear-gradient(135deg, ${info.color}14, transparent 80%)`,
       }}
     >
-      <h4 className="text-sm font-semibold text-gray-900">{headline}</h4>
+      <button
+        type="button"
+        onClick={() => open({ type: "aspectPattern", value: { pattern, owner } })}
+        className="cursor-pointer text-left text-sm font-semibold text-gray-900 hover:underline"
+      >
+        {headline}
+      </button>
       <p className="mt-1 text-xs leading-relaxed text-gray-600">{info.description}</p>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {pattern.planets.map((planet) => (
           <PlanetChip key={planet} planet={planet} owner={owner} />
         ))}
       </div>
-      {pattern.focus && (
+      {focusNames.length > 0 && (
         <p className="mt-2 text-xs text-gray-600">
-          Points to <span className="font-medium text-gray-900">{PlanetsData[pattern.focus].displayName}</span>
+          Points to <span className="font-medium text-gray-900">{joinNames(focusNames)}</span>
         </p>
       )}
     </li>
   );
 };
+
+// "Sun", "Sun and Moon", "Sun, Moon and Mars".
+const joinNames = (names: string[]) =>
+  names.length <= 1 ? (names[0] ?? "") : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
