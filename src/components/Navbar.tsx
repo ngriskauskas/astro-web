@@ -15,7 +15,7 @@ const ACCOUNT_LINKS = [{ to: "/profile", label: "Profile" }];
 
 // The current page gets a filled pill. Gray tokens, not a fixed colour, so it reads in every theme.
 const linkClass = ({ isActive }: { isActive: boolean }) =>
-  `rounded-full px-3 py-1.5 text-sm transition-colors ${
+  `cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors ${
     isActive
       ? "bg-gray-200 font-medium text-gray-900"
       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
@@ -38,7 +38,7 @@ export const Navbar = () => {
         <div className="flex min-w-0 items-center gap-6">
           <Link
             to="/"
-            className="flex shrink-0 items-center gap-2 text-lg font-semibold tracking-tight text-gray-900"
+            className="flex shrink-0 cursor-pointer items-center gap-2 text-lg font-semibold tracking-tight text-gray-900"
           >
             <span aria-hidden="true" className="text-2xl leading-none text-indigo-600">
               ☉
@@ -70,7 +70,7 @@ export const Navbar = () => {
         </div>
 
         <button
-          className="rounded-full p-2 hover:bg-gray-100 md:hidden"
+          className="cursor-pointer rounded-full p-2 hover:bg-gray-100 md:hidden"
           aria-label="Menu"
           aria-expanded={isOpen}
           onClick={() => setIsOpen(!isOpen)}
@@ -100,7 +100,10 @@ export const Navbar = () => {
         inert={!isOpen}
         aria-hidden={!isOpen}
       >
-        <div className="absolute inset-0 bg-black/30" onClick={() => setIsOpen(false)} />
+        <div
+          className="absolute inset-0 cursor-pointer bg-black/30"
+          onClick={() => setIsOpen(false)}
+        />
 
         <div
           role="menu"
@@ -139,7 +142,7 @@ export const Navbar = () => {
                 to={to}
                 role="menuitem"
                 className={({ isActive }) =>
-                  `rounded-xl px-3 py-2.5 text-base transition-colors ${
+                  `cursor-pointer rounded-xl px-3 py-2.5 text-base transition-colors ${
                     isActive
                       ? "bg-gray-200 font-medium text-gray-900"
                       : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"

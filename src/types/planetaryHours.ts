@@ -13,6 +13,11 @@ export interface PlanetaryHour {
   dateTime: string;
 }
 
+export interface PlanetaryHourDescriptionValue {
+  hour: PlanetaryHour;
+  end: Date;
+}
+
 export interface PlanetaryHoursType {
   date: string;
   dayRuler: ClassicalPlanet;

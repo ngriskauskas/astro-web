@@ -7,6 +7,7 @@ import { RetrogradePreview } from "../descriptions/RetrogradeTimingPanel";
 import { StationPreview } from "../descriptions/StationTimingPanel";
 import { Spinner } from "../utils/Spinner";
 import { LoadError } from "../utils/LoadError";
+import { useDesc } from "../../contexts/DescContext";
 
 const WEEKDAY_RULERS: readonly PlanetName[] = [
   "SUN",
@@ -31,6 +32,7 @@ export const WeeklyPlanetaryTimings = ({
   error = false,
   timings,
 }: WeeklyPlanetaryTimingsProps) => {
+  const { open } = useDesc();
   if (loading) return <Spinner />;
   if (error) return <LoadError message="Could not load this week's timings." />;
 
@@ -74,29 +76,36 @@ export const WeeklyPlanetaryTimings = ({
               key={date.toISOString()}
               className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2 py-3 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-3"
             >
-              <div className="flex items-start gap-2 border-r border-gray-100 pr-2 sm:pr-3">
-                <span
-                  className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-lg"
-                  style={{
-                    color: planetInfo.color,
-                    borderColor: `${planetInfo.color}66`,
-                    backgroundColor: `${planetInfo.color}16`,
-                  }}
-                  aria-hidden="true"
+              <div className="border-r border-gray-100 pr-2 sm:pr-3">
+                <button
+                  type="button"
+                  aria-label={`View ${planetInfo.displayName} day details`}
+                  onClick={() => open({ type: "planet", value: ruler })}
+                  className="flex cursor-pointer items-start gap-2 rounded text-left hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500"
                 >
-                  {planetInfo.glyph}
-                </span>
-                <div className="min-w-0">
-                  <div className="text-xs font-semibold text-gray-800">
-                    {date.toLocaleDateString(undefined, { weekday: "short" })}
-                  </div>
-                  <div className="text-[10px] text-gray-500">
-                    {date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-                  </div>
-                  <div className="mt-1 text-[10px] leading-tight text-gray-500">
-                    {planetInfo.displayName} day
-                  </div>
-                </div>
+                  <span
+                    className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-lg"
+                    style={{
+                      color: planetInfo.color,
+                      borderColor: `${planetInfo.color}66`,
+                      backgroundColor: `${planetInfo.color}16`,
+                    }}
+                    aria-hidden="true"
+                  >
+                    {planetInfo.glyph}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs font-semibold text-gray-800">
+                      {date.toLocaleDateString(undefined, { weekday: "short" })}
+                    </span>
+                    <span className="block text-[10px] text-gray-500">
+                      {date.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    </span>
+                    <span className="mt-1 block text-[10px] leading-tight text-gray-500">
+                      {planetInfo.displayName} day
+                    </span>
+                  </span>
+                </button>
               </div>
               <div className="flex min-w-0 flex-wrap content-start items-start gap-2">
                 {dayEvents.length > 0 ? (

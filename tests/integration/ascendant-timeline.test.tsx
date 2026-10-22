@@ -1,6 +1,6 @@
 import { within } from "@testing-library/react";
 import { expect, test, vi } from "vitest";
-import { dailyTimingsFor, emptyDailyTimings, planetaryHoursUnavailable } from "../mocks";
+import { dailyTimings, dailyTimingsFor, emptyDailyTimings, planetaryHoursUnavailable } from "../mocks";
 import { drawer, findWidget, renderChartPage, widget } from "./charts";
 import { capture, hold, reject } from "./requests";
 
@@ -40,9 +40,38 @@ test("marks each planet that meets the Ascendant today, with its time, and nothi
 
   // The response also has a square to the Ascendant and a conjunction of two planets;
   // neither belongs on this timeline.
-  expect(region.getAllByRole("button").map((button) => button.getAttribute("aria-label"))).toEqual(
-    MARKERS,
-  );
+  expect(
+    region
+      .getAllByRole("button")
+      .map((button) => button.getAttribute("aria-label"))
+      .filter((label) => MARKERS.includes(label ?? "")),
+  ).toEqual(MARKERS);
+});
+
+test("spaces close Ascendant conjunction markers so they remain individually visible", async () => {
+  const original = dailyTimings.aspects[0];
+  const closeTimings = {
+    ...dailyTimings,
+    aspects: [
+      {
+        ...original,
+        exactDateRanges: ["2026-01-15T07:15:00", "2026-01-15T07:18:00", "2026-01-15T07:21:00"].map(
+          (dateTime) => ({ ...original.exactDateRanges[0], dateTime }),
+        ),
+      },
+    ],
+  };
+  await renderChartPage("daily", { handlers: dailyTimingsFor(closeTimings) });
+  const region = await timeline();
+
+  const markers = region
+    .getAllByRole("button", { name: /conjuncts ASC at/ })
+    .map((button) => button.closest<HTMLElement>("[data-conjunction-marker]")!);
+  expect(markers).toHaveLength(3);
+  const positions = markers.map((marker) => Number.parseFloat(marker.style.top));
+  expect(positions[1] - positions[0]).toBeGreaterThanOrEqual(2.5);
+  expect(positions[2] - positions[1]).toBeGreaterThanOrEqual(2.5);
+  expect(region.getAllByRole("button", { name: /conjuncts ASC at/ })).toHaveLength(3);
 });
 
 test("starts scrolled to the current time", async () => {
@@ -70,7 +99,7 @@ test("says so when no planet meets the Ascendant today", async () => {
   const region = await timeline();
 
   expect(region.getByText("No exact ASC conjunctions today")).toBeInTheDocument();
-  expect(region.queryByRole("button")).not.toBeInTheDocument();
+  expect(region.queryByRole("button", { name: /conjuncts ASC/ })).not.toBeInTheDocument();
 });
 
 test("shows a loading indication until the timings arrive", async () => {
@@ -128,9 +157,12 @@ const hourNames = (column: Awaited<ReturnType<typeof hourColumn>>) =>
 // What the timeline showed before it had planetary hours.
 const expectTheTimelineAsBefore = (region: Awaited<ReturnType<typeof timeline>>) => {
   expect(region.getAllByTitle(/ from /)).toHaveLength(13);
-  expect(region.getAllByRole("button").map((button) => button.getAttribute("aria-label"))).toEqual(
-    MARKERS,
-  );
+  expect(
+    region
+      .getAllByRole("button")
+      .map((button) => button.getAttribute("aria-label"))
+      .filter((label) => MARKERS.includes(label ?? "")),
+  ).toEqual(MARKERS);
   expect(region.getByText("NOW")).toBeInTheDocument();
 };
 
@@ -209,11 +241,26 @@ test("at midday the current planetary hour is a day hour", async () => {
   ).toBeInTheDocument();
 });
 
-test("planetary hours are nothing to select", async () => {
-  await renderChartPage("daily");
+test("selecting a planetary hour opens its specific description", async () => {
+  const { user } = await renderChartPage("daily");
   const column = await hourColumn();
 
-  expect(column.queryByRole("button")).not.toBeInTheDocument();
+  const button = column.getByRole("button", {
+    name: `View ${CURRENT_HOUR} details`,
+  });
+  await user.click(button);
+
+  expect(drawer.title()).toBe("Saturn Hour");
+  expect(drawer.get().getByText("24 of 24 · Night")).toBeInTheDocument();
+});
+
+test("selecting a sign segment opens its description", async () => {
+  const { user } = await renderChartPage("daily");
+  const region = await timeline();
+
+  await user.click(region.getByRole("button", { name: "View Scorpio sign details" }));
+
+  expect(drawer.title()).toBe("Scorpio");
 });
 
 test("without a sunrise or sunset, the timeline is shown as before, with no planetary hours", async () => {

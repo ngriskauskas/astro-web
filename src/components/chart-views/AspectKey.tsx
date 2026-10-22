@@ -1,12 +1,10 @@
 import { AspectData, type AspectType } from "../../types/aspect";
+import { Widget, type WidgetProps } from "../widgets/Widget";
 
 // A key for the matrix's symbols. Each aspect pairs its symbol with its name, so the meaning
 // does not depend on colour.
-export const AspectKey = () => (
-  <section aria-labelledby="aspect-key-heading" className="flex flex-col">
-    <h2 id="aspect-key-heading" className="mb-3 text-lg font-semibold text-gray-900">
-      Aspect key
-    </h2>
+export const AspectKey = ({ className }: WidgetProps) => (
+  <Widget id="aspect-key" title="Aspect key" className={className}>
     <ul className="flex flex-col gap-2">
       {(Object.keys(AspectData) as AspectType[]).map((type) => {
         const info = AspectData[type];
@@ -24,5 +22,5 @@ export const AspectKey = () => (
         );
       })}
     </ul>
-  </section>
+  </Widget>
 );

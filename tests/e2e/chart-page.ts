@@ -50,8 +50,19 @@ export const opensAndCloses = async (page: Page, item: Locator, title: RegExp | 
 export const expectDrawerCoversScreenOnPhone = async (page: Page) => {
   if (!(await menuButton(page).isVisible())) return;
   const viewport = page.viewportSize()!;
-  const box = (await drawer(page).panel.boundingBox())!;
-  expect(box).toEqual({ x: 0, y: 0, width: viewport.width, height: viewport.height });
+  await expect
+    .poll(async () => {
+      const box = await drawer(page).panel.boundingBox();
+      return box
+        ? {
+            x: Math.round(box.x),
+            y: Math.round(box.y),
+            width: Math.round(box.width),
+            height: Math.round(box.height),
+          }
+        : null;
+    })
+    .toEqual({ x: 0, y: 0, width: viewport.width, height: viewport.height });
 };
 
 export const expectNoSidewaysScroll = async (page: Page) => {
