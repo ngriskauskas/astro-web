@@ -66,8 +66,10 @@ const PatternCard = ({ pattern, owner }: { pattern: AspectPattern; owner?: Owner
   const headline = pattern.sign ? `${info.name} in ${ZodiacData[pattern.sign].displayName}` : info.name;
   const focusNames = pattern.focus.map((planet) => PlanetsData[planet].displayName);
   return (
+    // The title button is stretched over the whole card, so anywhere on the card opens the drawer.
+    // The planet chips sit above that layer and open their own drawers.
     <li
-      className="rounded-xl border p-3"
+      className="group relative cursor-pointer rounded-xl border p-3 transition-shadow hover:shadow-md focus-within:shadow-md"
       style={{
         borderColor: `${info.color}55`,
         background: `linear-gradient(135deg, ${info.color}14, transparent 80%)`,
@@ -76,12 +78,12 @@ const PatternCard = ({ pattern, owner }: { pattern: AspectPattern; owner?: Owner
       <button
         type="button"
         onClick={() => open({ type: "aspectPattern", value: { pattern, owner } })}
-        className="cursor-pointer text-left text-sm font-semibold text-gray-900 hover:underline"
+        className="cursor-pointer text-left text-sm font-semibold text-gray-900 outline-none after:absolute after:inset-0 after:rounded-xl after:content-[''] focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-indigo-600"
       >
         {headline}
       </button>
       <p className="mt-1 text-xs leading-relaxed text-gray-600">{info.description}</p>
-      <div className="mt-2 flex flex-wrap gap-1.5">
+      <div className="relative z-10 mt-2 flex flex-wrap gap-1.5">
         {pattern.planets.map((planet) => (
           <PlanetChip key={planet} planet={planet} owner={owner} />
         ))}
