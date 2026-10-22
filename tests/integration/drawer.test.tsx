@@ -219,11 +219,19 @@ test("closing clears the trail: back in a reopened drawer does not return to ear
   expect(drawer.isOpen()).toBe(false);
 });
 
-test("only the close and back buttons close the drawer", async () => {
+test("Escape closes the drawer", async () => {
   const { user } = await renderChartPage("charts");
   await openSun(user);
 
   await user.keyboard("{Escape}");
+
+  expect(drawer.isOpen()).toBe(false);
+});
+
+test("clicking the page behind the drawer does not close it", async () => {
+  const { user } = await renderChartPage("charts");
+  await openSun(user);
+
   await user.click(screen.getByRole("heading", { name: "Natal Chart" }));
 
   expect(drawer.title()).toBe("Sun");

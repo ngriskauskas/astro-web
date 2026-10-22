@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useDesc } from "../../contexts/DescContext";
 import type { ZodiacSign } from "../../types/zodiac";
 import { PlanetPanel } from "./PlanetPanel";
@@ -19,7 +20,26 @@ import { MoonPhasePanel } from "./MoonPhasePanel";
 import type { MoonPhaseDescriptionValue } from "../../types/moon";
 
 export const DescriptionSidePanel = () => {
-  const { active } = useDesc();
+  const { active, close } = useDesc();
+  const panelRef = useRef<HTMLElement>(null);
+  // Read through a ref: the close function changes every render, and the effect below must
+  // not re-run (and move focus again) on each render.
+  const closeRef = useRef(close);
+  useEffect(() => {
+    closeRef.current = close;
+  });
+
+  // Opening the panel, or moving to another item in it, moves focus to the top of the panel.
+  // Escape closes it, as the close button does.
+  useEffect(() => {
+    if (!active) return;
+    panelRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") closeRef.current();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [active]);
 
   if (!active) return null;
 
@@ -66,8 +86,10 @@ export const DescriptionSidePanel = () => {
   // Covers the screen on a phone; a panel on the right from tablet width up.
   return (
     <aside
+      ref={panelRef}
+      tabIndex={-1}
       aria-label="Description"
-      className="motion-panel fixed inset-0 z-50 flex flex-col bg-white shadow-2xl md:left-auto md:w-[26rem] md:max-w-full md:border-l md:border-gray-200"
+      className="motion-panel fixed inset-0 z-50 flex flex-col bg-white focus:outline-none shadow-2xl md:left-auto md:w-[26rem] md:max-w-full md:border-l md:border-gray-200"
     >
       {renderPanel()}
     </aside>

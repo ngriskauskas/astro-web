@@ -38,7 +38,7 @@ export const HoursToday = () => {
               <span aria-hidden="true" style={{ color: planet.color }} className="w-4 shrink-0 text-center text-base">
                 {planet.glyph}
               </span>
-              <span className="min-w-0 truncate">
+              <span className="min-w-0 leading-snug">
                 {planet.displayName}
                 <span className="sr-only">
                   {hour.period === "DAY" ? " daytime hour" : " night hour"}

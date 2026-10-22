@@ -54,6 +54,12 @@ html[data-theme="dusk"] {
   --color-indigo-700: #9f1239;
 }
 
+/* Checkboxes are a larger touch target than the browser default (13px). */
+input[type="checkbox"] {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
 body {
   background-color: var(--color-gray-50);
   color: var(--color-gray-900);

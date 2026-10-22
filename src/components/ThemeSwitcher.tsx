@@ -21,7 +21,7 @@ export const ThemeSwitcher = ({ showLabels = false }: { showLabels?: boolean }) 
             aria-label={`${item.label} theme`}
             title={`${item.label} theme`}
             onClick={() => choose(item.id)}
-            className={`flex cursor-pointer items-center gap-1.5 rounded-full px-1.5 py-1 text-xs transition-colors ${
+            className={`flex min-h-7 min-w-7 cursor-pointer items-center gap-1.5 rounded-full px-1.5 py-1 text-xs transition-colors ${
               selected ? "bg-gray-200 text-gray-900" : "text-gray-600 hover:text-gray-900"
             }`}
           >

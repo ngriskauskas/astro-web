@@ -123,9 +123,22 @@ export const DescSection = ({
       )}
       {isOpen && (
         <div className="motion-fade-up mt-2 border-l-2 border-indigo-500/40 pl-3 text-[13px] leading-relaxed text-gray-700">
-          {desc}
+          {withHeadline(desc)}
         </div>
       )}
     </div>
+  );
+};
+
+// A generated description is a headline, a blank line, then the reading. The headline is
+// shown on its own, in bold. A placeholder has no headline and is shown as it is.
+const withHeadline = (text: string) => {
+  const [headline, ...rest] = text.split("\n\n");
+  if (rest.length === 0) return text;
+  return (
+    <>
+      <p className="font-semibold text-gray-900">{headline}</p>
+      <p className="mt-1">{rest.join("\n\n")}</p>
+    </>
   );
 };
