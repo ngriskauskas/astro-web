@@ -96,6 +96,7 @@ const body = ({ ascendant, midheaven, planets, retrograde = [] }: ChartSpec): Ch
   ) as Record<PlanetName, Planet>,
   houses: houses(ascendant),
   keyAngles: keyAngles(ascendant, midheaven),
+  patterns: [],
 });
 
 type PointName = PlanetName | "ASC" | "MC" | "IC" | "DC";

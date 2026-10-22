@@ -1,5 +1,6 @@
 import {
   AscendantTodayWidget,
+  AspectPatternsWidget,
   ChartSettingsWidget,
   TwoChartMatrixWidget,
   TwoChartPlacementsWidget,
@@ -24,6 +25,7 @@ export const Transits = () => (
           <AscendantTodayWidget className="order-2" />
           <WeeklyTimingsWidget className="order-2" />
           <TwoChartPlacementsWidget className="order-4" />
+          <AspectPatternsWidget className="order-5" />
         </>
       }
     />

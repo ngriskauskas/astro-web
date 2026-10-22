@@ -8,13 +8,13 @@ import { capture } from "./requests";
 
 const lastBody = (sent: { body: unknown }[]) => sent[sent.length - 1].body;
 
-test("shows its four widgets", async () => {
+test("shows its five widgets", async () => {
   await renderChartPage("synastry");
 
-  for (const name of ["Synastry", "Chart Settings", "Synastry Aspects", "Placements"]) {
+  for (const name of ["Synastry", "Chart Settings", "Synastry Aspects", "Placements", "Aspect patterns"]) {
     expect(screen.getByRole("region", { name })).toBeInTheDocument();
   }
-  expect(screen.getAllByRole("region")).toHaveLength(4);
+  expect(screen.getAllByRole("region")).toHaveLength(5);
 });
 
 test("compares the user's own profile with their first other profile", async () => {

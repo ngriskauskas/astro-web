@@ -5,6 +5,7 @@ import { usePlanetaryHours } from "../hooks/usePlanetaryHours";
 import {
   AscendantTodayWidget,
   AspectKeyWidget,
+  AspectPatternsWidget,
   AspectMatrixWidget,
   KeyAspectsWidget,
   WidgetDisclosure,
@@ -47,6 +48,7 @@ const ORDER = [
   "order-9",
   "order-10",
   "order-11",
+  "order-12",
 ];
 
 export const Daily = () => {
@@ -212,6 +214,7 @@ const ExploreTabs = () => {
             <div className="flex min-w-0 flex-col gap-6">
               {renderCard("ruler")}
               {renderCard("dignities")}
+              {renderCard("patterns")}
             </div>
             {renderCard("hemispheres")}
           </WidgetRow>
@@ -236,6 +239,8 @@ const renderCard = (id: DailyCard, className = "") => {
       return <ChartRulerWidget className={className} />;
     case "dignities":
       return <DignitiesWidget className={className} />;
+    case "patterns":
+      return <AspectPatternsWidget className={className} />;
     case "hemispheres":
       return <HemispheresWidget className={className} />;
     case "weekly":

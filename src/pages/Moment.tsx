@@ -1,5 +1,6 @@
 import {
   AspectMatrixWidget,
+  AspectPatternsWidget,
   ChartRulerWidget,
   ChartSettingsWidget,
   ChartSummaryWidget,
@@ -28,6 +29,7 @@ export const Moment = () => (
           <ChartRulerWidget className="order-3" />
           <DignitiesWidget className="order-4" />
           <PlacementsWidget className="order-5" />
+          <AspectPatternsWidget className="order-6" />
         </>
       }
     />

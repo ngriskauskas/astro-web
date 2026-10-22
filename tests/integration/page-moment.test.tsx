@@ -21,12 +21,13 @@ test("shows its widgets, with date and time settings and no profile choice", asy
     "Dignities",
     "Aspect Matrix",
     "Hemispheres and quadrants",
+    "Aspect patterns",
     "Placements",
   ]) {
     expect(screen.getByRole("region", { name })).toBeInTheDocument();
   }
   // The chart summary holds three sections of its own: elements, modalities and tightest aspects.
-  expect(screen.getAllByRole("region")).toHaveLength(11);
+  expect(screen.getAllByRole("region")).toHaveLength(12);
   expect(widget("Chart Settings").queryByLabelText("Profile")).not.toBeInTheDocument();
 });
 

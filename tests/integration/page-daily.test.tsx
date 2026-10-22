@@ -15,6 +15,7 @@ const REGIONS = [
   "Summary",
   "Chart ruler",
   "Dignities",
+  "Aspect patterns",
   "Hemispheres and quadrants",
   "Moon Timings",
   "Weekly Timings",

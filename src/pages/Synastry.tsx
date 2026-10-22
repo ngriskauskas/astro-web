@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import {
+  AspectPatternsWidget,
   ChartSettingsWidget,
   TwoChartMatrixWidget,
   TwoChartPlacementsWidget,
@@ -47,6 +48,7 @@ export const Synastry = () => {
           <>
             <ChartSettingsWidget className="order-2" />
             <TwoChartPlacementsWidget otherLabel="Other Profile" className="order-4" />
+            <AspectPatternsWidget className="order-5" />
           </>
         }
       />

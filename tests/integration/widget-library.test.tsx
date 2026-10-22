@@ -2,7 +2,7 @@ import { screen } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { expect, test } from "vitest";
 import { dignitiesOf } from "../../src/utils/natalSummary";
-import { API_URL } from "../mocks";
+import { API_URL, natalChart, transitChart } from "../mocks";
 import { drawer, findWidget, renderChartPage } from "./charts";
 import { capture } from "./requests";
 
@@ -185,4 +185,45 @@ test("a quarter opens its own description, which asks the server about that quar
   expect(request!.body).toMatchObject({
     context: { type: "distribution", kind: "QUADRANT", value: "COLLECTIVE", count: 5, total: 10 },
   });
+});
+
+test("a chart's shapes come from the server and show in the aspect patterns widget", async () => {
+  const withPatterns = http.post(`${API_URL}/charts/natal`, () =>
+    HttpResponse.json({
+      ...natalChart,
+      patterns: [{ type: "GRAND_TRINE", planets: ["SUN", "JUPITER", "MOON"], focus: null, sign: null }],
+    }),
+  );
+  await renderChartPage("charts", { handlers: [withPatterns] });
+
+  const patterns = await findWidget("Aspect patterns");
+
+  expect(patterns.getByRole("heading", { name: "Grand trine" })).toBeInTheDocument();
+  expect(patterns.getByRole("button", { name: "Jupiter" })).toBeInTheDocument();
+});
+
+test("a chart with no shapes says so in the aspect patterns widget", async () => {
+  await renderChartPage("charts");
+
+  const patterns = await findWidget("Aspect patterns");
+
+  expect(patterns.getByText("No aspect patterns on this chart.")).toBeInTheDocument();
+});
+
+test("a two-chart view shows each side's shapes under that side", async () => {
+  const sides = http.post(`${API_URL}/charts/transit`, () =>
+    HttpResponse.json({
+      ...transitChart,
+      main: { ...transitChart.main, patterns: [{ type: "T_SQUARE", planets: ["MARS", "SATURN", "MOON"], focus: "MOON", sign: null }] },
+    }),
+  );
+  await renderChartPage("transits", { handlers: [sides] });
+
+  const patterns = await findWidget("Aspect patterns");
+
+  expect(patterns.getByRole("heading", { name: "T-square" })).toBeInTheDocument();
+  expect(
+    patterns.getByText((_, element) => element?.tagName === "P" && element.textContent === "Points to Moon"),
+  ).toBeInTheDocument();
+  expect(patterns.getAllByText("No aspect patterns on this side.")).toHaveLength(1);
 });

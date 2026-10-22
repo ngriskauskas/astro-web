@@ -7,6 +7,7 @@ import { type PlanetAngle } from "../components/wheel/layers/Planets";
 import { type CuspAngle, type KeyAngleAngle } from "../components/wheel/layers/Houses";
 import { type SignAngle } from "../components/wheel/layers/Signs";
 import type { Aspect } from "../types/aspect";
+import type { AspectPattern } from "../types/aspectPattern";
 import type { Planet } from "../types/planet";
 import {
   getLocalISODate,
@@ -31,6 +32,8 @@ export interface SingleWheelContextType {
   keyAngles: KeyAngleAngle[];
   aspects: Aspect[];
   chartAspects: Aspect[];
+  // The shapes the chart's planets make together: grand trines, T-squares, yods and stelliums.
+  patterns: AspectPattern[];
   status: WheelStatus;
   type: "natal" | "time" | "moment";
   // True for a natal chart whose birth time is unknown. Its houses and angles are not
@@ -62,6 +65,7 @@ export const SingleWheelProvider = ({
   const [keyAngles, setKeyAngles] = useState<KeyAngleAngle[]>([]);
   const [aspects, setAspects] = useState<Aspect[]>([]);
   const [chartAspects, setChartAspects] = useState<Aspect[]>([]);
+  const [patterns, setPatterns] = useState<AspectPattern[]>([]);
 
   const [settings, setSettings] = useState<ZodiacWheelOptions>({
     profileId: mainProfile?.id,
@@ -218,6 +222,7 @@ export const SingleWheelProvider = ({
     setKeyAngles(calcKeyAngles(chart));
     setChartAspects(chart.aspects);
     setAspects(chart.aspects);
+    setPatterns(chart.patterns);
   }, [chart]);
 
   return (
@@ -231,6 +236,7 @@ export const SingleWheelProvider = ({
         keyAngles: timeUnknown ? [] : keyAngles,
         aspects,
         chartAspects,
+        patterns,
         status,
         type,
         timeUnknown,

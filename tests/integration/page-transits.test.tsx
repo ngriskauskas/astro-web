@@ -13,6 +13,7 @@ const REGIONS = [
   "Weekly Timings",
   "Aspect Matrix",
   "Placements",
+  "Aspect patterns",
 ];
 
 const lastBody = (sent: { body: unknown }[]) => sent[sent.length - 1].body;
