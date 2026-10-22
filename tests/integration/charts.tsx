@@ -1,8 +1,9 @@
-import { screen, within } from "@testing-library/react";
+import { act, screen, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import type { RequestHandler } from "msw";
 import type { ReactElement } from "react";
 import { Route, Routes } from "react-router-dom";
+import { vi } from "vitest";
 import { Navbar } from "../../src/components/Navbar";
 import { ProtectedCharts } from "../../src/components/ProtectedCharts";
 import { ProtectedRoute } from "../../src/components/ProtectedRoute";
@@ -14,6 +15,7 @@ import { Synastry } from "../../src/pages/Synastry";
 import { Transits } from "../../src/pages/Transits";
 import type { ScenarioName } from "../mocks";
 import { renderWithApp } from "./render";
+import { FIXED_NOW } from "./setup";
 
 export type ChartPage = "charts" | "moment" | "daily" | "transits" | "synastry";
 
@@ -93,3 +95,16 @@ export const drawer = {
   back: (user: UserEvent) => user.click(drawer.get().getByRole("button", { name: "Back" })),
   close: (user: UserEvent) => user.click(drawer.get().getByRole("button", { name: "Close" })),
 };
+
+// Lets a test run the one-minute refresh (the Daily chart, the planetary hours clock) by
+// hand. Call it before rendering.
+export const fakeTheMinuteTimer = (now: Date = FIXED_NOW) => {
+  vi.useRealTimers();
+  vi.useFakeTimers({ toFake: ["Date", "setInterval", "clearInterval"] });
+  vi.setSystemTime(now);
+};
+
+export const aMinutePasses = () =>
+  act(async () => {
+    vi.advanceTimersByTime(60 * 1000);
+  });

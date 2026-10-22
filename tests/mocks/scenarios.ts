@@ -11,6 +11,7 @@ import {
   googleSignInScript,
   moonTimingsFor,
   natalChartFor,
+  planetaryHoursFor,
   postBirthProfile,
   putBirthProfile,
   putMe,
@@ -45,6 +46,7 @@ const common = (): RequestHandler[] => [
   ...dailyTimingsFor(),
   ...weeklyTimingsFor(),
   moonTimingsFor(),
+  planetaryHoursFor(),
   descriptions(),
 ];
 

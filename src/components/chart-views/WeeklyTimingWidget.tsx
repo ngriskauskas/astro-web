@@ -25,7 +25,7 @@ export const WeeklyTimingWidget = () => {
             aria-pressed={view === "grouped"}
             onClick={() => setView("grouped")}
             className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
-              view === "grouped" ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-100"
+              view === "grouped" ? "bg-indigo-600 text-white" : "text-gray-600 hover:bg-gray-100"
             }`}
           >
             By day
@@ -35,7 +35,7 @@ export const WeeklyTimingWidget = () => {
             aria-pressed={view === "timeline"}
             onClick={() => setView("timeline")}
             className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
-              view === "timeline" ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-100"
+              view === "timeline" ? "bg-indigo-600 text-white" : "text-gray-600 hover:bg-gray-100"
             }`}
           >
             Timeline

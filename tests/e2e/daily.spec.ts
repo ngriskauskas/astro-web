@@ -16,6 +16,7 @@ test("today's sky and timings are read widget by widget", async ({ page }) => {
   await expect(page).toHaveURL(/\/daily/);
   for (const name of [
     "Zodiac Wheel",
+    "Planetary Hour",
     "Ascendant Today",
     "Moon Timings",
     "Weekly Timings",
@@ -36,10 +37,23 @@ test("today's sky and timings are read widget by widget", async ({ page }) => {
   await drawer(page).close.click();
   await expect(drawer(page).panel).toBeHidden();
 
-  // The Ascendant timeline opens scrolled to the current time.
+  // The planetary hour: at 07:00, before sunrise, it is still Saturn's night hour.
+  const hourRuler = widget(page, "Planetary Hour").getByRole("group", {
+    name: "Hour ruler: Saturn",
+  });
+  await expect(hourRuler).toBeVisible();
+  await expect(hourRuler).toContainText("Hour 24 · Night");
+
+  // The Ascendant timeline opens scrolled to the current time, with the same planetary
+  // hour beside the sign.
   const ascendant = widget(page, "Ascendant Today");
   await ascendant.scrollIntoViewIfNeeded();
   await expect(ascendant.getByText("NOW")).toBeInViewport();
+  await expect(
+    ascendant
+      .getByRole("list", { name: "Planetary hours" })
+      .getByRole("listitem", { name: "Saturn hour, 24 of 24, night, 6:01 AM to 7:12 AM" }),
+  ).toBeInViewport();
   await opensAndCloses(
     page,
     ascendant.getByRole("button", { name: "Sun conjuncts ASC at 7:15 AM" }),

@@ -31,7 +31,7 @@ export const PlanetPanel = ({
     <div className="flex flex-col h-full">
       <div
         className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-gray-200"
-        style={{ backgroundColor: planetInfo.color }}
+        style={{ background: `linear-gradient(135deg, ${planetInfo.color}, ${planetInfo.color}66)` }}
       >
         <BackButton />
         <span className="text-2xl">{planetInfo.glyph}</span>
@@ -40,7 +40,7 @@ export const PlanetPanel = ({
       </div>
       <div className="p-3 flex-1 overflow-y-auto overscroll-contain">
         <Section title="Overview">
-          <div className="p-2 bg-white border rounded shadow-sm text-sm mb-3">
+          <div className="mb-3 rounded-xl bg-gray-50 p-3 text-sm leading-relaxed text-gray-800">
             {planetInfo.info.description}
           </div>
           <div className="mt-3 space-y-2">

@@ -5,6 +5,7 @@ import { Houses } from "./layers/Houses";
 import { Planets } from "./layers/Planets";
 import { Aspects } from "./layers/Aspects";
 import { useWheel } from "../../hooks/useWheel";
+import { BirthTimeNotice } from "../utils/BirthTimeNotice";
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { type PlanetName } from "../../types/planet";
 import { LoadError } from "../utils/LoadError";
@@ -13,7 +14,7 @@ export const ZodiacWheel = () => {
   const [hoveredPlanet, setHoveredPlanet] = useState<PlanetName | null>(null);
   const [hoverAspectedPlanets, setHoverAspectedPlanets] = useState<PlanetName[]>([]);
 
-  const { aspects, planetAngles, cuspAngles, keyAngles, status } =
+  const { aspects, planetAngles, cuspAngles, keyAngles, status, timeUnknown } =
     useWheel() as SingleWheelContextType;
 
   const size = 700;
@@ -21,6 +22,7 @@ export const ZodiacWheel = () => {
 
   return (
     <div>
+      {timeUnknown && <BirthTimeNotice />}
       {status === "error" ? (
         <LoadError message="Could not load the chart." />
       ) : planetAngles.length > 0 ? (

@@ -1,11 +1,10 @@
 import { useDesc } from "../../contexts/DescContext";
 import { PlanetsData, type PlanetName } from "../../types/planet";
 import { AspectData, type AspectDisplay } from "../../types/aspect";
+import { AngleData } from "../../types/cusp";
 import { aspectName } from "../../utils/aspectName";
 import { SignCircle } from "./SignChip";
-
-const CHIP =
-  "flex max-w-full flex-wrap items-center gap-1 px-1 py-0.5 bg-white border rounded shadow-sm font-medium";
+import { CHIP_BASE, CHIP_INTERACTIVE, chipTint } from "./chipStyles";
 
 // `interactive={false}` draws the chip without making it a button, for use inside
 // something that is already one.
@@ -21,66 +20,34 @@ export const AspectChip = ({
   interactive?: boolean;
 }) => {
   const { open } = useDesc();
-  const { color, glyph: aspectGylph } = AspectData[aspect.type];
+  const info = AspectData[aspect.type];
 
-  const style = {
-    backgroundColor: `${color}11`,
-    borderColor: `${color}55`,
-  };
   const content = (
     <>
       {showSign && <SignCircle sign={aspect.point1.value.sign} />}
-
-      {aspect.point1.type === "Planet" ? (
-        <span className="flex flex-row items-center gap-1 text-xs">
-          <span className="text-base">
-            {PlanetsData[aspect.point1.value.name as PlanetName].glyph}
-          </span>
-          {showPlanetName && (
-            <span className="text-xs">
-              {PlanetsData[aspect.point1.value.name as PlanetName].displayName}
-            </span>
-          )}
-        </span>
-      ) : (
-        <span className="inline-block font-mono tracking-tight">
-          <span className="text-base capitalize">{aspect.point1.value.name.charAt(0)}</span>
-          {showPlanetName && (
-            <span className="relative -top-1 text-xs">{aspect.point1.value.name.slice(1)}</span>
-          )}
-        </span>
-      )}
-
-      <span className="text-base">{aspectGylph}</span>
-
-      {aspect.point2.type === "Planet" ? (
-        <span className="flex flex-row items-center gap-1 text-xs">
-          <span className="text-base">
-            {PlanetsData[aspect.point2.value.name as PlanetName].glyph}
-          </span>
-          {showPlanetName && (
-            <span>{PlanetsData[aspect.point2.value.name as PlanetName].displayName}</span>
-          )}
-        </span>
-      ) : (
-        <span className="inline-block font-mono font-semibold tracking-tight">
-          <span className="text-base capitalize">{aspect.point2.value.name.charAt(0)}</span>
-          {showPlanetName && (
-            <span className="relative -top-1 text-xs">{aspect.point2.value.name.slice(1)}</span>
-          )}
-        </span>
-      )}
-
+      <Point point={aspect.point1} showName={showPlanetName} />
+      <span
+        aria-hidden="true"
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs leading-none"
+        style={{ backgroundColor: `${info.color}33`, color: info.color }}
+      >
+        {info.glyph}
+      </span>
+      <Point point={aspect.point2} showName={showPlanetName} />
       {showSign && <SignCircle sign={aspect.point2.value.sign} />}
       {aspect.orb && (
-        <span className="text-gray-500 text-[10px] ml-1">{aspect.orb.toFixed(2)}°</span>
+        <span className="ml-0.5 text-[10px] font-normal tabular-nums text-gray-600">
+          {aspect.orb.toFixed(2)}°
+        </span>
       )}
     </>
   );
 
+  const style = chipTint(info.color);
+
   if (!interactive) {
     return (
-      <span className={CHIP} style={style}>
+      <span className={CHIP_BASE} style={style}>
         {content}
       </span>
     );
@@ -89,11 +56,41 @@ export const AspectChip = ({
     <button
       type="button"
       aria-label={aspectName(aspect)}
-      className={`${CHIP} cursor-pointer hover:shadow-md`}
+      className={`${CHIP_BASE} ${CHIP_INTERACTIVE}`}
       onClick={() => open({ type: "aspect", value: aspect })}
       style={style}
     >
       {content}
     </button>
+  );
+};
+
+// One end of the aspect: a planet's glyph, or an angle's letters. Angles keep their
+// letters in the chip and name themselves for screen readers through the chip label.
+const Point = ({
+  point,
+  showName,
+}: {
+  point: AspectDisplay["point1"];
+  showName: boolean;
+}) => {
+  if (point.type === "Planet") {
+    const planet = PlanetsData[point.value.name as PlanetName];
+    return (
+      <span className="inline-flex items-center gap-1">
+        <span className="text-sm leading-none" aria-hidden="true">
+          {planet.glyph}
+        </span>
+        {showName && <span>{planet.displayName}</span>}
+      </span>
+    );
+  }
+
+  const angle = AngleData[point.value.name];
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className="font-mono font-semibold tracking-tight">{point.value.name}</span>
+      {showName && <span className="text-gray-600">{angle.name}</span>}
+    </span>
   );
 };

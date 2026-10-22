@@ -43,7 +43,8 @@ export const NewAccountModal = () => {
         name: "My Profile",
         isMain: true,
         birthDate,
-        birthTime,
+        // Sent as null, not "", when the time is unknown: an empty string is not a time.
+        birthTime: unknownTime ? null : birthTime,
         birthTimeUnknown: unknownTime,
         location: birthPlace.address,
         latitude: birthPlace.latitude,

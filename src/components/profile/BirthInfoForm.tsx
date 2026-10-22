@@ -57,7 +57,7 @@ export const BirthInfoForm = ({
       latitude,
       longitude: longitude,
       birthTimeUnknown: unknownTime,
-      birthTime: birthTime,
+      birthTime: unknownTime ? null : birthTime,
       birthDate: birthDate,
       location: location,
       isMain: isMain,
@@ -202,7 +202,7 @@ export const BirthInfoForm = ({
             <button
               type="button"
               onClick={() => setConfirmingDelete(false)}
-              className="px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 cursor-pointer"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
             >
               Cancel
             </button>
@@ -221,7 +221,7 @@ export const BirthInfoForm = ({
             <button
               type="button"
               onClick={onCancel}
-              className="px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 cursor-pointer"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
             >
               Cancel
             </button>

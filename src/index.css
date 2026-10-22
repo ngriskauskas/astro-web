@@ -1,5 +1,70 @@
 @import "tailwindcss";
 
+/* Themes. Pages use Tailwind's white and gray utilities, so a theme only re-points those
+   colour tokens (and, for the dark themes, the indigo accent). Paper is the default. These
+   rules are unlayered, so they win over Tailwind's theme layer. */
+:root {
+  color-scheme: light;
+  --color-white: #fffdf9;
+  --color-gray-50: #f6f3ec;
+  --color-gray-100: #efeae0;
+  --color-gray-200: #e2dccf;
+  --color-gray-300: #cfc8b8;
+  --color-gray-400: #a39c8c;
+  --color-gray-500: #77715f;
+  --color-gray-600: #5f5a4d;
+  --color-gray-700: #4a463c;
+  --color-gray-800: #35322b;
+  --color-gray-900: #1f1d19;
+}
+
+html[data-theme="midnight"] {
+  color-scheme: dark;
+  --color-white: #161e33;
+  --color-gray-50: #0d1426;
+  --color-gray-100: #131c31;
+  --color-gray-200: #27324d;
+  --color-gray-300: #34405f;
+  --color-gray-400: #56628a;
+  --color-gray-500: #8a95b5;
+  --color-gray-600: #a9b2cc;
+  --color-gray-700: #c3cadd;
+  --color-gray-800: #dde2ee;
+  --color-gray-900: #f2f4fa;
+  --color-indigo-500: #d97706;
+  --color-indigo-600: #b45309;
+  --color-indigo-700: #92400e;
+}
+
+html[data-theme="dusk"] {
+  color-scheme: dark;
+  --color-white: #22192f;
+  --color-gray-50: #130e1d;
+  --color-gray-100: #1c1528;
+  --color-gray-200: #33264a;
+  --color-gray-300: #41325c;
+  --color-gray-400: #6c5a8c;
+  --color-gray-500: #9a8ab3;
+  --color-gray-600: #b6a6cc;
+  --color-gray-700: #cdbfe0;
+  --color-gray-800: #e3d9ef;
+  --color-gray-900: #f6f2fb;
+  --color-indigo-500: #e11d48;
+  --color-indigo-600: #be123c;
+  --color-indigo-700: #9f1239;
+}
+
+/* Checkboxes are a larger touch target than the browser default (13px). */
+input[type="checkbox"] {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+body {
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-900);
+}
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
   /* Chrome, Safari, Edge */
@@ -22,8 +87,8 @@
    while there is more to see in that direction. */
 .scroll-hint-x {
   background:
-    linear-gradient(to right, white 30%, transparent) left center,
-    linear-gradient(to left, white 30%, transparent) right center,
+    linear-gradient(to right, var(--color-white) 30%, transparent) left center,
+    linear-gradient(to left, var(--color-white) 30%, transparent) right center,
     radial-gradient(farthest-side at 0 50%, rgb(0 0 0 / 0.25), transparent) left center,
     radial-gradient(farthest-side at 100% 50%, rgb(0 0 0 / 0.25), transparent) right center;
   background-repeat: no-repeat;
@@ -33,4 +98,58 @@
     0.75rem 100%,
     0.75rem 100%;
   background-attachment: local, local, scroll, scroll;
+}
+
+/* Motion. Short and small: content eases in when it appears, and the description panel
+   slides in (a sheet from the bottom on a phone, a drawer from the right on wider screens). */
+@keyframes motion-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes motion-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes motion-drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.motion-fade-up {
+  animation: motion-fade-up 260ms ease-out both;
+}
+
+.motion-panel {
+  animation: motion-sheet-up 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@media (width >= 48rem) {
+  .motion-panel {
+    animation: motion-drawer-in 220ms ease-out both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-fade-up,
+  .motion-panel {
+    animation: none;
+  }
 }

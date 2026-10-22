@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useWheel } from "../../hooks/useWheel";
+import { CHIP_BASE, CHIP_INTERACTIVE, CHIP_NEUTRAL } from "./chipStyles";
 
 export const DateChip = ({
   date,
@@ -27,11 +28,11 @@ export const DateChip = ({
       to={toLink}
       className={
         style
-          ? "inline-flex items-center gap-1 px-2 py-1 bg-white border rounded shadow-sm text-xs font-medium hover:shadow-md hover:bg-gray-50"
+          ? `${CHIP_BASE} ${CHIP_NEUTRAL} ${CHIP_INTERACTIVE}`
           : ""
       }
     >
-      <span className={style ? "font-medium text-gray-600" : ""}>{displayDate}</span>
+      <span className={style ? "font-medium text-gray-700" : ""}>{displayDate}</span>
     </Link>
   );
 };
@@ -65,9 +66,9 @@ export const DateTimeChip = ({
   return (
     <Link
       to={toLink}
-      className="inline-flex items-center gap-1 px-2 py-1 bg-white border rounded shadow-sm text-xs font-medium hover:shadow-md hover:bg-gray-50"
+      className={`${CHIP_BASE} ${CHIP_NEUTRAL} ${CHIP_INTERACTIVE}`}
     >
-      <span className="font-medium text-gray-600">{displayDateTime}</span>
+      <span className="font-medium text-gray-700">{displayDateTime}</span>
     </Link>
   );
 };
@@ -104,11 +105,11 @@ export const TimeChip = ({
       to={toLink}
       className={
         style
-          ? "inline-flex items-center gap-1 px-2 py-1 bg-white border rounded shadow-sm text-xs font-medium hover:shadow-md hover:bg-gray-50"
+          ? `${CHIP_BASE} ${CHIP_NEUTRAL} ${CHIP_INTERACTIVE}`
           : ""
       }
     >
-      <span className={style ? "font-medium text-gray-600" : ""}>{displayTime}</span>
+      <span className={style ? "font-medium text-gray-700" : ""}>{displayTime}</span>
     </Link>
   );
 };

@@ -5,10 +5,11 @@ import type { AstrologySettings } from "../../src/types/astrologySettings";
 import type { User } from "../../src/contexts/AuthContext";
 import type { MultiChart, SingleChart } from "../../src/types/chart";
 import type { MoonTimingsType } from "../../src/types/moon";
+import type { PlanetaryHoursType } from "../../src/types/planetaryHours";
 import type { CurrentTimingsType, DailyTimingsType } from "../../src/types/timings";
 import { momentChart, natalChart, otherNatalChart, synastryChart, transitChart } from "./charts";
 import { defaultSettings, places, settings, user } from "./data";
-import { dailyTimings, moonTimings, weeklyTimings } from "./timings";
+import { dailyTimings, moonTimings, planetaryHours, weeklyTimings } from "./timings";
 
 export const PLACE_SEARCH_URL = "https://nominatim.openstreetmap.org/search";
 
@@ -90,6 +91,22 @@ export const weeklyTimingsFor = (data: CurrentTimingsType = weeklyTimings) => [
 
 export const moonTimingsFor = (data: MoonTimingsType = moonTimings) =>
   http.post(`${API_URL}/timing/current-moon`, () => HttpResponse.json(data));
+
+export const planetaryHoursFor = (data: PlanetaryHoursType = planetaryHours) =>
+  http.post(`${API_URL}/timing/planetary-hours`, () => HttpResponse.json(data));
+
+// What the backend answers where the sun does not rise or set that day.
+export const planetaryHoursUnavailable = () =>
+  http.post(`${API_URL}/timing/planetary-hours`, () =>
+    HttpResponse.json(
+      {
+        error: "PlanetaryHoursUnavailable",
+        message: "No sunrise or sunset at this location on this date",
+        status: 422,
+      },
+      { status: 422 },
+    ),
+  );
 
 interface PlacementSubject {
   chart: string;

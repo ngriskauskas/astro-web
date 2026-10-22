@@ -29,7 +29,7 @@ npx playwright install chromium   # one-time browser download
 | `npx playwright show-report`            | Open the last browser report (screenshot and trace for each failure)                        |
 | `npm run review:layout`                 | Capture screenshots for the layout review (see [Layout review](#layout-review)); not a test |
 
-Measured on 2026-10-03: `npm test` about 8 seconds (195 tests), `npm run test:e2e` about
+Measured on 2026-10-03: `npm test` about 8 seconds (225 tests), `npm run test:e2e` about
 8 seconds (7 journeys at 2 sizes).
 
 The browser tests start their own dev server on port 5174 with a fake API URL, so it does
@@ -40,7 +40,9 @@ not matter whether your normal dev server is running.
 - `mocks/data.ts`: fixture objects, typed against the app's own types. Fixed values only.
 - `mocks/charts.ts`: chart fixtures, built from zodiac longitudes so each chart's positions,
   signs and houses agree. Aspects are listed by hand, as the backend would return them.
-- `mocks/timings.ts`: daily, weekly and moon timings for the frozen day and week.
+- `mocks/timings.ts`: daily, weekly and moon timings for the frozen day and week, and the
+  day's planetary hours (sunrise 07:12, sunset 17:00, so the frozen 07:00 is still the last
+  night hour of the day before).
 - `mocks/handlers.ts`: one MSW handler per endpoint.
 - `mocks/scenarios.ts`: named backend situations built from handlers.
 
@@ -59,6 +61,9 @@ To mock a new endpoint: add fixture data to `data.ts`, a handler to `handlers.ts
 include it in `common()` (or in one scenario) in `scenarios.ts`.
 
 To add a scenario: add its name to `ScenarioName` and an entry to `scenarios`.
+
+Planetary hours have a second handler, `planetaryHoursUnavailable()`, for a place where the
+sun does not rise or set that day: pass it in `handlers` (or to `network.use`).
 
 ### "Requests with no mock"
 
@@ -145,8 +150,10 @@ Each shared widget is tested once, on one page: one-chart widgets on Charts, two
 widgets on Synastry, timing widgets on Daily. The `page-*.test.tsx` files cover only what
 is particular to a page. Keep it that way when adding tests.
 
-The one-minute refresh on Daily needs a fake interval; see `fakeTheMinuteTimer()` in
-`integration/page-daily.test.tsx`. Everything else keeps real timers.
+The one-minute refresh on Daily and the planetary hours clock need a fake interval: call
+`fakeTheMinuteTimer()` from `integration/charts.tsx` before rendering (it takes the time to
+start at), then `await aMinutePasses()`. Everything else keeps real timers. To render at
+another moment without running the interval, call `vi.setSystemTime(...)` before rendering.
 
 ## Add a browser test
 

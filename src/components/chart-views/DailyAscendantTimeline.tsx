@@ -3,15 +3,22 @@ import { useDailyTimings } from "../../hooks/timings/useDailyTimings";
 import { isMulti, useWheel } from "../../hooks/useWheel";
 import type { MultiWheelContextType } from "../../contexts/MultiWheelContext";
 import { useDesc } from "../../contexts/DescContext";
+import { usePlanetaryHours } from "../../hooks/usePlanetaryHours";
 import type { SingleWheelContextType } from "../../contexts/SingleWheelContext";
 import { ZodiacData, ZodiacSigns, type ZodiacSign } from "../../types/zodiac";
 import type { AngleTiming, AspectTiming } from "../../types/timings";
 import { PlanetsData } from "../../types/planet";
-import { formatDegMin } from "../../utils/funcs";
+import { formatDegMin, formatTime } from "../../utils/funcs";
+import { planetaryHourBlocks } from "../../utils/planetaryHours";
 import { Spinner } from "../utils/Spinner";
 import { LoadError } from "../utils/LoadError";
 
 const TRACK_HEIGHT = 2160;
+
+// Time labels, signs, (planetary hours,) conjunction markers.
+const COLUMNS = "grid-cols-[3rem_4.5rem_minmax(0,1fr)] sm:grid-cols-[3.5rem_6.5rem_minmax(0,1fr)]";
+const COLUMNS_WITH_HOURS =
+  "grid-cols-[3rem_4.5rem_2.25rem_minmax(0,1fr)] sm:grid-cols-[3.5rem_6.5rem_3rem_minmax(0,1fr)]";
 
 interface SignSegment {
   sign: ZodiacSign;
@@ -32,7 +39,8 @@ export const DailyAscendantTimeline = () => {
   const { timings, loading, error } = useDailyTimings();
   const { open } = useDesc();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const now = new Date();
+  const planetaryHours = usePlanetaryHours();
+  const { now } = planetaryHours;
   const dayStart = new Date(now);
   dayStart.setHours(0, 0, 0, 0);
   const dayEnd = new Date(dayStart);
@@ -53,6 +61,11 @@ export const DailyAscendantTimeline = () => {
     ? buildSignSegments(ascendantTransitions, ascendant.sign, dayStart.getTime(), dayEnd.getTime())
     : [];
   const conjunctions = getConjunctionEvents(timings.aspects, dayStart.getTime(), dayEnd.getTime());
+  // Planetary hours are an addition: without them the timeline is shown as it always was.
+  const hourBlocks =
+    planetaryHours.status === "ready" && planetaryHours.data
+      ? planetaryHourBlocks(planetaryHours.data, dayStart.getTime(), dayEnd.getTime())
+      : undefined;
 
   // Bring the current time into view once, when the timeline first appears. Doing it
   // again as the time moves on would undo the user's own scrolling.
@@ -95,12 +108,9 @@ export const DailyAscendantTimeline = () => {
         <span className="text-gray-500">{formatDegMin(ascendant.position.degMin)}</span>
       </div>
 
-      <div
-        ref={scrollRef}
-        className="max-h-[460px] overflow-y-auto border-y border-gray-200"
-      >
+      <div ref={scrollRef} className="max-h-[460px] overflow-y-auto border-y border-gray-200">
         <div
-          className="relative grid grid-cols-[3rem_4.5rem_minmax(0,1fr)] sm:grid-cols-[3.5rem_6.5rem_minmax(0,1fr)]"
+          className={`relative grid ${hourBlocks ? COLUMNS_WITH_HOURS : COLUMNS}`}
           style={{ height: TRACK_HEIGHT }}
         >
           <div className="relative text-[10px] text-gray-500">
@@ -151,6 +161,60 @@ export const DailyAscendantTimeline = () => {
               );
             })}
           </div>
+
+          {hourBlocks && (
+            <div
+              role="list"
+              aria-label="Planetary hours"
+              className="relative border-r border-gray-200"
+            >
+              {hourBlocks.map(({ hour, start, end, top, bottom }) => {
+                const planet = PlanetsData[hour.ruler];
+                const isDay = hour.period === "DAY";
+                const name = `${planet.displayName} hour, ${hour.hour} of 24, ${isDay ? "day" : "night"}, ${formatTime(start)} to ${formatTime(end)}`;
+                const isCurrent = top <= now.getTime() && now.getTime() < bottom;
+                return (
+                  <div
+                    key={hour.dateTime}
+                    role="listitem"
+                    aria-label={name}
+                    aria-current={isCurrent ? "time" : undefined}
+                    title={name}
+                    className={`absolute inset-x-0 flex flex-col items-center overflow-hidden border-t border-gray-400 ${
+                      isDay ? "bg-amber-50" : "bg-slate-200/70"
+                    }`}
+                    style={{
+                      top: `${((top - dayStart.getTime()) / dayDuration) * 100}%`,
+                      height: `${((bottom - top) / dayDuration) * 100}%`,
+                    }}
+                  >
+                    {/* The line at the top of a block is where its hour starts. An hour that
+                        began before midnight has no line of its own on this day. */}
+                    {top === start && (
+                      <time
+                        dateTime={hour.dateTime}
+                        className="mt-0.5 whitespace-nowrap text-[7px] leading-none tabular-nums text-gray-600 sm:text-[8px]"
+                      >
+                        {formatTime(start)}
+                      </time>
+                    )}
+                    {/* Hours 1 and 13 begin at sunrise and sunset. */}
+                    {(hour.hour === 1 || hour.hour === 13) && (
+                      <span className="mt-0.5 text-[7px] font-semibold uppercase leading-none text-gray-600 sm:text-[8px]">
+                        {isDay ? "Sunrise" : "Sunset"}
+                      </span>
+                    )}
+                    <span
+                      className="flex min-h-0 flex-1 items-center text-base font-semibold leading-none text-gray-900"
+                      aria-hidden="true"
+                    >
+                      {planet.glyph}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           <div className="relative min-w-0">
             <div className="absolute inset-y-0 left-3 border-l border-dashed border-gray-300" />
@@ -251,6 +315,3 @@ const previousSign = (sign: ZodiacSign): ZodiacSign => {
   const index = ZodiacSigns.indexOf(sign);
   return ZodiacSigns[(index + ZodiacSigns.length - 1) % ZodiacSigns.length] as ZodiacSign;
 };
-
-const formatTime = (time: number) =>
-  new Date(time).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
